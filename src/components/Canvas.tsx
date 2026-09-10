@@ -200,6 +200,12 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   }, [page, totalRows, setPageBottom]);
 
   const pageBlocks = blocksFor(page).filter((b) => !isHidden(b.id));
+  const shapes = pageBlocks.filter((b) => b.kind === "shape");
+  const contentBlocks = pageBlocks.filter((b) => b.kind !== "shape");
+  const shapeBottom = shapes.reduce((max, b) => {
+    const p = placementFor(b.id);
+    return Math.max(max, p.y + p.h);
+  }, 0);
 
   async function onDrop(e: React.DragEvent) {
     if (!editing) return;
@@ -250,12 +256,14 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
         style={
           stacked
             ? undefined
-            : { minHeight: `${Math.max(totalRows, 8) * ROW_UNIT}px` }
+            : { minHeight: `${Math.max(totalRows, shapeBottom, 8) * ROW_UNIT}px` }
         }
       >
         {editing && !stacked && <CanvasGuides />}
+        {!stacked &&
+          shapes.map((block) => <ShapeBlock key={block.id} block={block} />)}
         {children}
-        {pageBlocks.map((block) => (
+        {contentBlocks.map((block) => (
           <PlacedBlock key={block.id} block={block} />
         ))}
       </div>
