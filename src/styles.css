@@ -379,3 +379,10 @@
 .canvas-block[data-styled-color] *:not([data-editor-ui]):not([data-editor-ui] *) {
   color: inherit;
 }
+
+/* One piece of type picked out for its own settings. */
+.canvas-block.is-editing [data-type-selected] {
+  outline: 1px solid color-mix(in oklab, var(--color-foreground) 45%, transparent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}

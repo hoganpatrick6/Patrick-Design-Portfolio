@@ -54,6 +54,55 @@ function overlapsX(a: Placement, b: Placement) {
   return a.x < b.x + b.w && b.x < a.x + a.w;
 }
 
+/* ------------------------------------------------------------------ */
+/* Picking out one piece of type inside a block                        */
+/* ------------------------------------------------------------------ */
+
+/** True for a settings key that points at one line of type, not a whole block. */
+export function isTextTargetId(id: string) {
+  return id.includes("#");
+}
+
+/** The block a piece of type belongs to. */
+export function blockIdOf(id: string) {
+  return id.split("#")[0] as string;
+}
+
+function pathTo(root: HTMLElement, el: HTMLElement): string | null {
+  const parts: number[] = [];
+  let node: HTMLElement | null = el;
+  while (node && node !== root) {
+    const parent: HTMLElement | null = node.parentElement;
+    if (!parent) return null;
+    parts.unshift(Array.prototype.indexOf.call(parent.children, node));
+    node = parent;
+  }
+  return node === root ? parts.join(".") : null;
+}
+
+function elementAt(root: HTMLElement, path: string): HTMLElement | null {
+  let node: HTMLElement | null = root;
+  for (const part of path.split(".")) {
+    if (!node) return null;
+    node = (node.children[Number(part)] as HTMLElement | undefined) ?? null;
+  }
+  return node;
+}
+
+/** The nearest thing around a click that actually carries words. */
+function textElementFrom(root: HTMLElement, start: HTMLElement): HTMLElement | null {
+  let node: HTMLElement | null = start;
+  while (node && node !== root) {
+    if (node.hasAttribute("data-editor-ui")) return null;
+    const carriesWords = Array.from(node.childNodes).some(
+      (n) => n.nodeType === 3 && (n.textContent ?? "").trim().length > 0,
+    );
+    if (carriesWords) return node;
+    node = node.parentElement;
+  }
+  return null;
+}
+
 /**
  * The page canvas: 12 columns across, a fine baseline row down. Blocks keep
  * the spot they were given and are nudged down only far enough to stay clear
@@ -265,12 +314,15 @@ export function CanvasBlock({
     selectedId,
     setSelectedId,
     styleFor,
+    styles,
   } = useCanvas();
   const { stacked, colWidth, resolved, register, unregister, reportHeight } =
     useCanvasLayout();
 
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
+  const touchedRef = useRef<{ el: HTMLElement; css: string }[]>([]);
+  const justDragged = useRef(false);
   const [drag, setDrag] = useState<DragMode | null>(null);
   const [offset, setOffset] = useState<{ x: number; y: number } | null>(null);
 
@@ -297,6 +349,36 @@ export function CanvasBlock({
     reportHeight(id, el.getBoundingClientRect().height);
     return () => ro.disconnect();
   }, [id, hidden, reportHeight]);
+
+  // Paint the settings of any single piece of type onto the words themselves,
+  // and outline whichever piece is currently picked.
+  useEffect(() => {
+    touchedRef.current.forEach(({ el, css }) => {
+      el.style.cssText = css;
+      el.removeAttribute("data-type-selected");
+    });
+    touchedRef.current = [];
+    const root = innerRef.current;
+    if (!root) return;
+    const touched: { el: HTMLElement; css: string }[] = [];
+    const prefix = `${id}#`;
+    Object.entries(styles).forEach(([key, value]) => {
+      if (!key.startsWith(prefix)) return;
+      const el = elementAt(root, key.slice(prefix.length));
+      if (!el) return;
+      touched.push({ el, css: el.style.cssText });
+      Object.assign(el.style, blockStyleToCss(value) as Record<string, string>);
+    });
+    if (editing && selectedId?.startsWith(prefix)) {
+      const el = elementAt(root, selectedId.slice(prefix.length));
+      if (el) {
+        el.setAttribute("data-type-selected", "");
+        if (!touched.some((t) => t.el === el)) touched.push({ el, css: el.style.cssText });
+      }
+    }
+    touchedRef.current = touched;
+  });
+
 
   const startDrag = useCallback(
     (event: React.PointerEvent, mode: DragMode) => {
@@ -356,6 +438,7 @@ export function CanvasBlock({
       function onUp() {
         setDrag(null);
         setOffset(null);
+        justDragged.current = moved;
         if (!moved) setSelectedId(id);
         window.removeEventListener("pointermove", onMove);
         window.removeEventListener("pointerup", onUp);
@@ -445,7 +528,29 @@ export function CanvasBlock({
           )}
         </>
       )}
-      <div ref={innerRef}>{children}</div>
+      <div
+        ref={innerRef}
+        onClickCapture={(e) => {
+          if (!editing) return;
+          if (justDragged.current) {
+            justDragged.current = false;
+            return;
+          }
+          const root = innerRef.current;
+          if (!root) return;
+          const target = e.target as HTMLElement;
+          if (target.closest("[data-editor-ui], input, textarea, select")) return;
+          const el = textElementFrom(root, target);
+          if (!el) return;
+          const path = pathTo(root, el);
+          if (path === null) return;
+          if (target.closest("a")) e.preventDefault();
+          e.stopPropagation();
+          setSelectedId(`${id}#${path}`);
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
