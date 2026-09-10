@@ -470,6 +470,7 @@ export function CanvasBlock({
         top: `${(spot?.top ?? placement.y) * ROW_UNIT}px`,
         minHeight: `${Math.max(placement.h, spot?.rows ?? 0) * ROW_UNIT}px`,
         transform: offset ? `translate(${offset.x}px, ${offset.y}px)` : undefined,
+        zIndex: 1,
       };
 
   return (
