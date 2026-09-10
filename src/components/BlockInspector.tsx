@@ -199,7 +199,7 @@ export function BlockInspector() {
       )}
 
       {/* Media */}
-      {!isTextPick && block && block.kind !== "text" && (
+      {!isTextPick && block && (block.kind === "image" || block.kind === "video") && (
         <div className="mb-4 space-y-2 border-t border-[var(--color-border)] pt-3">
           <input
             ref={fileRef}
@@ -255,7 +255,63 @@ export function BlockInspector() {
         </div>
       )}
 
+      {/* Colour shape */}
+      {block?.kind === "shape" && (
+        <div className="mb-4 space-y-3 border-t border-[var(--color-border)] pt-3">
+          <div className="text-[10px] uppercase tracking-wide text-[var(--color-foreground-subtle)]">
+            Colour
+          </div>
+          <div className="flex flex-wrap items-center gap-1">
+            {SHAPE_FILLS.map((c) => (
+              <button
+                key={c.label}
+                type="button"
+                title={c.label}
+                onClick={() => updateBlock(id, { fill: c.value })}
+                className={`h-6 w-6 rounded-full border ${
+                  block.fill === c.value
+                    ? "border-foreground ring-2 ring-foreground/30"
+                    : "border-[var(--color-border)]"
+                }`}
+                style={{ background: c.value }}
+              />
+            ))}
+            <input
+              type="color"
+              aria-label="Custom colour"
+              onChange={(e) => updateBlock(id, { fill: e.target.value })}
+              className="h-6 w-8 cursor-pointer rounded border border-[var(--color-border)] bg-transparent"
+            />
+          </div>
+          <Slider
+            label="Strength"
+            value={block.opacity ?? 0.06}
+            active
+            min={0.02}
+            max={1}
+            step={0.02}
+            digits={2}
+            suffix=""
+            onChange={(v) => updateBlock(id, { opacity: v })}
+            onClear={() => updateBlock(id, { opacity: 0.06 })}
+          />
+          <Slider
+            label="Corners"
+            value={block.radius ?? 0}
+            active
+            min={0}
+            max={64}
+            step={1}
+            digits={0}
+            suffix="px"
+            onChange={(v) => updateBlock(id, { radius: v })}
+            onClear={() => updateBlock(id, { radius: 0 })}
+          />
+        </div>
+      )}
+
       {/* Typography */}
+      {block?.kind !== "shape" && (
       <div className="space-y-3 border-t border-[var(--color-border)] pt-3">
         <div className="text-[10px] uppercase tracking-wide text-[var(--color-foreground-subtle)]">
           Type
@@ -448,8 +504,10 @@ export function BlockInspector() {
           </button>
         </div>
       </div>
+      )}
 
       {/* Shared styles */}
+      {block?.kind !== "shape" && (
       <div className="mt-4 space-y-2 border-t border-[var(--color-border)] pt-3">
         <div className="text-[10px] uppercase tracking-wide text-[var(--color-foreground-subtle)]">
           Shared styles
