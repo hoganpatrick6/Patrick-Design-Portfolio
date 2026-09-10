@@ -1,0 +1,389 @@
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import {
+  CANVAS_KEYS,
+  SITE_CANVAS,
+  clampPlacement,
+  defaultPlacement,
+  type BlockKind,
+  type BlockStyle,
+  type CanvasBlock,
+  type CanvasDefaults,
+  type Placement,
+  type PlacementMap,
+  type StyleMap,
+} from "../config/canvas-defaults";
+import { SITE_KEYS, siteContent, writeSiteValue } from "../lib/site-content";
+
+/** A swap applied to a picture that already exists in the page design. */
+export type MediaOverride = {
+  kind: "image" | "video";
+  src: string;
+  crop?: { zoom: number; x: number; y: number };
+};
+
+const OVERRIDES_STORAGE_KEY = "media-overrides";
+
+type CanvasContextValue = {
+  editing: boolean;
+  setEditing: (v: boolean) => void;
+  /** Which block is open in the inspector. */
+  selectedId: string | null;
+  setSelectedId: (id: string | null) => void;
+
+  placements: PlacementMap;
+  placementFor: (id: string) => Placement;
+  setPlacement: (id: string, next: Placement) => void;
+
+  blocks: CanvasBlock[];
+  blocksFor: (page: string) => CanvasBlock[];
+  blockById: (id: string) => CanvasBlock | undefined;
+  addBlock: (page: string, kind: BlockKind, at?: Partial<Placement>) => CanvasBlock;
+  updateBlock: (id: string, patch: Partial<CanvasBlock>) => void;
+  removeBlock: (id: string) => void;
+
+  styles: StyleMap;
+  styleFor: (id: string) => BlockStyle | undefined;
+  setStyle: (id: string, patch: BlockStyle) => void;
+  clearStyle: (id: string) => void;
+
+  hidden: string[];
+  isHidden: (id: string) => boolean;
+  hideBlock: (id: string) => void;
+  showBlock: (id: string) => void;
+
+  overrideFor: (id: string) => MediaOverride | undefined;
+  setOverride: (id: string, value: MediaOverride) => void;
+  clearOverride: (id: string) => void;
+
+  /** Last measured bottom row of a page, used when dropping in new blocks. */
+  bottomOf: (page: string) => number;
+  setPageBottom: (page: string, rows: number) => void;
+
+  snapshot: () => CanvasDefaults;
+  reset: () => void;
+};
+
+const CanvasContext = createContext<CanvasContextValue | null>(null);
+
+function store(key: string, value: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* ignore */
+  }
+}
+
+function read<T>(key: string): T | null {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function CanvasProvider({ children }: { children: ReactNode }) {
+  const [editing, setEditing] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [placements, setPlacements] = useState<PlacementMap>(SITE_CANVAS.placements);
+  const [blocks, setBlocks] = useState<CanvasBlock[]>(SITE_CANVAS.blocks);
+  const [styles, setStyles] = useState<StyleMap>(SITE_CANVAS.styles);
+  const [hidden, setHidden] = useState<string[]>(SITE_CANVAS.hidden);
+  const [overrides, setOverrides] = useState<Record<string, MediaOverride>>({});
+  const bottoms = useRef<Record<string, number>>({});
+
+  // Pick up this browser's copy after hydration, then anything saved site-wide.
+  useEffect(() => {
+    const p = read<PlacementMap>(CANVAS_KEYS.placements);
+    if (p) setPlacements({ ...SITE_CANVAS.placements, ...p });
+    const b = read<CanvasBlock[]>(CANVAS_KEYS.blocks);
+    if (Array.isArray(b)) setBlocks(b);
+    const s = read<StyleMap>(CANVAS_KEYS.styles);
+    if (s) setStyles(s);
+    const h = read<string[]>(CANVAS_KEYS.hidden);
+    if (Array.isArray(h)) setHidden(h);
+    const o = read<Record<string, MediaOverride>>(OVERRIDES_STORAGE_KEY);
+    if (o) setOverrides(o);
+
+    void siteContent().then((values) => {
+      const rp = values[SITE_KEYS.canvasPlacements];
+      if (rp && typeof rp === "object") {
+        setPlacements({ ...SITE_CANVAS.placements, ...(rp as PlacementMap) });
+      }
+      const rb = values[SITE_KEYS.canvasBlocks];
+      if (Array.isArray(rb)) setBlocks(rb as CanvasBlock[]);
+      const rs = values[SITE_KEYS.canvasStyles];
+      if (rs && typeof rs === "object") setStyles(rs as StyleMap);
+      const rh = values[SITE_KEYS.canvasHidden];
+      if (Array.isArray(rh)) setHidden(rh as string[]);
+      const ro = values[SITE_KEYS.mediaOverrides];
+      if (ro && typeof ro === "object") {
+        setOverrides(ro as Record<string, MediaOverride>);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!editing) setSelectedId(null);
+  }, [editing]);
+
+  const placementFor = useCallback(
+    (id: string) => placements[id] ?? defaultPlacement(id),
+    [placements],
+  );
+
+  const setPlacement = useCallback((id: string, next: Placement) => {
+    setPlacements((prev) => {
+      const merged = { ...prev, [id]: clampPlacement(next) };
+      store(CANVAS_KEYS.placements, merged);
+      writeSiteValue(SITE_KEYS.canvasPlacements, merged);
+      return merged;
+    });
+  }, []);
+
+  const blocksFor = useCallback(
+    (page: string) => blocks.filter((b) => b.page === page),
+    [blocks],
+  );
+
+  const blockById = useCallback(
+    (id: string) => blocks.find((b) => b.id === id),
+    [blocks],
+  );
+
+  const persistBlocks = useCallback((next: CanvasBlock[]) => {
+    store(CANVAS_KEYS.blocks, next);
+    writeSiteValue(SITE_KEYS.canvasBlocks, next);
+  }, []);
+
+  const addBlock = useCallback(
+    (page: string, kind: BlockKind, at?: Partial<Placement>) => {
+      const block: CanvasBlock = {
+        id: `block-${Math.random().toString(36).slice(2, 8)}`,
+        page,
+        kind,
+        src: "",
+        alt: "",
+        caption: "",
+        aspect: kind === "video" ? "16:9" : "3:2",
+        ...(kind === "text" ? { text: "New text block", role: "body" } : {}),
+      };
+      setBlocks((prev) => {
+        const next = [...prev, block];
+        persistBlocks(next);
+        return next;
+      });
+      const place: Placement = clampPlacement({
+        x: at?.x ?? 0,
+        y: at?.y ?? 0,
+        w: at?.w ?? (kind === "text" ? 6 : 6),
+        h: at?.h ?? (kind === "text" ? 6 : 12),
+      });
+      setPlacements((prev) => {
+        const merged = { ...prev, [block.id]: place };
+        store(CANVAS_KEYS.placements, merged);
+        writeSiteValue(SITE_KEYS.canvasPlacements, merged);
+        return merged;
+      });
+      setSelectedId(block.id);
+      return block;
+    },
+    [persistBlocks],
+  );
+
+  const updateBlock = useCallback(
+    (id: string, patch: Partial<CanvasBlock>) => {
+      setBlocks((prev) => {
+        const next = prev.map((b) => (b.id === id ? { ...b, ...patch } : b));
+        persistBlocks(next);
+        return next;
+      });
+    },
+    [persistBlocks],
+  );
+
+  const removeBlock = useCallback(
+    (id: string) => {
+      setBlocks((prev) => {
+        const next = prev.filter((b) => b.id !== id);
+        persistBlocks(next);
+        return next;
+      });
+      setSelectedId((current) => (current === id ? null : current));
+    },
+    [persistBlocks],
+  );
+
+  const styleFor = useCallback((id: string) => styles[id], [styles]);
+
+  const setStyle = useCallback((id: string, patch: BlockStyle) => {
+    setStyles((prev) => {
+      const merged = { ...prev, [id]: { ...prev[id], ...patch } };
+      (Object.keys(merged[id]!) as (keyof BlockStyle)[]).forEach((k) => {
+        if (merged[id]![k] === undefined) delete merged[id]![k];
+      });
+      store(CANVAS_KEYS.styles, merged);
+      writeSiteValue(SITE_KEYS.canvasStyles, merged);
+      return merged;
+    });
+  }, []);
+
+  const clearStyle = useCallback((id: string) => {
+    setStyles((prev) => {
+      const merged = { ...prev };
+      delete merged[id];
+      store(CANVAS_KEYS.styles, merged);
+      writeSiteValue(SITE_KEYS.canvasStyles, merged);
+      return merged;
+    });
+  }, []);
+
+  const isHidden = useCallback((id: string) => hidden.includes(id), [hidden]);
+
+  const hideBlock = useCallback((id: string) => {
+    setHidden((prev) => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
+      store(CANVAS_KEYS.hidden, next);
+      writeSiteValue(SITE_KEYS.canvasHidden, next);
+      return next;
+    });
+    setSelectedId((current) => (current === id ? null : current));
+  }, []);
+
+  const showBlock = useCallback((id: string) => {
+    setHidden((prev) => {
+      const next = prev.filter((h) => h !== id);
+      store(CANVAS_KEYS.hidden, next);
+      writeSiteValue(SITE_KEYS.canvasHidden, next);
+      return next;
+    });
+  }, []);
+
+  const overrideFor = useCallback((id: string) => overrides[id], [overrides]);
+
+  const setOverride = useCallback((id: string, value: MediaOverride) => {
+    setOverrides((prev) => {
+      const next = { ...prev, [id]: value };
+      store(OVERRIDES_STORAGE_KEY, next);
+      writeSiteValue(SITE_KEYS.mediaOverrides, next);
+      return next;
+    });
+  }, []);
+
+  const clearOverride = useCallback((id: string) => {
+    setOverrides((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      store(OVERRIDES_STORAGE_KEY, next);
+      writeSiteValue(SITE_KEYS.mediaOverrides, next);
+      return next;
+    });
+  }, []);
+
+  const bottomOf = useCallback((page: string) => bottoms.current[page] ?? 0, []);
+
+  const setPageBottom = useCallback((page: string, rows: number) => {
+    bottoms.current[page] = rows;
+  }, []);
+
+  const snapshot = useCallback(
+    (): CanvasDefaults => ({ placements, blocks, styles, hidden }),
+    [placements, blocks, styles, hidden],
+  );
+
+  const reset = useCallback(() => {
+    setPlacements(SITE_CANVAS.placements);
+    setBlocks(SITE_CANVAS.blocks);
+    setStyles(SITE_CANVAS.styles);
+    setHidden(SITE_CANVAS.hidden);
+    setSelectedId(null);
+    try {
+      Object.values(CANVAS_KEYS).forEach((k) => localStorage.removeItem(k));
+    } catch {
+      /* ignore */
+    }
+    writeSiteValue(SITE_KEYS.canvasPlacements, SITE_CANVAS.placements);
+    writeSiteValue(SITE_KEYS.canvasBlocks, SITE_CANVAS.blocks);
+    writeSiteValue(SITE_KEYS.canvasStyles, SITE_CANVAS.styles);
+    writeSiteValue(SITE_KEYS.canvasHidden, SITE_CANVAS.hidden);
+  }, []);
+
+  const value = useMemo(
+    () => ({
+      editing,
+      setEditing,
+      selectedId,
+      setSelectedId,
+      placements,
+      placementFor,
+      setPlacement,
+      blocks,
+      blocksFor,
+      blockById,
+      addBlock,
+      updateBlock,
+      removeBlock,
+      styles,
+      styleFor,
+      setStyle,
+      clearStyle,
+      hidden,
+      isHidden,
+      hideBlock,
+      showBlock,
+      overrideFor,
+      setOverride,
+      clearOverride,
+      bottomOf,
+      setPageBottom,
+      snapshot,
+      reset,
+    }),
+    [
+      editing,
+      selectedId,
+      placements,
+      placementFor,
+      setPlacement,
+      blocks,
+      blocksFor,
+      blockById,
+      addBlock,
+      updateBlock,
+      removeBlock,
+      styles,
+      styleFor,
+      setStyle,
+      clearStyle,
+      hidden,
+      isHidden,
+      hideBlock,
+      showBlock,
+      overrideFor,
+      setOverride,
+      clearOverride,
+      bottomOf,
+      setPageBottom,
+      snapshot,
+      reset,
+    ],
+  );
+
+  return <CanvasContext.Provider value={value}>{children}</CanvasContext.Provider>;
+}
+
+export function useCanvas() {
+  const ctx = useContext(CanvasContext);
+  if (!ctx) throw new Error("useCanvas must be used inside CanvasProvider");
+  return ctx;
+}

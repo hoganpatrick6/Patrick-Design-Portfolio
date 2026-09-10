@@ -2,10 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { FragmentName } from "../components/FragmentName";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { TypeSettingsPanel } from "../components/TypeSettingsPanel";
-import { LayoutEditorToggle } from "../components/LayoutEditorToggle";
-import { GridBlock, PageGrid } from "../components/PageGrid";
-import { MediaBlocks } from "../components/MediaBlocks";
-import { MediaEditorToggle } from "../components/MediaEditorToggle";
+import { EditorToolbar } from "../components/EditorToolbar";
+import { Canvas, CanvasBlock } from "../components/Canvas";
 import { EditableBullets } from "../components/EditableBullets";
 
 export const Route = createFileRoute("/about")({
@@ -120,6 +118,8 @@ function Divider() {
   return <div className="h-px w-full bg-[var(--color-border)]" />;
 }
 
+const PAGE = "about";
+
 function AboutPage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
@@ -137,11 +137,10 @@ function AboutPage() {
             </Link>
           </div>
           <div className="flex items-start justify-between md:col-span-8 md:col-start-5 lg:col-span-9 lg:col-start-4">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <ThemeToggle />
-              <TypeSettingsPanel page="about" />
-              <LayoutEditorToggle />
-              <MediaEditorToggle page="about" />
+              <TypeSettingsPanel />
+              <EditorToolbar page={PAGE} />
             </div>
             <nav className="flex gap-6 type-nav">
               <Link
@@ -163,17 +162,17 @@ function AboutPage() {
 
       {/* Main grid */}
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
-        <PageGrid>
-          <GridBlock id="about-intro" label="Intro">
+        <Canvas page={PAGE}>
+          <CanvasBlock id="about-intro" label="Intro">
             <div className="border-t border-[var(--color-border)] pt-8">
               <p className="type-body text-foreground">
                 A multidisciplinary designer with 10+ years of experience, I lead brand, product,
                 and editorial work from concept to launch.
               </p>
             </div>
-          </GridBlock>
+          </CanvasBlock>
 
-          <GridBlock id="about-contact" label="Contact">
+          <CanvasBlock id="about-contact" label="Contact">
             <div className="space-y-3 border-t border-[var(--color-border)] pt-6">
               <a
                 href="mailto:hello@patrickhogan.com"
@@ -198,9 +197,9 @@ function AboutPage() {
                 <Arrow />
               </a>
             </div>
-          </GridBlock>
+          </CanvasBlock>
 
-          <GridBlock id="about-experience" label="Experience">
+          <CanvasBlock id="about-experience" label="Experience">
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Experience</SectionLabel>
               </div>
@@ -234,9 +233,9 @@ function AboutPage() {
                   </div>
                 ))}
               </div>
-          </GridBlock>
+          </CanvasBlock>
 
-          <GridBlock id="about-skills" label="Skills">
+          <CanvasBlock id="about-skills" label="Skills">
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Skills</SectionLabel>
               </div>
@@ -257,9 +256,9 @@ function AboutPage() {
                   </div>
                 ))}
               </div>
-          </GridBlock>
+          </CanvasBlock>
 
-          <GridBlock id="about-education" label="Education">
+          <CanvasBlock id="about-education" label="Education">
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Education</SectionLabel>
               </div>
@@ -274,9 +273,9 @@ function AboutPage() {
                   Minor: Studio Photography
                 </p>
               </div>
-          </GridBlock>
+          </CanvasBlock>
 
-          <GridBlock id="about-recommendations" label="Recommendations">
+          <CanvasBlock id="about-recommendations" label="Recommendations">
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Recommendations</SectionLabel>
               </div>
@@ -292,10 +291,8 @@ function AboutPage() {
                   </figure>
                 ))}
               </div>
-          </GridBlock>
-
-          <MediaBlocks page="about" />
-        </PageGrid>
+          </CanvasBlock>
+        </Canvas>
       </main>
     </div>
   );

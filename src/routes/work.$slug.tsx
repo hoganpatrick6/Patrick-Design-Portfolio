@@ -1,11 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { TypeSettingsPanel } from "../components/TypeSettingsPanel";
-import { LayoutEditorToggle } from "../components/LayoutEditorToggle";
-import { GridBlock, PageGrid } from "../components/PageGrid";
-import { MediaBlocks } from "../components/MediaBlocks";
+import { EditorToolbar } from "../components/EditorToolbar";
+import { Canvas, CanvasBlock } from "../components/Canvas";
 import { EditableMedia } from "../components/EditableMedia";
-import { MediaEditorToggle } from "../components/MediaEditorToggle";
 import { FragmentName } from "../components/FragmentName";
 import { getProject, projects } from "../data/projects";
 
@@ -57,11 +55,10 @@ function Header({ page = "project" }: { page?: string }) {
           </Link>
         </div>
         <div className="flex items-start justify-between md:col-span-8 md:col-start-5 lg:col-span-9 lg:col-start-4">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <ThemeToggle />
-            <TypeSettingsPanel page={page} />
-              <LayoutEditorToggle />
-            <MediaEditorToggle page={page} />
+            <TypeSettingsPanel />
+            <EditorToolbar page={page} />
           </div>
           <nav className="flex gap-6 type-nav">
             <Link
@@ -112,8 +109,8 @@ function ProjectPage() {
       <Header page={`project:${project.slug}`} />
 
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
-        <PageGrid>
-          <GridBlock id="project-header" label="Title">
+        <Canvas page={`project:${project.slug}`}>
+          <CanvasBlock id="project-header" label="Title">
             <div className="border-t border-[var(--color-border)] pt-8">
               <Link
                 to="/work"
@@ -130,10 +127,10 @@ function ProjectPage() {
                 {project.description}
               </p>
             </div>
-          </GridBlock>
+          </CanvasBlock>
 
 
-          <GridBlock id="project-details" label="Details">
+          <CanvasBlock id="project-details" label="Details">
             <dl className="space-y-8">
               <div>
                 <dt className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
@@ -160,9 +157,9 @@ function ProjectPage() {
                 <dd className="mt-2 type-body">{project.year}</dd>
               </div>
             </dl>
-          </GridBlock>
+          </CanvasBlock>
 
-          <GridBlock id="project-overview" label="Overview">
+          <CanvasBlock id="project-overview" label="Overview">
             <div className="max-w-2xl space-y-6">
               {project.overview.map((paragraph) => (
                 <p key={paragraph} className="type-body text-[var(--color-foreground-muted)]">
@@ -170,9 +167,9 @@ function ProjectPage() {
                 </p>
               ))}
             </div>
-          </GridBlock>
+          </CanvasBlock>
 
-          <GridBlock id="project-next" label="Next project">
+          <CanvasBlock id="project-next" label="Next project">
             <div className="border-t border-[var(--color-border)] pt-8">
           <div className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
             Next project
@@ -200,10 +197,8 @@ function ProjectPage() {
             </div>
           </Link>
             </div>
-          </GridBlock>
-
-          <MediaBlocks page={`project:${project.slug}`} />
-        </PageGrid>
+          </CanvasBlock>
+        </Canvas>
       </main>
     </div>
   );

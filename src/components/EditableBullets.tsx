@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLayout } from "./LayoutProvider";
+import { useCanvas } from "./CanvasProvider";
 import { SITE_KEYS, siteContent, writeSiteValue } from "../lib/site-content";
 
 const STORAGE_PREFIX = "bullets:";
@@ -10,7 +10,7 @@ const STORAGE_PREFIX = "bullets:";
  * in the browser so they survive reloads for the editor.
  */
 export function EditableBullets({ id, bullets }: { id: string; bullets: string[] }) {
-  const { editing } = useLayout();
+  const { editing } = useCanvas();
   const [items, setItems] = useState<string[]>(bullets);
 
   useEffect(() => {

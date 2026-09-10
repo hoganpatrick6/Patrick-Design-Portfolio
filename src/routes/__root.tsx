@@ -13,8 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { TypeSettingsProvider } from "../components/TypeSettingsProvider";
-import { LayoutProvider } from "../components/LayoutProvider";
-import { MediaProvider } from "../components/MediaProvider";
+import { CanvasProvider } from "../components/CanvasProvider";
+import { BlockInspector } from "../components/BlockInspector";
 import { SITE_TYPE_DEFAULTS, typeSettingsToCss } from "../config/type-defaults";
 
 function NotFoundComponent() {
@@ -188,14 +188,13 @@ function RootComponent() {
   return (
     <ThemeProvider>
       <TypeSettingsProvider>
-        <LayoutProvider>
-          <MediaProvider>
-            <QueryClientProvider client={queryClient}>
-              {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-              <Outlet />
-            </QueryClientProvider>
-          </MediaProvider>
-        </LayoutProvider>
+        <CanvasProvider>
+          <QueryClientProvider client={queryClient}>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+            <BlockInspector />
+          </QueryClientProvider>
+        </CanvasProvider>
       </TypeSettingsProvider>
     </ThemeProvider>
   );

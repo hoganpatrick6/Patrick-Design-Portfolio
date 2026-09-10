@@ -7,11 +7,11 @@ import { loadSiteContent, saveSiteContentValue } from "./site-content.functions"
  */
 
 export const SITE_KEYS = {
-  mediaBlocks: "media.blocks",
   mediaOverrides: "media.overrides",
-  layout: "layout.placements",
-  layoutHidden: "layout.hidden",
-  layoutRoles: "layout.roles",
+  canvasPlacements: "canvas.placements",
+  canvasBlocks: "canvas.blocks",
+  canvasStyles: "canvas.styles",
+  canvasHidden: "canvas.hidden",
   type: "type.settings",
   bullets: (id: string) => `bullets.${id}`,
 } as const;
