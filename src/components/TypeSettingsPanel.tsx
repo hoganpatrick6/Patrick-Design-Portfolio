@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useTypeSettings } from "./TypeSettingsProvider";
-import { useLayout } from "./LayoutProvider";
-import { useMedia } from "./MediaProvider";
 import { checkEditorAccess, saveTypeDefaults } from "../lib/type-settings.functions";
 import {
   FONT_STACKS,
@@ -56,10 +54,8 @@ const sliders = [
 const fieldClass =
   "mt-1 w-full rounded border border-[var(--color-border)] bg-transparent px-2 py-1 text-xs text-foreground";
 
-export function TypeSettingsPanel({ page }: { page?: string }) {
+export function TypeSettingsPanel() {
   const { settings, setValue, copyRole, resetRole, reset } = useTypeSettings();
-  const { setEditing } = useLayout();
-  const { addBlock, blocksFor } = useMedia();
   const [allowed, setAllowed] = useState(false);
   const [open, setOpen] = useState(false);
   const [role, setRole] = useState<RoleKey>("body");
@@ -159,28 +155,6 @@ export function TypeSettingsPanel({ page }: { page?: string }) {
           <div className="mb-3 text-xs uppercase tracking-wide text-[var(--color-foreground-subtle)]">
             Type settings (private)
           </div>
-
-          {page && (
-            <div className="mb-4 border-b border-[var(--color-border)] pb-4">
-              <button
-                type="button"
-                onClick={() => {
-                  addBlock(page, "text");
-                  setEditing(true);
-                  setOpen(false);
-                }}
-                className="rounded-full border border-[var(--color-border)] px-3 py-1 text-xs text-foreground transition-colors hover:border-foreground/30"
-              >
-                + Text block
-              </button>
-              <p className="mt-2 text-xs leading-relaxed text-[var(--color-foreground-subtle)]">
-                {blocksFor(page).filter((b) => b.kind === "text").length} text block
-                {blocksFor(page).filter((b) => b.kind === "text").length === 1 ? "" : "s"} on
-                this page. A new one drops straight onto the grid — type into it, pick which
-                style it uses, and drag it like any other block.
-              </p>
-            </div>
-          )}
 
           {/* Which text this affects */}
           <div className="mb-3 flex flex-wrap gap-1">

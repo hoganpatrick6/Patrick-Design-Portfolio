@@ -1,9 +1,8 @@
 import { useRef, useState } from "react";
-import { embedUrl } from "../config/media-defaults";
+import { embedUrl } from "../config/canvas-defaults";
 import { fileToDataUrl, fileToImageDataUrl } from "../lib/media-files";
 import { CroppableImage } from "./CroppableImage";
-import { useLayout } from "./LayoutProvider";
-import { useMedia } from "./MediaProvider";
+import { useCanvas } from "./CanvasProvider";
 
 /**
  * Wraps a picture that is part of the page design so it can be swapped for a
@@ -21,8 +20,7 @@ export function EditableMedia({
   alt: string;
   className?: string;
 }) {
-  const { editing } = useLayout();
-  const { overrideFor, setOverride, clearOverride } = useMedia();
+  const { editing, overrideFor, setOverride, clearOverride } = useCanvas();
   const fileRef = useRef<HTMLInputElement>(null);
   const [note, setNote] = useState<string | null>(null);
   const override = overrideFor(id);
