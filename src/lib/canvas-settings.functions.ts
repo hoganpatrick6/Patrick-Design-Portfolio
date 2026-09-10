@@ -36,8 +36,8 @@ function serialize(layout: LayoutMap): string {
  * Writes the current block positions into src/config/layout-defaults.ts so
  * every visitor sees them. Only available to an unlocked editor.
  */
-export const saveLayoutDefaults = createServerFn({ method: "POST" })
-  .inputValidator((data: { layout: LayoutMap }) => data)
+export const saveCanvasDefaults = createServerFn({ method: "POST" })
+  .validator((data: { layout: LayoutMap }) => data)
   .handler(async ({ data }) => {
     const isDev = process.env["NODE_ENV"] !== "production";
     if (!isDev) {
