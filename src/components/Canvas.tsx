@@ -691,9 +691,7 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
       event.preventDefault();
       event.stopPropagation();
       const start = { ...placement };
-      const startX = event.clientX;
       const startY = event.clientY;
-      const step = colWidth + GUTTER;
       setDrag(mode);
       setSelectedId(block.id);
 
@@ -728,8 +726,8 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
       } ${drag ? "is-dragging" : ""}`}
       style={{
         position: "absolute",
-        left: `calc((100% + ${GUTTER}px) * ${placement.x / GRID_COLUMNS})`,
-        width: `calc((100% + ${GUTTER}px) * ${placement.w / GRID_COLUMNS} - ${GUTTER}px)`,
+        left: 0,
+        width: "100%",
         top: `${placement.y * ROW_UNIT}px`,
         height: `${placement.h * ROW_UNIT}px`,
         zIndex: 0,
@@ -776,20 +774,8 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
           <span
             data-editor-ui=""
             data-no-drag=""
-            onPointerDown={(e) => startDrag(e, "size-x")}
-            className="canvas-handle absolute -right-1.5 top-1/2 h-10 w-3 -translate-y-1/2 cursor-ew-resize"
-          />
-          <span
-            data-editor-ui=""
-            data-no-drag=""
             onPointerDown={(e) => startDrag(e, "size-y")}
             className="canvas-handle absolute -bottom-1.5 left-1/2 h-3 w-10 -translate-x-1/2 cursor-ns-resize"
-          />
-          <span
-            data-editor-ui=""
-            data-no-drag=""
-            onPointerDown={(e) => startDrag(e, "size-xy")}
-            className="canvas-handle absolute -bottom-1.5 -right-1.5 h-3 w-3 cursor-nwse-resize"
           />
         </>
       )}
