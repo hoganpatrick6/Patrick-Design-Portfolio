@@ -168,6 +168,36 @@ export const SITE_CANVAS: CanvasDefaults = {
       "y": 40,
       "w": 12,
       "h": 20
+    },
+    "grocery-header": {
+      "x": 0,
+      "y": 0,
+      "w": 12,
+      "h": 9
+    },
+    "grocery-hero": {
+      "x": 0,
+      "y": 12,
+      "w": 12,
+      "h": 36
+    },
+    "grocery-story": {
+      "x": 3,
+      "y": 53,
+      "w": 6,
+      "h": 12
+    },
+    "grocery-gallery": {
+      "x": 0,
+      "y": 69,
+      "w": 12,
+      "h": 66
+    },
+    "grocery-campaign": {
+      "x": 0,
+      "y": 143,
+      "w": 12,
+      "h": 24
     }
   },
   "blocks": [],

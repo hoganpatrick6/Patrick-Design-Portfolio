@@ -14,11 +14,17 @@ export function EditableMedia({
   src,
   alt,
   className,
+  width,
+  height,
+  eager = false,
 }: {
   id: string;
   src: string;
   alt: string;
   className?: string;
+  width?: number;
+  height?: number;
+  eager?: boolean;
 }) {
   const { editing, overrideFor, setOverride, clearOverride } = useCanvas();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -87,7 +93,10 @@ export function EditableMedia({
         <img
           src={current}
           alt={alt}
-          loading="lazy"
+          loading={eager ? "eager" : "lazy"}
+          fetchPriority={eager ? "high" : "auto"}
+          width={width}
+          height={height}
           className="absolute inset-0 h-full w-full object-cover"
           style={{
             transform: `translate(${override.crop.x}%, ${override.crop.y}%) scale(${override.crop.zoom})`,
@@ -96,7 +105,15 @@ export function EditableMedia({
         />
       </div>
     ) : (
-      <img src={current} alt={alt} loading="lazy" className={className} />
+      <img
+        src={current}
+        alt={alt}
+        loading={eager ? "eager" : "lazy"}
+        fetchPriority={eager ? "high" : "auto"}
+        width={width}
+        height={height}
+        className={className}
+      />
     );
 
   if (!editing) return media;

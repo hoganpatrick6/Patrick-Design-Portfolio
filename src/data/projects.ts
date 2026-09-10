@@ -40,10 +40,10 @@ export const projects: Project[] = [
     description: "",
     image: driftwellThumb,
     role: "Art Direction, Editorial Design",
-    client: "Driftwell",
+    client: "Uber Eats",
     overview: [
       "Why would anyone want a stranger to do their shopping for them? To build more trust and attract more attention to Uber Eats’ grocery business we created a library of images focused specifically on produce and our courier’s process. After all, produce selection takes skill.",
-      "",
+      "We partnered with photographers to shoot in four different grocery stores across Los Angeles, each representing a different region of the world.",
     ],
   },
   {
