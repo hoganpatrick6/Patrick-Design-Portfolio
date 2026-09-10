@@ -314,6 +314,7 @@ export function CanvasBlock({
     selectedId,
     setSelectedId,
     styleFor,
+    styles,
   } = useCanvas();
   const { stacked, colWidth, resolved, register, unregister, reportHeight } =
     useCanvasLayout();
