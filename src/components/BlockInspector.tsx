@@ -66,9 +66,11 @@ export function BlockInspector() {
   if (!editing || !selectedId) return null;
 
   const id = selectedId;
+  const isTextPick = id.includes("#");
+  const parentBlockId = id.split("#")[0] as string;
   const style: BlockStyle = styleFor(id) ?? {};
   const placement = placementFor(id);
-  const block = blockById(id);
+  const block = isTextPick ? undefined : blockById(id);
 
   function patch(next: BlockStyle) {
     setStyle(id, next);
@@ -137,7 +139,15 @@ export function BlockInspector() {
     >
       <div className="mb-3 flex items-center justify-between">
         <span className="text-xs uppercase tracking-wide text-[var(--color-foreground-subtle)]">
-          {block ? (block.kind === "text" ? "Text block" : block.kind === "video" ? "Video block" : "Image block") : "Block"}
+          {isTextPick
+            ? "Selected type"
+            : block
+              ? block.kind === "text"
+                ? "Text block"
+                : block.kind === "video"
+                  ? "Video block"
+                  : "Image block"
+              : "Block"}
         </span>
         <button
           type="button"
@@ -148,7 +158,18 @@ export function BlockInspector() {
         </button>
       </div>
 
+      {isTextPick && (
+        <button
+          type="button"
+          onClick={() => setSelectedId(parentBlockId)}
+          className={`${chip} mb-3`}
+        >
+          ← Whole block instead
+        </button>
+      )}
+
       {/* Position */}
+      {!isTextPick && (
       <div className="mb-4 grid grid-cols-4 gap-2">
         {(
           [
@@ -175,9 +196,10 @@ export function BlockInspector() {
           </label>
         ))}
       </div>
+      )}
 
       {/* Media */}
-      {block && block.kind !== "text" && (
+      {!isTextPick && block && block.kind !== "text" && (
         <div className="mb-4 space-y-2 border-t border-[var(--color-border)] pt-3">
           <input
             ref={fileRef}
@@ -470,13 +492,15 @@ export function BlockInspector() {
         <button type="button" onClick={() => clearStyle(id)} className={chip}>
           Clear type overrides
         </button>
-        <button
-          type="button"
-          onClick={() => (block ? removeBlock(id) : hideBlock(id))}
-          className={chip}
-        >
-          Remove block
-        </button>
+        {!isTextPick && (
+          <button
+            type="button"
+            onClick={() => (block ? removeBlock(id) : hideBlock(id))}
+            className={chip}
+          >
+            Remove block
+          </button>
+        )}
       </div>
       {note && (
         <div className="mt-2 text-[11px] text-[var(--color-foreground-subtle)]">{note}</div>
