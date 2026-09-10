@@ -545,11 +545,14 @@ export function BlockInspector() {
           </select>
         </label>
       </div>
+      )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[var(--color-border)] pt-3">
-        <button type="button" onClick={() => clearStyle(id)} className={chip}>
-          Clear type overrides
-        </button>
+        {block?.kind !== "shape" && (
+          <button type="button" onClick={() => clearStyle(id)} className={chip}>
+            Clear type overrides
+          </button>
+        )}
         {!isTextPick && (
           <button
             type="button"
