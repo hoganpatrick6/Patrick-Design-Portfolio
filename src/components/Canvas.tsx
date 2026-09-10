@@ -667,3 +667,142 @@ function MediaBlockView({ block }: { block: CanvasBlockData }) {
     </figure>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Colour shapes that sit behind everything                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A block of colour used to break a page into sections. It keeps exactly the
+ * spot it is given, ignores the push-down rules, and always paints behind the
+ * words and pictures.
+ */
+function ShapeBlock({ block }: { block: CanvasBlockData }) {
+  const { editing, placementFor, setPlacement, selectedId, setSelectedId, removeBlock } =
+    useCanvas();
+  const { colWidth, stacked } = useCanvasLayout();
+  const [drag, setDrag] = useState<DragMode | null>(null);
+  const placement = placementFor(block.id);
+  const selected = editing && selectedId === block.id;
+
+  const startDrag = useCallback(
+    (event: React.PointerEvent, mode: DragMode) => {
+      if (!editing || stacked || colWidth <= 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const start = { ...placement };
+      const startX = event.clientX;
+      const startY = event.clientY;
+      const step = colWidth + GUTTER;
+      setDrag(mode);
+      setSelectedId(block.id);
+
+      function onMove(e: PointerEvent) {
+        const cols = Math.round((e.clientX - startX) / step);
+        const rows = Math.round((e.clientY - startY) / ROW_UNIT);
+        const next: Placement =
+          mode === "move"
+            ? {
+                ...start,
+                x: Math.min(Math.max(start.x + cols, 0), GRID_COLUMNS - start.w),
+                y: Math.max(0, start.y + rows),
+              }
+            : {
+                ...start,
+                w:
+                  mode === "size-y"
+                    ? start.w
+                    : Math.min(Math.max(start.w + cols, 1), GRID_COLUMNS - start.x),
+                h: mode === "size-x" ? start.h : Math.max(1, start.h + rows),
+              };
+        setPlacement(block.id, next);
+      }
+
+      function onUp() {
+        setDrag(null);
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+      }
+
+      window.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+    },
+    [block.id, colWidth, editing, placement, setPlacement, setSelectedId, stacked],
+  );
+
+  return (
+    <div
+      data-canvas-shape={block.id}
+      className={`canvas-block ${editing ? "is-editing" : ""} ${
+        selected ? "is-selected" : ""
+      } ${drag ? "is-dragging" : ""}`}
+      style={{
+        position: "absolute",
+        left: `calc((100% + ${GUTTER}px) * ${placement.x / GRID_COLUMNS})`,
+        width: `calc((100% + ${GUTTER}px) * ${placement.w / GRID_COLUMNS} - ${GUTTER}px)`,
+        top: `${placement.y * ROW_UNIT}px`,
+        height: `${placement.h * ROW_UNIT}px`,
+        zIndex: 0,
+        pointerEvents: editing ? "auto" : "none",
+      }}
+      onPointerDown={(e) => {
+        if (!editing) return;
+        const target = e.target as HTMLElement;
+        if (target.closest("[data-no-drag]")) return;
+        startDrag(e, "move");
+      }}
+    >
+      <div
+        aria-hidden="true"
+        className="h-full w-full"
+        style={{
+          background: block.fill || "var(--color-foreground)",
+          opacity: block.opacity ?? 0.06,
+          borderRadius: `${block.radius ?? 0}px`,
+        }}
+      />
+      {editing && (
+        <>
+          <button
+            type="button"
+            data-editor-ui=""
+            data-no-drag=""
+            onPointerDown={(e) => startDrag(e, "move")}
+            className="canvas-chip absolute -top-6 left-0 z-30 cursor-grab select-none"
+            title="Drag to move this colour block"
+          >
+            ⠿ Colour
+          </button>
+          <button
+            type="button"
+            data-editor-ui=""
+            data-no-drag=""
+            onClick={() => removeBlock(block.id)}
+            aria-label="Remove colour block"
+            className="canvas-chip absolute -top-6 right-0 z-30"
+          >
+            ✕
+          </button>
+          <span
+            data-editor-ui=""
+            data-no-drag=""
+            onPointerDown={(e) => startDrag(e, "size-x")}
+            className="canvas-handle absolute -right-1.5 top-1/2 h-10 w-3 -translate-y-1/2 cursor-ew-resize"
+          />
+          <span
+            data-editor-ui=""
+            data-no-drag=""
+            onPointerDown={(e) => startDrag(e, "size-y")}
+            className="canvas-handle absolute -bottom-1.5 left-1/2 h-3 w-10 -translate-x-1/2 cursor-ns-resize"
+          />
+          <span
+            data-editor-ui=""
+            data-no-drag=""
+            onPointerDown={(e) => startDrag(e, "size-xy")}
+            className="canvas-handle absolute -bottom-1.5 -right-1.5 h-3 w-3 cursor-nwse-resize"
+          />
+        </>
+      )}
+    </div>
+  );
+}
