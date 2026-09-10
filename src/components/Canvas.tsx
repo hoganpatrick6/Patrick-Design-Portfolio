@@ -321,7 +321,7 @@ export function CanvasBlock({
 
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
-  const touchedRef = useRef<HTMLElement[]>([]);
+  const touchedRef = useRef<{ el: HTMLElement; css: string }[]>([]);
   const justDragged = useRef(false);
   const [drag, setDrag] = useState<DragMode | null>(null);
   const [offset, setOffset] = useState<{ x: number; y: number } | null>(null);
@@ -353,27 +353,27 @@ export function CanvasBlock({
   // Paint the settings of any single piece of type onto the words themselves,
   // and outline whichever piece is currently picked.
   useEffect(() => {
-    touchedRef.current.forEach((el) => {
-      el.removeAttribute("style");
+    touchedRef.current.forEach(({ el, css }) => {
+      el.style.cssText = css;
       el.removeAttribute("data-type-selected");
     });
     touchedRef.current = [];
     const root = innerRef.current;
     if (!root) return;
-    const touched: HTMLElement[] = [];
+    const touched: { el: HTMLElement; css: string }[] = [];
     const prefix = `${id}#`;
     Object.entries(styles).forEach(([key, value]) => {
       if (!key.startsWith(prefix)) return;
       const el = elementAt(root, key.slice(prefix.length));
       if (!el) return;
+      touched.push({ el, css: el.style.cssText });
       Object.assign(el.style, blockStyleToCss(value) as Record<string, string>);
-      touched.push(el);
     });
     if (editing && selectedId?.startsWith(prefix)) {
       const el = elementAt(root, selectedId.slice(prefix.length));
       if (el) {
         el.setAttribute("data-type-selected", "");
-        if (!touched.includes(el)) touched.push(el);
+        if (!touched.some((t) => t.el === el)) touched.push({ el, css: el.style.cssText });
       }
     }
     touchedRef.current = touched;
