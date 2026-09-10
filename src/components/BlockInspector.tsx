@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   ASPECT_RATIOS,
   BLOCK_COLORS,
+  SHAPE_FILLS,
   type AlignValue,
   type BlockStyle,
   type TransformValue,
@@ -144,9 +145,11 @@ export function BlockInspector() {
             : block
               ? block.kind === "text"
                 ? "Text block"
-                : block.kind === "video"
-                  ? "Video block"
-                  : "Image block"
+                : block.kind === "shape"
+                  ? "Colour block"
+                  : block.kind === "video"
+                    ? "Video block"
+                    : "Image block"
               : "Block"}
         </span>
         <button
