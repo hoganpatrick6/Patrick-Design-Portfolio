@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { useSession } from "@tanstack/react-start/server";
-import type { LayoutMap, Placement } from "../config/layout-defaults";
+import type { CanvasDefaults } from "../config/canvas-defaults";
 
 type EditorSession = { editor?: boolean };
 
@@ -20,24 +20,27 @@ function sessionConfig() {
   };
 }
 
-function serialize(layout: LayoutMap): string {
-  const entries = Object.entries(layout)
-    .map(([id, p]) => {
-      const v = p as Placement;
-      const order = typeof v.order === "number" ? `, order: ${v.order}` : "";
-      return `  ${JSON.stringify(id)}: { colStart: ${v.colStart}, colSpan: ${v.colSpan}${order} },`;
-    })
-    .join("\n");
-  return `export const SITE_LAYOUT_DEFAULTS: LayoutMap = {\n${entries}\n};`;
+function serialize(canvas: CanvasDefaults): string {
+  const body = JSON.stringify(
+    {
+      placements: canvas.placements,
+      blocks: canvas.blocks,
+      styles: canvas.styles,
+      hidden: canvas.hidden,
+    },
+    null,
+    2,
+  );
+  return `export const SITE_CANVAS: CanvasDefaults = ${body};`;
 }
 
-
 /**
- * Writes the current block positions into src/config/layout-defaults.ts so
- * every visitor sees them. Only available to an unlocked editor.
+ * Writes the current canvas — positions, added blocks, per-block type styles
+ * and hidden blocks — into src/config/canvas-defaults.ts so every visitor sees
+ * them. Only available to an unlocked editor.
  */
 export const saveCanvasDefaults = createServerFn({ method: "POST" })
-  .validator((data: { layout: LayoutMap }) => data)
+  .validator((data: { canvas: CanvasDefaults }) => data)
   .handler(async ({ data }) => {
     const isDev = process.env["NODE_ENV"] !== "production";
     if (!isDev) {
@@ -50,11 +53,11 @@ export const saveCanvasDefaults = createServerFn({ method: "POST" })
     }
 
     const { readFile, writeFile } = await import("node:fs/promises");
-    const path = "src/config/layout-defaults.ts";
+    const path = "src/config/canvas-defaults.ts";
     const source = await readFile(path, "utf8");
     const updated = source.replace(
-      /export const SITE_LAYOUT_DEFAULTS: LayoutMap = \{[\s\S]*?\n\};/,
-      serialize(data.layout),
+      /export const SITE_CANVAS: CanvasDefaults = \{[\s\S]*?\n\};/,
+      serialize(data.canvas),
     );
     await writeFile(path, updated, "utf8");
     return { saved: true as const };
