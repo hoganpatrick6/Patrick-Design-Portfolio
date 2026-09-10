@@ -377,7 +377,7 @@ export function CanvasBlock({
         left: `calc((100% + ${GUTTER}px) * ${placement.x / GRID_COLUMNS})`,
         width: `calc((100% + ${GUTTER}px) * ${placement.w / GRID_COLUMNS} - ${GUTTER}px)`,
         top: `${(spot?.top ?? placement.y) * ROW_UNIT}px`,
-        minHeight: `${placement.h * ROW_UNIT}px`,
+        minHeight: `${Math.max(placement.h, spot?.rows ?? 0) * ROW_UNIT}px`,
         transform: offset ? `translate(${offset.x}px, ${offset.y}px)` : undefined,
       };
 
