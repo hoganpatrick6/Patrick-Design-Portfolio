@@ -171,16 +171,19 @@ export function BlockInspector() {
         </button>
       )}
 
-      {/* Position */}
+      {/* Position — colour blocks always span the full width, so only
+          vertical position and height apply to them. */}
       {!isTextPick && (
-      <div className="mb-4 grid grid-cols-4 gap-2">
+      <div className={`mb-4 grid gap-2 ${block?.kind === "shape" ? "grid-cols-2" : "grid-cols-4"}`}>
         {(
-          [
-            ["x", "Col", 0, 11],
-            ["y", "Row", 0, 999],
-            ["w", "Wide", 1, 12],
-            ["h", "Tall", 1, 999],
-          ] as const
+          block?.kind === "shape"
+            ? ([["y", "Row", 0, 999], ["h", "Tall", 1, 999]] as const)
+            : ([
+                ["x", "Col", 0, 11],
+                ["y", "Row", 0, 999],
+                ["w", "Wide", 1, 12],
+                ["h", "Tall", 1, 999],
+              ] as const)
         ).map(([key, label, min, max]) => (
           <label key={key} className="block">
             <span className="text-[10px] uppercase tracking-wide text-[var(--color-foreground-subtle)]">
