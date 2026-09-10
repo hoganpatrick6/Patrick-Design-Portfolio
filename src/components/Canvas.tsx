@@ -54,6 +54,55 @@ function overlapsX(a: Placement, b: Placement) {
   return a.x < b.x + b.w && b.x < a.x + a.w;
 }
 
+/* ------------------------------------------------------------------ */
+/* Picking out one piece of type inside a block                        */
+/* ------------------------------------------------------------------ */
+
+/** True for a settings key that points at one line of type, not a whole block. */
+export function isTextTargetId(id: string) {
+  return id.includes("#");
+}
+
+/** The block a piece of type belongs to. */
+export function blockIdOf(id: string) {
+  return id.split("#")[0] as string;
+}
+
+function pathTo(root: HTMLElement, el: HTMLElement): string | null {
+  const parts: number[] = [];
+  let node: HTMLElement | null = el;
+  while (node && node !== root) {
+    const parent: HTMLElement | null = node.parentElement;
+    if (!parent) return null;
+    parts.unshift(Array.prototype.indexOf.call(parent.children, node));
+    node = parent;
+  }
+  return node === root ? parts.join(".") : null;
+}
+
+function elementAt(root: HTMLElement, path: string): HTMLElement | null {
+  let node: HTMLElement | null = root;
+  for (const part of path.split(".")) {
+    if (!node) return null;
+    node = (node.children[Number(part)] as HTMLElement | undefined) ?? null;
+  }
+  return node;
+}
+
+/** The nearest thing around a click that actually carries words. */
+function textElementFrom(root: HTMLElement, start: HTMLElement): HTMLElement | null {
+  let node: HTMLElement | null = start;
+  while (node && node !== root) {
+    if (node.hasAttribute("data-editor-ui")) return null;
+    const carriesWords = Array.from(node.childNodes).some(
+      (n) => n.nodeType === 3 && (n.textContent ?? "").trim().length > 0,
+    );
+    if (carriesWords) return node;
+    node = node.parentElement;
+  }
+  return null;
+}
+
 /**
  * The page canvas: 12 columns across, a fine baseline row down. Blocks keep
  * the spot they were given and are nudged down only far enough to stay clear
