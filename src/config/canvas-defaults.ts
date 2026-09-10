@@ -279,3 +279,13 @@ export const BLOCK_COLORS: { label: string; value: string }[] = [
   { label: "Background", value: "var(--color-background)" },
   { label: "Accent", value: "var(--color-chart-1)" },
 ];
+
+/** Fill choices offered for background shapes. */
+export const SHAPE_FILLS: { label: string; value: string }[] = [
+  { label: "Paper", value: "var(--color-foreground)" },
+  { label: "Page", value: "var(--color-background)" },
+  { label: "Accent", value: "var(--color-chart-1)" },
+  { label: "Warm", value: "#e8dfd2" },
+  { label: "Cool", value: "#d7e0e6" },
+  { label: "Ink", value: "#1b1b1b" },
+];
