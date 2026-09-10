@@ -85,21 +85,84 @@ export const STACK_BREAKPOINT = 768;
 
 export const SITE_CANVAS: CanvasDefaults = {
   "placements": {
-    "about-intro": { "x": 0, "y": 0, "w": 4, "h": 6 },
-    "about-contact": { "x": 0, "y": 8, "w": 4, "h": 6 },
-    "about-experience": { "x": 4, "y": 0, "w": 8, "h": 40 },
-    "about-skills": { "x": 4, "y": 44, "w": 8, "h": 16 },
-    "about-education": { "x": 4, "y": 62, "w": 8, "h": 10 },
-    "about-recommendations": { "x": 4, "y": 74, "w": 8, "h": 14 },
-
-    "work-intro": { "x": 0, "y": 0, "w": 12, "h": 8 },
-    "work-projects-label": { "x": 0, "y": 12, "w": 2, "h": 2 },
-    "work-projects": { "x": 2, "y": 12, "w": 10, "h": 60 },
-
-    "project-header": { "x": 0, "y": 0, "w": 12, "h": 12 },
-    "project-details": { "x": 0, "y": 16, "w": 3, "h": 20 },
-    "project-overview": { "x": 4, "y": 16, "w": 8, "h": 20 },
-    "project-next": { "x": 0, "y": 40, "w": 12, "h": 20 }
+    "about-intro": {
+      "x": 0,
+      "y": 0,
+      "w": 4,
+      "h": 6
+    },
+    "about-contact": {
+      "x": 0,
+      "y": 8,
+      "w": 4,
+      "h": 6
+    },
+    "about-experience": {
+      "x": 4,
+      "y": 0,
+      "w": 8,
+      "h": 40
+    },
+    "about-skills": {
+      "x": 4,
+      "y": 44,
+      "w": 8,
+      "h": 16
+    },
+    "about-education": {
+      "x": 4,
+      "y": 62,
+      "w": 8,
+      "h": 10
+    },
+    "about-recommendations": {
+      "x": 4,
+      "y": 74,
+      "w": 8,
+      "h": 14
+    },
+    "work-intro": {
+      "x": 0,
+      "y": 0,
+      "w": 12,
+      "h": 8
+    },
+    "work-projects-label": {
+      "x": 0,
+      "y": 12,
+      "w": 2,
+      "h": 2
+    },
+    "work-projects": {
+      "x": 2,
+      "y": 12,
+      "w": 10,
+      "h": 60
+    },
+    "project-header": {
+      "x": 0,
+      "y": 0,
+      "w": 12,
+      "h": 12
+    },
+    "project-details": {
+      "x": 0,
+      "y": 16,
+      "w": 3,
+      "h": 20
+    },
+    "project-overview": {
+      "x": 4,
+      "y": 16,
+      "w": 8,
+      "h": 20
+    },
+    "project-next": {
+      "x": 0,
+      "y": 40,
+      "w": 12,
+      "h": 20
+    }
   },
   "blocks": [],
   "styles": {},
