@@ -697,8 +697,8 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
 
       function onMove(e: PointerEvent) {
         const rows = Math.round((e.clientY - startY) / ROW_UNIT);
-        // Colour blocks always span the full margin-to-margin width; only the
-        // vertical position and height can change.
+        // Colour blocks always span the full page width; only the vertical
+        // position and height can change.
         const next: Placement =
           mode === "move"
             ? { ...start, x: 0, w: GRID_COLUMNS, y: Math.max(0, start.y + rows) }
@@ -726,8 +726,8 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
       } ${drag ? "is-dragging" : ""}`}
       style={{
         position: "absolute",
-        left: 0,
-        width: "100%",
+        left: "calc(50% - 50vw)",
+        width: "100vw",
         top: `${placement.y * ROW_UNIT}px`,
         height: `${placement.h * ROW_UNIT}px`,
         zIndex: 0,
