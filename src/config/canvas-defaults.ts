@@ -43,7 +43,7 @@ export type BlockStyle = Partial<{
   color: string;
 }>;
 
-export type BlockKind = "text" | "image" | "video";
+export type BlockKind = "text" | "image" | "video" | "shape";
 
 /** A block added through the editor (text, picture or video). */
 export type CanvasBlock = {
@@ -63,6 +63,12 @@ export type CanvasBlock = {
   role?: string;
   /** How a picture sits inside its frame. */
   crop?: { zoom: number; x: number; y: number };
+  /** Colour of a background shape. */
+  fill?: string;
+  /** Corner rounding of a background shape, in px. */
+  radius?: number;
+  /** Opacity of a background shape, 0–1. */
+  opacity?: number;
 };
 
 export type PlacementMap = Record<string, Placement>;
@@ -272,4 +278,14 @@ export const BLOCK_COLORS: { label: string; value: string }[] = [
   { label: "Subtle", value: "var(--color-foreground-subtle)" },
   { label: "Background", value: "var(--color-background)" },
   { label: "Accent", value: "var(--color-chart-1)" },
+];
+
+/** Fill choices offered for background shapes. */
+export const SHAPE_FILLS: { label: string; value: string }[] = [
+  { label: "Paper", value: "var(--color-foreground)" },
+  { label: "Page", value: "var(--color-background)" },
+  { label: "Accent", value: "var(--color-chart-1)" },
+  { label: "Warm", value: "#e8dfd2" },
+  { label: "Cool", value: "#d7e0e6" },
+  { label: "Ink", value: "#1b1b1b" },
 ];

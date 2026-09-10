@@ -101,6 +101,13 @@ export function EditorToolbar({ page }: { page: string }) {
           >
             + Video
           </button>
+          <button
+            type="button"
+            onClick={() => addBlock(page, "shape", { x: 0, y: bottomRow(), w: 12, h: 16 })}
+            className={chip}
+          >
+            + Colour
+          </button>
           <button type="button" onClick={onSave} className={chip}>
             Publish layout
           </button>

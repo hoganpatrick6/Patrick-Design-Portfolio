@@ -176,6 +176,9 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         caption: "",
         aspect: kind === "video" ? "16:9" : "3:2",
         ...(kind === "text" ? { text: "New text block", role: "body" } : {}),
+        ...(kind === "shape"
+          ? { fill: "var(--color-foreground)", opacity: 0.06, radius: 0 }
+          : {}),
       };
       setBlocks((prev) => {
         const next = [...prev, block];
