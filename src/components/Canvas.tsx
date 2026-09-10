@@ -350,6 +350,36 @@ export function CanvasBlock({
     return () => ro.disconnect();
   }, [id, hidden, reportHeight]);
 
+  // Paint the settings of any single piece of type onto the words themselves,
+  // and outline whichever piece is currently picked.
+  useEffect(() => {
+    touchedRef.current.forEach((el) => {
+      el.removeAttribute("style");
+      el.removeAttribute("data-type-selected");
+    });
+    touchedRef.current = [];
+    const root = innerRef.current;
+    if (!root) return;
+    const touched: HTMLElement[] = [];
+    const prefix = `${id}#`;
+    Object.entries(styles).forEach(([key, value]) => {
+      if (!key.startsWith(prefix)) return;
+      const el = elementAt(root, key.slice(prefix.length));
+      if (!el) return;
+      Object.assign(el.style, blockStyleToCss(value) as Record<string, string>);
+      touched.push(el);
+    });
+    if (editing && selectedId?.startsWith(prefix)) {
+      const el = elementAt(root, selectedId.slice(prefix.length));
+      if (el) {
+        el.setAttribute("data-type-selected", "");
+        if (!touched.includes(el)) touched.push(el);
+      }
+    }
+    touchedRef.current = touched;
+  });
+
+
   const startDrag = useCallback(
     (event: React.PointerEvent, mode: DragMode) => {
       if (!editing || stacked || colWidth <= 0) return;
