@@ -691,30 +691,18 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
       event.preventDefault();
       event.stopPropagation();
       const start = { ...placement };
-      const startX = event.clientX;
       const startY = event.clientY;
-      const step = colWidth + GUTTER;
       setDrag(mode);
       setSelectedId(block.id);
 
       function onMove(e: PointerEvent) {
-        const cols = Math.round((e.clientX - startX) / step);
         const rows = Math.round((e.clientY - startY) / ROW_UNIT);
+        // Colour blocks always span the full margin-to-margin width; only the
+        // vertical position and height can change.
         const next: Placement =
           mode === "move"
-            ? {
-                ...start,
-                x: Math.min(Math.max(start.x + cols, 0), GRID_COLUMNS - start.w),
-                y: Math.max(0, start.y + rows),
-              }
-            : {
-                ...start,
-                w:
-                  mode === "size-y"
-                    ? start.w
-                    : Math.min(Math.max(start.w + cols, 1), GRID_COLUMNS - start.x),
-                h: mode === "size-x" ? start.h : Math.max(1, start.h + rows),
-              };
+            ? { ...start, x: 0, w: GRID_COLUMNS, y: Math.max(0, start.y + rows) }
+            : { ...start, x: 0, w: GRID_COLUMNS, h: Math.max(1, start.h + rows) };
         setPlacement(block.id, next);
       }
 
@@ -738,8 +726,8 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
       } ${drag ? "is-dragging" : ""}`}
       style={{
         position: "absolute",
-        left: `calc((100% + ${GUTTER}px) * ${placement.x / GRID_COLUMNS})`,
-        width: `calc((100% + ${GUTTER}px) * ${placement.w / GRID_COLUMNS} - ${GUTTER}px)`,
+        left: 0,
+        width: "100%",
         top: `${placement.y * ROW_UNIT}px`,
         height: `${placement.h * ROW_UNIT}px`,
         zIndex: 0,
@@ -786,20 +774,8 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
           <span
             data-editor-ui=""
             data-no-drag=""
-            onPointerDown={(e) => startDrag(e, "size-x")}
-            className="canvas-handle absolute -right-1.5 top-1/2 h-10 w-3 -translate-y-1/2 cursor-ew-resize"
-          />
-          <span
-            data-editor-ui=""
-            data-no-drag=""
             onPointerDown={(e) => startDrag(e, "size-y")}
             className="canvas-handle absolute -bottom-1.5 left-1/2 h-3 w-10 -translate-x-1/2 cursor-ns-resize"
-          />
-          <span
-            data-editor-ui=""
-            data-no-drag=""
-            onPointerDown={(e) => startDrag(e, "size-xy")}
-            className="canvas-handle absolute -bottom-1.5 -right-1.5 h-3 w-3 cursor-nwse-resize"
           />
         </>
       )}
