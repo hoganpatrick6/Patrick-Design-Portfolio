@@ -438,6 +438,7 @@ export function CanvasBlock({
       function onUp() {
         setDrag(null);
         setOffset(null);
+        justDragged.current = moved;
         if (!moved) setSelectedId(id);
         window.removeEventListener("pointermove", onMove);
         window.removeEventListener("pointerup", onUp);
@@ -527,7 +528,29 @@ export function CanvasBlock({
           )}
         </>
       )}
-      <div ref={innerRef}>{children}</div>
+      <div
+        ref={innerRef}
+        onClickCapture={(e) => {
+          if (!editing) return;
+          if (justDragged.current) {
+            justDragged.current = false;
+            return;
+          }
+          const root = innerRef.current;
+          if (!root) return;
+          const target = e.target as HTMLElement;
+          if (target.closest("[data-editor-ui], input, textarea, select")) return;
+          const el = textElementFrom(root, target);
+          if (!el) return;
+          const path = pathTo(root, el);
+          if (path === null) return;
+          if (target.closest("a")) e.preventDefault();
+          e.stopPropagation();
+          setSelectedId(`${id}#${path}`);
+        }}
+      >
+        {children}
+      </div>
     </div>
   );
 }
