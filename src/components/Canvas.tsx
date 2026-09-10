@@ -698,23 +698,13 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
       setSelectedId(block.id);
 
       function onMove(e: PointerEvent) {
-        const cols = Math.round((e.clientX - startX) / step);
         const rows = Math.round((e.clientY - startY) / ROW_UNIT);
+        // Colour blocks always span the full margin-to-margin width; only the
+        // vertical position and height can change.
         const next: Placement =
           mode === "move"
-            ? {
-                ...start,
-                x: Math.min(Math.max(start.x + cols, 0), GRID_COLUMNS - start.w),
-                y: Math.max(0, start.y + rows),
-              }
-            : {
-                ...start,
-                w:
-                  mode === "size-y"
-                    ? start.w
-                    : Math.min(Math.max(start.w + cols, 1), GRID_COLUMNS - start.x),
-                h: mode === "size-x" ? start.h : Math.max(1, start.h + rows),
-              };
+            ? { ...start, x: 0, w: GRID_COLUMNS, y: Math.max(0, start.y + rows) }
+            : { ...start, x: 0, w: GRID_COLUMNS, h: Math.max(1, start.h + rows) };
         setPlacement(block.id, next);
       }
 
