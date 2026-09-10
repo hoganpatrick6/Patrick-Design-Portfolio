@@ -321,6 +321,8 @@ export function CanvasBlock({
 
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
+  const touchedRef = useRef<HTMLElement[]>([]);
+  const justDragged = useRef(false);
   const [drag, setDrag] = useState<DragMode | null>(null);
   const [offset, setOffset] = useState<{ x: number; y: number } | null>(null);
 
