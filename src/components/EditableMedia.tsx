@@ -57,7 +57,7 @@ export function EditableMedia({
   }
 
   const media =
-    placeholder && !override ? (
+    placeholder && (!override || override.src === src) ? (
       <div
         className={`bg-foreground/15 ${className ?? ""}`}
         role="img"
