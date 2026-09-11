@@ -260,6 +260,7 @@ function GroceryFreshPage() {
               width={1600}
               height={1008}
               eager
+              placeholder
               className="aspect-[16/10] w-full object-cover"
             />
           </CanvasBlock>
@@ -291,6 +292,7 @@ function GroceryFreshPage() {
                 alt="A shopper selecting a mandarin from a market display"
                 width={1008}
                 height={1200}
+                placeholder
                 className="aspect-[5/6] w-full object-cover"
               />
               <EditableMedia
@@ -299,6 +301,7 @@ function GroceryFreshPage() {
                 alt="Four blueberries casting shadows on a pale blue background"
                 width={1008}
                 height={1200}
+                placeholder
                 className="aspect-[5/6] w-full object-cover"
               />
               <EditableMedia
@@ -307,6 +310,7 @@ function GroceryFreshPage() {
                 alt="A hand holding two heirloom tomatoes against deep red"
                 width={1008}
                 height={1200}
+                placeholder
                 className="aspect-[5/6] w-full object-cover"
               />
               <EditableMedia
@@ -315,6 +319,7 @@ function GroceryFreshPage() {
                 alt="Stacks of yellow egg cartons on green grocery crates"
                 width={1008}
                 height={1200}
+                placeholder
                 className="aspect-[5/6] w-full object-cover"
               />
             </div>
@@ -328,6 +333,7 @@ function GroceryFreshPage() {
                 alt="A colorful series of produce-led grocery campaign artworks"
                 width={1920}
                 height={912}
+                placeholder
                 className="h-auto min-h-72 w-full object-cover"
               />
             </div>

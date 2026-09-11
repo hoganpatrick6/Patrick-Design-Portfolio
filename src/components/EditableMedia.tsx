@@ -17,6 +17,7 @@ export function EditableMedia({
   width,
   height,
   eager = false,
+  placeholder = false,
 }: {
   id: string;
   src: string;
@@ -25,6 +26,8 @@ export function EditableMedia({
   width?: number;
   height?: number;
   eager?: boolean;
+  /** Show a neutral placeholder until this media slot receives an override. */
+  placeholder?: boolean;
 }) {
   const { editing, overrideFor, setOverride, clearOverride } = useCanvas();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -54,7 +57,13 @@ export function EditableMedia({
   }
 
   const media =
-    kind === "video" ? (
+    placeholder && (!override || override.src === src) ? (
+      <div
+        className={`bg-foreground/15 ${className ?? ""}`}
+        role="img"
+        aria-label={`${alt} placeholder`}
+      />
+    ) : kind === "video" ? (
       frame ? (
         <div className={`relative overflow-hidden ${className ?? ""}`}>
           <iframe
