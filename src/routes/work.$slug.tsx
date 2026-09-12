@@ -223,33 +223,31 @@ function GroceryFreshPage() {
 
       <main className="px-4 pb-32 pt-12 sm:px-8 md:px-16 md:pt-20">
         <Canvas page={page}>
-          <CanvasBlock id="grocery-header" label="Project introduction">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:items-end md:gap-x-6">
-              <h1 className="type-display md:col-span-12 text-foreground">
-                Grocery Fresh
-              </h1>
-              <dl className="grid grid-cols-2 gap-5 md:col-span-4 md:max-w-xs">
-                <div>
-                  <dt className="type-label text-[var(--color-foreground-subtle)]">
-                    Client
-                  </dt>
-                  <dd className="mt-1 type-label text-foreground">Uber</dd>
-                </div>
-                <div>
-                  <dt className="type-label text-[var(--color-foreground-subtle)]">
-                    Role
-                  </dt>
-                  <dd className="mt-1 type-label text-foreground">Art Direction</dd>
-                </div>
-              </dl>
-              <p className="type-label md:col-span-6 md:col-start-6 md:max-w-xl">
-                Why would anyone want a stranger to do their shopping for them? To
-                build more trust and attract more attention to Uber Eats’ grocery
-                business, we created a library of images focused specifically on
-                produce and our courier’s process. After all, produce selection takes
-                skill.
-              </p>
-            </div>
+          <CanvasBlock id="grocery-title" label="Project title">
+            <h1 className="type-display text-foreground">Grocery Fresh</h1>
+          </CanvasBlock>
+
+          <CanvasBlock id="grocery-client" label="Client details">
+            <dl>
+              <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
+              <dd className="mt-1 type-label text-foreground">Uber</dd>
+            </dl>
+          </CanvasBlock>
+
+          <CanvasBlock id="grocery-role" label="Role details">
+            <dl>
+              <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
+              <dd className="mt-1 type-label text-foreground">Art Direction</dd>
+            </dl>
+          </CanvasBlock>
+
+          <CanvasBlock id="grocery-summary" label="Project summary">
+            <p className="type-label max-w-xl">
+              Why would anyone want a stranger to do their shopping for them? To build
+              more trust and attract more attention to Uber Eats’ grocery business, we
+              created a library of images focused specifically on produce and our
+              courier’s process. After all, produce selection takes skill.
+            </p>
           </CanvasBlock>
 
           <CanvasBlock id="grocery-hero" label="Carrot photograph">
@@ -265,64 +263,74 @@ function GroceryFreshPage() {
             />
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-story" label="Image library story">
-            <div className="mx-auto max-w-xl text-center">
-              <h2 className="fragment-name text-2xl leading-tight">Global Image Library</h2>
-              <div className="mx-auto mt-7 max-w-md space-y-4">
-                <p className="type-label">
-                  We partnered with photographers to shoot in four different grocery
-                  stores across Los Angeles, each representing a different region of
-                  the world.
-                </p>
-                <p className="type-label">
-                  It was important for us to shoot in real Eats grocery locations with
-                  real Eats couriers. We wanted to give our audience an authentic look
-                  into who is behind their shopping and how they do it—while also
-                  making each produce item shine like the delicious heroes they are.
-                </p>
-              </div>
-            </div>
+          <CanvasBlock id="grocery-story-title" label="Image library title">
+            <h2 className="fragment-name text-center text-2xl leading-tight">
+              Global Image Library
+            </h2>
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-gallery" label="Produce image library">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <EditableMedia
-                id="grocery-fresh:oranges"
-                src={groceryOranges}
-                alt="A shopper selecting a mandarin from a market display"
-                width={1008}
-                height={1200}
-                placeholder
-                className="aspect-[5/6] w-full object-cover"
-              />
-              <EditableMedia
-                id="grocery-fresh:blueberries"
-                src={groceryBlueberries}
-                alt="Four blueberries casting shadows on a pale blue background"
-                width={1008}
-                height={1200}
-                placeholder
-                className="aspect-[5/6] w-full object-cover"
-              />
-              <EditableMedia
-                id="grocery-fresh:tomatoes"
-                src={groceryTomatoes}
-                alt="A hand holding two heirloom tomatoes against deep red"
-                width={1008}
-                height={1200}
-                placeholder
-                className="aspect-[5/6] w-full object-cover"
-              />
-              <EditableMedia
-                id="grocery-fresh:eggs"
-                src={groceryEggs}
-                alt="Stacks of yellow egg cartons on green grocery crates"
-                width={1008}
-                height={1200}
-                placeholder
-                className="aspect-[5/6] w-full object-cover"
-              />
-            </div>
+          <CanvasBlock id="grocery-story-intro" label="Image library introduction">
+            <p className="type-label text-center">
+              We partnered with photographers to shoot in four different grocery stores
+              across Los Angeles, each representing a different region of the world.
+            </p>
+          </CanvasBlock>
+
+          <CanvasBlock id="grocery-story-detail" label="Image library details">
+            <p className="type-label text-center">
+              It was important for us to shoot in real Eats grocery locations with real
+              Eats couriers. We wanted to give our audience an authentic look into who
+              is behind their shopping and how they do it—while also making each produce
+              item shine like the delicious heroes they are.
+            </p>
+          </CanvasBlock>
+
+          <CanvasBlock id="grocery-oranges" label="Oranges image">
+            <EditableMedia
+              id="grocery-fresh:oranges"
+              src={groceryOranges}
+              alt="A shopper selecting a mandarin from a market display"
+              width={1008}
+              height={1200}
+              placeholder
+              className="aspect-[5/6] w-full object-cover"
+            />
+          </CanvasBlock>
+
+          <CanvasBlock id="grocery-blueberries" label="Blueberries image">
+            <EditableMedia
+              id="grocery-fresh:blueberries"
+              src={groceryBlueberries}
+              alt="Four blueberries casting shadows on a pale blue background"
+              width={1008}
+              height={1200}
+              placeholder
+              className="aspect-[5/6] w-full object-cover"
+            />
+          </CanvasBlock>
+
+          <CanvasBlock id="grocery-tomatoes" label="Tomatoes image">
+            <EditableMedia
+              id="grocery-fresh:tomatoes"
+              src={groceryTomatoes}
+              alt="A hand holding two heirloom tomatoes against deep red"
+              width={1008}
+              height={1200}
+              placeholder
+              className="aspect-[5/6] w-full object-cover"
+            />
+          </CanvasBlock>
+
+          <CanvasBlock id="grocery-eggs" label="Eggs image">
+            <EditableMedia
+              id="grocery-fresh:eggs"
+              src={groceryEggs}
+              alt="Stacks of yellow egg cartons on green grocery crates"
+              width={1008}
+              height={1200}
+              placeholder
+              className="aspect-[5/6] w-full object-cover"
+            />
           </CanvasBlock>
 
           <CanvasBlock id="grocery-campaign" label="Campaign artwork">
