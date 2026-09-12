@@ -51,6 +51,7 @@ export function BlockInspector() {
     clearStyle,
     blockById,
     updateBlock,
+    duplicateBlock,
     removeBlock,
     hideBlock,
   } = useCanvas();
@@ -258,6 +259,42 @@ export function BlockInspector() {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {!isTextPick && block?.kind === "project-description" && (
+        <div className="mb-4 space-y-2 border-t border-[var(--color-border)] pt-3">
+          <input
+            className={field}
+            value={block.title ?? ""}
+            placeholder="Project title"
+            onChange={(e) => updateBlock(id, { title: e.target.value })}
+          />
+          <textarea
+            className={field}
+            value={block.description ?? ""}
+            placeholder="Project description"
+            rows={4}
+            onChange={(e) => updateBlock(id, { description: e.target.value })}
+          />
+          <input
+            className={field}
+            value={block.category ?? ""}
+            placeholder="Category"
+            onChange={(e) => updateBlock(id, { category: e.target.value })}
+          />
+          <input
+            className={field}
+            value={block.year ?? ""}
+            placeholder="Year"
+            onChange={(e) => updateBlock(id, { year: e.target.value })}
+          />
+          <input
+            className={field}
+            value={block.href ?? ""}
+            placeholder="Project link"
+            onChange={(e) => updateBlock(id, { href: e.target.value })}
+          />
         </div>
       )}
 
@@ -554,6 +591,16 @@ export function BlockInspector() {
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[var(--color-border)] pt-3">
+        {block && block.kind !== "shape" && (
+          <>
+            <button type="button" onClick={() => duplicateBlock(id, "above")} className={chip}>
+              Duplicate above
+            </button>
+            <button type="button" onClick={() => duplicateBlock(id, "below")} className={chip}>
+              Duplicate below
+            </button>
+          </>
+        )}
         {block?.kind !== "shape" && (
           <button type="button" onClick={() => clearStyle(id)} className={chip}>
             Clear type overrides

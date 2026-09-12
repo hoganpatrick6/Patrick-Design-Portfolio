@@ -47,6 +47,7 @@ type CanvasContextValue = {
   blocksFor: (page: string) => CanvasBlock[];
   blockById: (id: string) => CanvasBlock | undefined;
   addBlock: (page: string, kind: BlockKind, at?: Partial<Placement>) => CanvasBlock;
+  duplicateBlock: (id: string, direction: "above" | "below") => CanvasBlock | undefined;
   updateBlock: (id: string, patch: Partial<CanvasBlock>) => void;
   removeBlock: (id: string) => void;
 
@@ -106,7 +107,10 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const p = read<PlacementMap>(CANVAS_KEYS.placements);
     if (p) setPlacements({ ...SITE_CANVAS.placements, ...p });
     const b = read<CanvasBlock[]>(CANVAS_KEYS.blocks);
-    if (Array.isArray(b)) setBlocks(b);
+    if (Array.isArray(b)) {
+      const savedIds = new Set(b.map((block) => block.id));
+      setBlocks([...SITE_CANVAS.blocks.filter((block) => !savedIds.has(block.id)), ...b]);
+    }
     const s = read<StyleMap>(CANVAS_KEYS.styles);
     if (s) setStyles(s);
     const h = read<string[]>(CANVAS_KEYS.hidden);
@@ -120,7 +124,11 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         setPlacements({ ...SITE_CANVAS.placements, ...(rp as PlacementMap) });
       }
       const rb = values[SITE_KEYS.canvasBlocks];
-      if (Array.isArray(rb)) setBlocks(rb as CanvasBlock[]);
+      if (Array.isArray(rb)) {
+        const remote = rb as CanvasBlock[];
+        const remoteIds = new Set(remote.map((block) => block.id));
+        setBlocks([...SITE_CANVAS.blocks.filter((block) => !remoteIds.has(block.id)), ...remote]);
+      }
       const rs = values[SITE_KEYS.canvasStyles];
       if (rs && typeof rs === "object") setStyles(rs as StyleMap);
       const rh = values[SITE_KEYS.canvasHidden];
@@ -212,6 +220,39 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       });
     },
     [persistBlocks],
+  );
+
+  const duplicateBlock = useCallback(
+    (id: string, direction: "above" | "below") => {
+      const source = blocks.find((block) => block.id === id);
+      if (!source) return undefined;
+      const copy: CanvasBlock = {
+        ...source,
+        id: `block-${Math.random().toString(36).slice(2, 8)}`,
+      };
+      setBlocks((prev) => {
+        const next = [...prev, copy];
+        persistBlocks(next);
+        return next;
+      });
+      const sourcePlacement = placementFor(id);
+      const y = direction === "above"
+        ? Math.max(0, sourcePlacement.y - sourcePlacement.h - 1)
+        : sourcePlacement.y + sourcePlacement.h + 1;
+      setPlacement(copy.id, { ...sourcePlacement, y });
+      const sourceStyle = styles[id];
+      if (sourceStyle) {
+        setStyles((prev) => {
+          const next = { ...prev, [copy.id]: { ...sourceStyle } };
+          store(CANVAS_KEYS.styles, next);
+          writeSiteValue(SITE_KEYS.canvasStyles, next);
+          return next;
+        });
+      }
+      setSelectedId(copy.id);
+      return copy;
+    },
+    [blocks, persistBlocks, placementFor, setPlacement, styles],
   );
 
   const removeBlock = useCallback(
@@ -334,6 +375,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       blocksFor,
       blockById,
       addBlock,
+      duplicateBlock,
       updateBlock,
       removeBlock,
       styles,
@@ -362,6 +404,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       blocksFor,
       blockById,
       addBlock,
+      duplicateBlock,
       updateBlock,
       removeBlock,
       styles,
