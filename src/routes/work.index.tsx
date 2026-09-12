@@ -70,7 +70,7 @@ function WorkPage() {
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
         <Canvas page="work">
           <CanvasBlock id="work-intro" label="Intro">
-            <div className="border-t border-[var(--color-border)] pt-8">
+            <div className="pt-8">
               <p className="type-display text-foreground">
                 Patrick is a brand designer, art director and photographer who excels at
                 bringing creativity to design systems thinking.
