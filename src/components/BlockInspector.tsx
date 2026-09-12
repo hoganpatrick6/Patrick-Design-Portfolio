@@ -51,6 +51,7 @@ export function BlockInspector() {
     clearStyle,
     blockById,
     updateBlock,
+    duplicateBlock,
     removeBlock,
     hideBlock,
   } = useCanvas();
@@ -554,6 +555,16 @@ export function BlockInspector() {
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[var(--color-border)] pt-3">
+        {block && block.kind !== "shape" && (
+          <>
+            <button type="button" onClick={() => duplicateBlock(id, "above")} className={chip}>
+              Duplicate above
+            </button>
+            <button type="button" onClick={() => duplicateBlock(id, "below")} className={chip}>
+              Duplicate below
+            </button>
+          </>
+        )}
         {block?.kind !== "shape" && (
           <button type="button" onClick={() => clearStyle(id)} className={chip}>
             Clear type overrides

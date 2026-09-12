@@ -43,7 +43,7 @@ export type BlockStyle = Partial<{
   color: string;
 }>;
 
-export type BlockKind = "text" | "image" | "video" | "shape";
+export type BlockKind = "text" | "image" | "video" | "shape" | "project-description";
 
 /** A block added through the editor (text, picture or video). */
 export type CanvasBlock = {
@@ -69,6 +69,13 @@ export type CanvasBlock = {
   radius?: number;
   /** Opacity of a background shape, 0–1. */
   opacity?: number;
+  /** Optional destination for linked media or project copy. */
+  href?: string;
+  /** Structured copy used by independently editable project-list entries. */
+  title?: string;
+  description?: string;
+  category?: string;
+  year?: string;
 };
 
 export type PlacementMap = Record<string, Placement>;
@@ -139,12 +146,18 @@ export const SITE_CANVAS: CanvasDefaults = {
       "w": 2,
       "h": 2
     },
-    "work-projects": {
-      "x": 2,
-      "y": 12,
-      "w": 10,
-      "h": 60
-    },
+    "work-project-lunethra-image": { "x": 2, "y": 12, "w": 5, "h": 14 },
+    "work-project-lunethra-copy": { "x": 7, "y": 12, "w": 5, "h": 14 },
+    "work-project-driftwell-image": { "x": 2, "y": 28, "w": 5, "h": 14 },
+    "work-project-driftwell-copy": { "x": 7, "y": 28, "w": 5, "h": 14 },
+    "work-project-clyra-image": { "x": 2, "y": 44, "w": 5, "h": 14 },
+    "work-project-clyra-copy": { "x": 7, "y": 44, "w": 5, "h": 14 },
+    "work-project-forgekind-image": { "x": 2, "y": 60, "w": 5, "h": 14 },
+    "work-project-forgekind-copy": { "x": 7, "y": 60, "w": 5, "h": 14 },
+    "work-project-nestive-image": { "x": 2, "y": 76, "w": 5, "h": 14 },
+    "work-project-nestive-copy": { "x": 7, "y": 76, "w": 5, "h": 14 },
+    "work-project-pollenate-image": { "x": 2, "y": 92, "w": 5, "h": 14 },
+    "work-project-pollenate-copy": { "x": 7, "y": 92, "w": 5, "h": 14 },
     "project-header": {
       "x": 0,
       "y": 0,
@@ -248,7 +261,20 @@ export const SITE_CANVAS: CanvasDefaults = {
       "h": 24
     }
   },
-  "blocks": [],
+  "blocks": [
+    { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": "/src/assets/projects/lunethra.jpg", "alt": "Uber Credit Card", "caption": "", "aspect": "3:2", "href": "/work/lunethra" },
+    { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Identity", "year": "2025" },
+    { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": "/src/assets/projects/driftwell.jpg", "alt": "Grocery Fresh", "caption": "", "aspect": "3:2", "href": "/work/driftwell" },
+    { "id": "work-project-driftwell-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/driftwell", "title": "Grocery Fresh", "description": "", "category": "Art Direction", "year": "2023" },
+    { "id": "work-project-clyra-image", "page": "work", "kind": "image", "src": "/src/assets/projects/clyra.jpg", "alt": "Clyra", "caption": "", "aspect": "3:2", "href": "/work/clyra" },
+    { "id": "work-project-clyra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/clyra", "title": "Clyra", "description": "UI system and marketing site for a B2B SaaS product.", "category": "Product Design", "year": "2023" },
+    { "id": "work-project-forgekind-image", "page": "work", "kind": "image", "src": "/src/assets/projects/forgekind.jpg", "alt": "Forgekind", "caption": "", "aspect": "3:2", "href": "/work/forgekind" },
+    { "id": "work-project-forgekind-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/forgekind", "title": "Forgekind", "description": "Identity, typography, and web experience for a creative studio.", "category": "Brand & Web", "year": "2022" },
+    { "id": "work-project-nestive-image", "page": "work", "kind": "image", "src": "/src/assets/projects/nestive.jpg", "alt": "Nestive", "caption": "", "aspect": "3:2", "href": "/work/nestive" },
+    { "id": "work-project-nestive-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/nestive", "title": "Nestive", "description": "Magazine design and digital editorial direction.", "category": "Editorial", "year": "2022" },
+    { "id": "work-project-pollenate-image", "page": "work", "kind": "image", "src": "/src/assets/projects/pollenate.jpg", "alt": "Pollenate", "caption": "", "aspect": "3:2", "href": "/work/pollenate" },
+    { "id": "work-project-pollenate-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/pollenate", "title": "Pollenate", "description": "Visual direction and packaging for a consumer goods launch.", "category": "Art Direction", "year": "2021" }
+  ],
   "styles": {},
   "hidden": []
 };

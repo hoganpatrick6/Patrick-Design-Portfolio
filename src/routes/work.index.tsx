@@ -3,9 +3,7 @@ import { ThemeToggle } from "../components/ThemeToggle";
 import { TypeSettingsPanel } from "../components/TypeSettingsPanel";
 import { EditorToolbar } from "../components/EditorToolbar";
 import { Canvas, CanvasBlock } from "../components/Canvas";
-import { EditableMedia } from "../components/EditableMedia";
 import { FragmentName } from "../components/FragmentName";
-import { projects } from "../data/projects";
 
 export const Route = createFileRoute("/work/")({
   head: () => ({
@@ -86,54 +84,6 @@ function WorkPage() {
             </div>
           </CanvasBlock>
 
-          <CanvasBlock id="work-projects" label="Project list">
-            <div className="space-y-16">
-              {projects.map((project) => (
-                <div
-                  key={project.slug}
-                  className="group grid grid-cols-1 items-start gap-4 border-b border-[var(--color-border)] pb-12 md:grid-cols-12 md:gap-x-8 md:gap-y-2"
-                >
-                  <div className="md:col-span-5">
-                    <Link
-                      to="/work/$slug"
-                      params={{ slug: project.slug }}
-                      aria-label={`View ${project.title}`}
-                      className="block"
-                    >
-                      <EditableMedia
-                        id={`project-thumb:${project.slug}`}
-                        src={project.image}
-                        alt={project.title}
-                        className="aspect-[3/2] w-full rounded-sm object-cover transition-opacity group-hover:opacity-85"
-                      />
-                    </Link>
-                  </div>
-                  <div className="md:col-span-4">
-                    <h2 className="type-heading font-medium text-foreground">
-                      <Link
-                        to="/work/$slug"
-                        params={{ slug: project.slug }}
-                        className="transition-colors hover:text-[var(--color-foreground-muted)]"
-                      >
-                        {project.title}
-                      </Link>
-                    </h2>
-                    <p className="mt-2 max-w-md type-body text-[var(--color-foreground-muted)]">
-                      {project.description}
-                    </p>
-                  </div>
-                  <div className="md:col-span-3 md:text-right">
-                    <span className="block type-body text-[var(--color-foreground-muted)]">
-                      {project.category}
-                    </span>
-                    <span className="block type-body text-[var(--color-foreground-subtle)]">
-                      {project.year}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CanvasBlock>
         </Canvas>
       </main>
     </div>
