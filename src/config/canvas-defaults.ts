@@ -169,11 +169,29 @@ export const SITE_CANVAS: CanvasDefaults = {
       "w": 12,
       "h": 20
     },
-    "grocery-header": {
+    "grocery-title": {
       "x": 0,
       "y": 0,
       "w": 12,
-      "h": 9
+      "h": 5
+    },
+    "grocery-client": {
+      "x": 0,
+      "y": 6,
+      "w": 2,
+      "h": 3
+    },
+    "grocery-role": {
+      "x": 2,
+      "y": 6,
+      "w": 2,
+      "h": 3
+    },
+    "grocery-summary": {
+      "x": 5,
+      "y": 6,
+      "w": 6,
+      "h": 5
     },
     "grocery-hero": {
       "x": 0,
@@ -181,17 +199,47 @@ export const SITE_CANVAS: CanvasDefaults = {
       "w": 12,
       "h": 36
     },
-    "grocery-story": {
+    "grocery-story-title": {
       "x": 3,
       "y": 53,
       "w": 6,
-      "h": 12
+      "h": 3
     },
-    "grocery-gallery": {
+    "grocery-story-intro": {
+      "x": 4,
+      "y": 57,
+      "w": 4,
+      "h": 4
+    },
+    "grocery-story-detail": {
+      "x": 4,
+      "y": 62,
+      "w": 4,
+      "h": 6
+    },
+    "grocery-oranges": {
       "x": 0,
       "y": 69,
-      "w": 12,
-      "h": 66
+      "w": 6,
+      "h": 32
+    },
+    "grocery-blueberries": {
+      "x": 6,
+      "y": 69,
+      "w": 6,
+      "h": 32
+    },
+    "grocery-tomatoes": {
+      "x": 0,
+      "y": 102,
+      "w": 6,
+      "h": 32
+    },
+    "grocery-eggs": {
+      "x": 6,
+      "y": 102,
+      "w": 6,
+      "h": 32
     },
     "grocery-campaign": {
       "x": 0,
