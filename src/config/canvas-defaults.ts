@@ -76,6 +76,8 @@ export type CanvasBlock = {
   radius?: number;
   /** Opacity of a background shape, 0–1. */
   opacity?: number;
+  /** Thickness of a rule line, in px. */
+  thickness?: number;
   /** Optional destination for linked media or project copy. */
   href?: string;
   /** Structured copy used by independently editable project-list entries. */
