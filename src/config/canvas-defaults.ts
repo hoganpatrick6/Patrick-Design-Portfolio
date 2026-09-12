@@ -50,7 +50,7 @@ export type BlockStyle = Partial<{
   color: string;
 }>;
 
-export type BlockKind = "text" | "image" | "video" | "shape" | "project-description";
+export type BlockKind = "text" | "image" | "video" | "shape" | "rule" | "project-description";
 
 /** A block added through the editor (text, picture or video). */
 export type CanvasBlock = {
