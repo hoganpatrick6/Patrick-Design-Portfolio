@@ -48,13 +48,13 @@ export const projects: Project[] = [
   },
   {
     slug: "clyra",
-    title: "Clyra",
+    title: "Uber Color System",
     category: "Product Design",
     year: "2023",
-    description: "UI system and marketing site for a B2B SaaS product.",
+    description: "A strategic consolidation to Uber's global color theory.",
     image: clyraThumb,
     role: "Product Design, Web Design",
-    client: "Clyra",
+    client: "Uber",
     overview: [
       "A component library and marketing site built on one shared type and spacing scale, so the product and the pitch look like the same company.",
       "Dense data views were simplified to a small set of predictable patterns.",

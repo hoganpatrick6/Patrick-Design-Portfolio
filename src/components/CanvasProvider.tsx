@@ -92,6 +92,31 @@ function read<T>(key: string): T | null {
   }
 }
 
+/**
+ * One-time content repair: saved canvas copies still hold the original
+ * "Clyra" text for this block, and saved blocks win over the code defaults.
+ * Rewrite only when the old text is still present so later edits are kept.
+ */
+function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; changed: boolean } {
+  let changed = false;
+  const next = blocks.map((block) => {
+    if (
+      block.id === "work-project-clyra-copy" &&
+      block.title === "Clyra" &&
+      block.description === "UI system and marketing site for a B2B SaaS product."
+    ) {
+      changed = true;
+      return {
+        ...block,
+        title: "Uber Color System",
+        description: "A strategic consolidation to Uber's global color theory.",
+      };
+    }
+    return block;
+  });
+  return { blocks: next, changed };
+}
+
 export function CanvasProvider({ children }: { children: ReactNode }) {
   const [editing, setEditing] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -109,7 +134,13 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const b = read<CanvasBlock[]>(CANVAS_KEYS.blocks);
     if (Array.isArray(b)) {
       const savedIds = new Set(b.map((block) => block.id));
-      setBlocks([...SITE_CANVAS.blocks.filter((block) => !savedIds.has(block.id)), ...b]);
+      const merged = [...SITE_CANVAS.blocks.filter((block) => !savedIds.has(block.id)), ...b];
+      const repaired = repairSavedBlocks(merged);
+      setBlocks(repaired.blocks);
+      if (repaired.changed) {
+        store(CANVAS_KEYS.blocks, repaired.blocks);
+        writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
+      }
     }
     const s = read<StyleMap>(CANVAS_KEYS.styles);
     if (s) setStyles(s);
@@ -127,7 +158,13 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       if (Array.isArray(rb)) {
         const remote = rb as CanvasBlock[];
         const remoteIds = new Set(remote.map((block) => block.id));
-        setBlocks([...SITE_CANVAS.blocks.filter((block) => !remoteIds.has(block.id)), ...remote]);
+        const merged = [...SITE_CANVAS.blocks.filter((block) => !remoteIds.has(block.id)), ...remote];
+        const repaired = repairSavedBlocks(merged);
+        setBlocks(repaired.blocks);
+        if (repaired.changed) {
+          store(CANVAS_KEYS.blocks, repaired.blocks);
+          writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
+        }
       }
       const rs = values[SITE_KEYS.canvasStyles];
       if (rs && typeof rs === "object") setStyles(rs as StyleMap);
