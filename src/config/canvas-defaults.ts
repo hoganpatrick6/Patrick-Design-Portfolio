@@ -167,6 +167,13 @@ export const SITE_CANVAS: CanvasDefaults = {
     "work-project-nestive-copy": { "x": 7, "y": 76, "w": 5, "h": 14 },
     "work-project-pollenate-image": { "x": 2, "y": 92, "w": 5, "h": 14 },
     "work-project-pollenate-copy": { "x": 7, "y": 92, "w": 5, "h": 14 },
+    "work-rule-intro": { "x": 0, "y": 0, "w": 12, "h": 1 },
+    "work-rule-lunethra": { "x": 7, "y": 26, "w": 5, "h": 1 },
+    "work-rule-driftwell": { "x": 7, "y": 42, "w": 5, "h": 1 },
+    "work-rule-clyra": { "x": 7, "y": 58, "w": 5, "h": 1 },
+    "work-rule-forgekind": { "x": 7, "y": 74, "w": 5, "h": 1 },
+    "work-rule-nestive": { "x": 7, "y": 90, "w": 5, "h": 1 },
+    "work-rule-pollenate": { "x": 7, "y": 106, "w": 5, "h": 1 },
     "project-header": {
       "x": 0,
       "y": 0,
