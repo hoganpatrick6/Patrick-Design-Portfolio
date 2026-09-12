@@ -158,7 +158,13 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       if (Array.isArray(rb)) {
         const remote = rb as CanvasBlock[];
         const remoteIds = new Set(remote.map((block) => block.id));
-        setBlocks([...SITE_CANVAS.blocks.filter((block) => !remoteIds.has(block.id)), ...remote]);
+        const merged = [...SITE_CANVAS.blocks.filter((block) => !remoteIds.has(block.id)), ...remote];
+        const repaired = repairSavedBlocks(merged);
+        setBlocks(repaired.blocks);
+        if (repaired.changed) {
+          store(CANVAS_KEYS.blocks, repaired.blocks);
+          writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
+        }
       }
       const rs = values[SITE_KEYS.canvasStyles];
       if (rs && typeof rs === "object") setStyles(rs as StyleMap);
