@@ -148,6 +148,8 @@ export function BlockInspector() {
                 ? "Text block"
                 : block.kind === "shape"
                   ? "Colour block"
+                  : block.kind === "rule"
+                  ? "Line"
                   : block.kind === "video"
                     ? "Video block"
                     : "Image block"
@@ -593,7 +595,7 @@ export function BlockInspector() {
       )}
 
       {/* Shared styles */}
-      {block?.kind !== "shape" && (
+      {block?.kind !== "shape" && block?.kind !== "rule" && (
       <div className="mt-4 space-y-2 border-t border-[var(--color-border)] pt-3">
         <div className="text-[10px] uppercase tracking-wide text-[var(--color-foreground-subtle)]">
           Shared styles
@@ -644,7 +646,7 @@ export function BlockInspector() {
             </button>
           </>
         )}
-        {block?.kind !== "shape" && (
+        {block?.kind !== "shape" && block?.kind !== "rule" && (
           <button type="button" onClick={() => clearStyle(id)} className={chip}>
             Clear type overrides
           </button>
