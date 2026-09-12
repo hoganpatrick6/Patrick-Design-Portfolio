@@ -224,6 +224,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         ...(kind === "shape"
           ? { fill: "var(--color-foreground)", opacity: 0.06, radius: 0 }
           : {}),
+        ...(kind === "rule" ? { fill: "var(--color-border)", thickness: 1 } : {}),
       };
       setBlocks((prev) => {
         const next = [...prev, block];

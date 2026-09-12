@@ -574,13 +574,17 @@ function PlacedBlock({ block }: { block: CanvasBlockData }) {
     ? "Video"
     : block.kind === "text"
       ? "Text"
-      : block.kind === "project-description"
-        ? "Project description"
-        : "Image";
+      : block.kind === "rule"
+        ? "Line"
+        : block.kind === "project-description"
+          ? "Project description"
+          : "Image";
   return (
     <CanvasBlock id={block.id} label={label} onDelete={() => removeBlock(block.id)}>
       {block.kind === "text" ? (
         <TextBlockView block={block} />
+      ) : block.kind === "rule" ? (
+        <RuleBlockView block={block} />
       ) : block.kind === "project-description" ? (
         <ProjectDescriptionBlockView block={block} />
       ) : (
@@ -590,9 +594,23 @@ function PlacedBlock({ block }: { block: CanvasBlockData }) {
   );
 }
 
+/** A plain horizontal rule that can be moved and removed on its own. */
+function RuleBlockView({ block }: { block: CanvasBlockData }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="w-full"
+      style={{
+        height: `${block.thickness ?? 1}px`,
+        background: block.fill || "var(--color-border)",
+      }}
+    />
+  );
+}
+
 function ProjectDescriptionBlockView({ block }: { block: CanvasBlockData }) {
   const content = (
-    <div className="grid grid-cols-1 gap-4 border-b border-[var(--color-border)] pb-8 md:grid-cols-5">
+    <div className="grid grid-cols-1 gap-4 pb-8 md:grid-cols-5">
       <div className="md:col-span-3">
         <h2 className="type-heading font-medium text-foreground">{block.title}</h2>
         {block.description && (

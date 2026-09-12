@@ -50,7 +50,7 @@ export type BlockStyle = Partial<{
   color: string;
 }>;
 
-export type BlockKind = "text" | "image" | "video" | "shape" | "project-description";
+export type BlockKind = "text" | "image" | "video" | "shape" | "rule" | "project-description";
 
 /** A block added through the editor (text, picture or video). */
 export type CanvasBlock = {
@@ -76,6 +76,8 @@ export type CanvasBlock = {
   radius?: number;
   /** Opacity of a background shape, 0–1. */
   opacity?: number;
+  /** Thickness of a rule line, in px. */
+  thickness?: number;
   /** Optional destination for linked media or project copy. */
   href?: string;
   /** Structured copy used by independently editable project-list entries. */
@@ -165,6 +167,13 @@ export const SITE_CANVAS: CanvasDefaults = {
     "work-project-nestive-copy": { "x": 7, "y": 76, "w": 5, "h": 14 },
     "work-project-pollenate-image": { "x": 2, "y": 92, "w": 5, "h": 14 },
     "work-project-pollenate-copy": { "x": 7, "y": 92, "w": 5, "h": 14 },
+    "work-rule-intro": { "x": 0, "y": 0, "w": 12, "h": 1 },
+    "work-rule-lunethra": { "x": 7, "y": 26, "w": 5, "h": 1 },
+    "work-rule-driftwell": { "x": 7, "y": 42, "w": 5, "h": 1 },
+    "work-rule-clyra": { "x": 7, "y": 58, "w": 5, "h": 1 },
+    "work-rule-forgekind": { "x": 7, "y": 74, "w": 5, "h": 1 },
+    "work-rule-nestive": { "x": 7, "y": 90, "w": 5, "h": 1 },
+    "work-rule-pollenate": { "x": 7, "y": 106, "w": 5, "h": 1 },
     "project-header": {
       "x": 0,
       "y": 0,
@@ -281,6 +290,14 @@ export const SITE_CANVAS: CanvasDefaults = {
     { "id": "work-project-nestive-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/nestive", "title": "Nestive", "description": "Magazine design and digital editorial direction.", "category": "Editorial", "year": "2022" },
     { "id": "work-project-pollenate-image", "page": "work", "kind": "image", "src": pollenateThumb, "alt": "Pollenate", "caption": "", "aspect": "3:2", "href": "/work/pollenate" },
     { "id": "work-project-pollenate-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/pollenate", "title": "Pollenate", "description": "Visual direction and packaging for a consumer goods launch.", "category": "Art Direction", "year": "2021" }
+    ,
+    { "id": "work-rule-intro", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-lunethra", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-driftwell", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-clyra", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-forgekind", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-nestive", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-pollenate", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 }
   ],
   "styles": {},
   "hidden": []

@@ -108,6 +108,13 @@ export function EditorToolbar({ page }: { page: string }) {
           >
             + Colour
           </button>
+          <button
+            type="button"
+            onClick={() => addBlock(page, "rule", { x: 0, y: bottomRow(), w: 12, h: 1 })}
+            className={chip}
+          >
+            + Line
+          </button>
           <button type="button" onClick={onSave} className={chip}>
             Publish layout
           </button>

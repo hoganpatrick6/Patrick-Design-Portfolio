@@ -148,6 +148,8 @@ export function BlockInspector() {
                 ? "Text block"
                 : block.kind === "shape"
                   ? "Colour block"
+                  : block.kind === "rule"
+                  ? "Line"
                   : block.kind === "video"
                     ? "Video block"
                     : "Image block"
@@ -353,8 +355,51 @@ export function BlockInspector() {
         </div>
       )}
 
+      {/* Rule line */}
+      {block?.kind === "rule" && (
+        <div className="mb-4 space-y-3 border-t border-[var(--color-border)] pt-3">
+          <div className="text-[10px] uppercase tracking-wide text-[var(--color-foreground-subtle)]">
+            Line
+          </div>
+          <div className="flex flex-wrap items-center gap-1">
+            {SHAPE_FILLS.map((c) => (
+              <button
+                key={c.label}
+                type="button"
+                title={c.label}
+                onClick={() => updateBlock(id, { fill: c.value })}
+                className={`h-6 w-6 rounded-full border ${
+                  block.fill === c.value
+                    ? "border-foreground ring-2 ring-foreground/30"
+                    : "border-[var(--color-border)]"
+                }`}
+                style={{ background: c.value }}
+              />
+            ))}
+            <input
+              type="color"
+              aria-label="Custom line colour"
+              onChange={(e) => updateBlock(id, { fill: e.target.value })}
+              className="h-6 w-8 cursor-pointer rounded border border-[var(--color-border)] bg-transparent"
+            />
+          </div>
+          <Slider
+            label="Thickness"
+            value={block.thickness ?? 1}
+            active
+            min={1}
+            max={12}
+            step={1}
+            digits={0}
+            suffix="px"
+            onChange={(v) => updateBlock(id, { thickness: v })}
+            onClear={() => updateBlock(id, { thickness: 1 })}
+          />
+        </div>
+      )}
+
       {/* Typography */}
-      {block?.kind !== "shape" && (
+      {block?.kind !== "shape" && block?.kind !== "rule" && (
       <div className="space-y-3 border-t border-[var(--color-border)] pt-3">
         <div className="text-[10px] uppercase tracking-wide text-[var(--color-foreground-subtle)]">
           Type
@@ -550,7 +595,7 @@ export function BlockInspector() {
       )}
 
       {/* Shared styles */}
-      {block?.kind !== "shape" && (
+      {block?.kind !== "shape" && block?.kind !== "rule" && (
       <div className="mt-4 space-y-2 border-t border-[var(--color-border)] pt-3">
         <div className="text-[10px] uppercase tracking-wide text-[var(--color-foreground-subtle)]">
           Shared styles
@@ -601,7 +646,7 @@ export function BlockInspector() {
             </button>
           </>
         )}
-        {block?.kind !== "shape" && (
+        {block?.kind !== "shape" && block?.kind !== "rule" && (
           <button type="button" onClick={() => clearStyle(id)} className={chip}>
             Clear type overrides
           </button>
