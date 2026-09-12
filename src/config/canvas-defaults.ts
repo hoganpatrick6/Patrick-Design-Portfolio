@@ -270,7 +270,7 @@ export const SITE_CANVAS: CanvasDefaults = {
   },
   "blocks": [
     { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2", "href": "/work/lunethra" },
-    { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Identity", "year": "2025" },
+    { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Design,\nArt Direction", "year": "2025" },
     { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2", "href": "/work/driftwell" },
     { "id": "work-project-driftwell-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/driftwell", "title": "Grocery Fresh", "description": "", "category": "Art Direction", "year": "2023" },
     { "id": "work-project-clyra-image", "page": "work", "kind": "image", "src": clyraThumb, "alt": "Clyra", "caption": "", "aspect": "3:2", "href": "/work/clyra" },
