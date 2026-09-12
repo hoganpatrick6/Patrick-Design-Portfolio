@@ -1,3 +1,10 @@
+import lunethraThumb from "../assets/projects/lunethra.jpg";
+import driftwellThumb from "../assets/projects/driftwell.jpg";
+import clyraThumb from "../assets/projects/clyra.jpg";
+import forgekindThumb from "../assets/projects/forgekind.jpg";
+import nestiveThumb from "../assets/projects/nestive.jpg";
+import pollenateThumb from "../assets/projects/pollenate.jpg";
+
 /**
  * The page canvas.
  *
@@ -262,17 +269,17 @@ export const SITE_CANVAS: CanvasDefaults = {
     }
   },
   "blocks": [
-    { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": "/src/assets/projects/lunethra.jpg", "alt": "Uber Credit Card", "caption": "", "aspect": "3:2", "href": "/work/lunethra" },
+    { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2", "href": "/work/lunethra" },
     { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Identity", "year": "2025" },
-    { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": "/src/assets/projects/driftwell.jpg", "alt": "Grocery Fresh", "caption": "", "aspect": "3:2", "href": "/work/driftwell" },
+    { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2", "href": "/work/driftwell" },
     { "id": "work-project-driftwell-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/driftwell", "title": "Grocery Fresh", "description": "", "category": "Art Direction", "year": "2023" },
-    { "id": "work-project-clyra-image", "page": "work", "kind": "image", "src": "/src/assets/projects/clyra.jpg", "alt": "Clyra", "caption": "", "aspect": "3:2", "href": "/work/clyra" },
+    { "id": "work-project-clyra-image", "page": "work", "kind": "image", "src": clyraThumb, "alt": "Clyra", "caption": "", "aspect": "3:2", "href": "/work/clyra" },
     { "id": "work-project-clyra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/clyra", "title": "Clyra", "description": "UI system and marketing site for a B2B SaaS product.", "category": "Product Design", "year": "2023" },
-    { "id": "work-project-forgekind-image", "page": "work", "kind": "image", "src": "/src/assets/projects/forgekind.jpg", "alt": "Forgekind", "caption": "", "aspect": "3:2", "href": "/work/forgekind" },
+    { "id": "work-project-forgekind-image", "page": "work", "kind": "image", "src": forgekindThumb, "alt": "Forgekind", "caption": "", "aspect": "3:2", "href": "/work/forgekind" },
     { "id": "work-project-forgekind-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/forgekind", "title": "Forgekind", "description": "Identity, typography, and web experience for a creative studio.", "category": "Brand & Web", "year": "2022" },
-    { "id": "work-project-nestive-image", "page": "work", "kind": "image", "src": "/src/assets/projects/nestive.jpg", "alt": "Nestive", "caption": "", "aspect": "3:2", "href": "/work/nestive" },
+    { "id": "work-project-nestive-image", "page": "work", "kind": "image", "src": nestiveThumb, "alt": "Nestive", "caption": "", "aspect": "3:2", "href": "/work/nestive" },
     { "id": "work-project-nestive-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/nestive", "title": "Nestive", "description": "Magazine design and digital editorial direction.", "category": "Editorial", "year": "2022" },
-    { "id": "work-project-pollenate-image", "page": "work", "kind": "image", "src": "/src/assets/projects/pollenate.jpg", "alt": "Pollenate", "caption": "", "aspect": "3:2", "href": "/work/pollenate" },
+    { "id": "work-project-pollenate-image", "page": "work", "kind": "image", "src": pollenateThumb, "alt": "Pollenate", "caption": "", "aspect": "3:2", "href": "/work/pollenate" },
     { "id": "work-project-pollenate-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/pollenate", "title": "Pollenate", "description": "Visual direction and packaging for a consumer goods launch.", "category": "Art Direction", "year": "2021" }
   ],
   "styles": {},

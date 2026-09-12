@@ -241,11 +241,18 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         : sourcePlacement.y + sourcePlacement.h + 1;
       setPlacement(copy.id, { ...sourcePlacement, y });
       const sourceStyle = styles[id];
-      if (sourceStyle) setStyle(copy.id, sourceStyle);
+      if (sourceStyle) {
+        setStyles((prev) => {
+          const next = { ...prev, [copy.id]: { ...sourceStyle } };
+          store(CANVAS_KEYS.styles, next);
+          writeSiteValue(SITE_KEYS.canvasStyles, next);
+          return next;
+        });
+      }
       setSelectedId(copy.id);
       return copy;
     },
-    [blocks, persistBlocks, placementFor, setPlacement, setStyle, styles],
+    [blocks, persistBlocks, placementFor, setPlacement, styles],
   );
 
   const removeBlock = useCallback(

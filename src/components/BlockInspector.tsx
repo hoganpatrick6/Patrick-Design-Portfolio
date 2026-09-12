@@ -262,6 +262,42 @@ export function BlockInspector() {
         </div>
       )}
 
+      {!isTextPick && block?.kind === "project-description" && (
+        <div className="mb-4 space-y-2 border-t border-[var(--color-border)] pt-3">
+          <input
+            className={field}
+            value={block.title ?? ""}
+            placeholder="Project title"
+            onChange={(e) => updateBlock(id, { title: e.target.value })}
+          />
+          <textarea
+            className={field}
+            value={block.description ?? ""}
+            placeholder="Project description"
+            rows={4}
+            onChange={(e) => updateBlock(id, { description: e.target.value })}
+          />
+          <input
+            className={field}
+            value={block.category ?? ""}
+            placeholder="Category"
+            onChange={(e) => updateBlock(id, { category: e.target.value })}
+          />
+          <input
+            className={field}
+            value={block.year ?? ""}
+            placeholder="Year"
+            onChange={(e) => updateBlock(id, { year: e.target.value })}
+          />
+          <input
+            className={field}
+            value={block.href ?? ""}
+            placeholder="Project link"
+            onChange={(e) => updateBlock(id, { href: e.target.value })}
+          />
+        </div>
+      )}
+
       {/* Colour shape */}
       {block?.kind === "shape" && (
         <div className="mb-4 space-y-3 border-t border-[var(--color-border)] pt-3">
