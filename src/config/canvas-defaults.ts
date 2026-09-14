@@ -278,17 +278,17 @@ export const SITE_CANVAS: CanvasDefaults = {
     }
   },
   "blocks": [
-    { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2", "href": "/work/lunethra" },
+    { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2" },
     { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Design,\nArt Direction", "year": "2025" },
-    { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2", "href": "/work/driftwell" },
+    { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2" },
     { "id": "work-project-driftwell-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/driftwell", "title": "Grocery Fresh", "description": "", "category": "Art Direction", "year": "2023" },
-    { "id": "work-project-clyra-image", "page": "work", "kind": "image", "src": clyraThumb, "alt": "Clyra", "caption": "", "aspect": "3:2", "href": "/work/clyra" },
+    { "id": "work-project-clyra-image", "page": "work", "kind": "image", "src": clyraThumb, "alt": "Clyra", "caption": "", "aspect": "3:2" },
     { "id": "work-project-clyra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/clyra", "title": "Uber Color System", "description": "A strategic consolidation to Uber's global color theory.", "category": "Product Design", "year": "2023" },
-    { "id": "work-project-forgekind-image", "page": "work", "kind": "image", "src": forgekindThumb, "alt": "Forgekind", "caption": "", "aspect": "3:2", "href": "/work/forgekind" },
+    { "id": "work-project-forgekind-image", "page": "work", "kind": "image", "src": forgekindThumb, "alt": "Forgekind", "caption": "", "aspect": "3:2" },
     { "id": "work-project-forgekind-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/forgekind", "title": "Forgekind", "description": "Identity, typography, and web experience for a creative studio.", "category": "Brand & Web", "year": "2022" },
-    { "id": "work-project-nestive-image", "page": "work", "kind": "image", "src": nestiveThumb, "alt": "Nestive", "caption": "", "aspect": "3:2", "href": "/work/nestive" },
+    { "id": "work-project-nestive-image", "page": "work", "kind": "image", "src": nestiveThumb, "alt": "Nestive", "caption": "", "aspect": "3:2" },
     { "id": "work-project-nestive-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/nestive", "title": "Nestive", "description": "Magazine design and digital editorial direction.", "category": "Editorial", "year": "2022" },
-    { "id": "work-project-pollenate-image", "page": "work", "kind": "image", "src": pollenateThumb, "alt": "Pollenate", "caption": "", "aspect": "3:2", "href": "/work/pollenate" },
+    { "id": "work-project-pollenate-image", "page": "work", "kind": "image", "src": pollenateThumb, "alt": "Pollenate", "caption": "", "aspect": "3:2" },
     { "id": "work-project-pollenate-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/pollenate", "title": "Pollenate", "description": "Visual direction and packaging for a consumer goods launch.", "category": "Art Direction", "year": "2021" }
     ,
     { "id": "work-rule-intro", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
