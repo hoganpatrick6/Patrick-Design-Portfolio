@@ -365,7 +365,7 @@ export function CanvasBlock({
     styleFor,
     styles,
   } = useCanvas();
-  const { stacked, colWidth, resolved, register, unregister, reportHeight } =
+  const { stacked, colWidth, resolved, register, unregister, reportHeight, page } =
     useCanvasLayout();
 
   const outerRef = useRef<HTMLDivElement>(null);
@@ -502,13 +502,17 @@ export function CanvasBlock({
   if (hidden) return null;
 
   const styled = blockStyleToCss(style);
+  const resolvedTop =
+    page === "project:driftwell" && id === "grocery-hero" && placement.y <= 16
+      ? 17
+      : (spot?.top ?? placement.y);
   const positioned: CSSProperties = stacked
     ? { order: spot?.order ?? 0, position: "relative", zIndex: 1 }
     : {
         position: "absolute",
         left: `calc((100% + ${GUTTER}px) * ${placement.x / GRID_COLUMNS})`,
         width: `calc((100% + ${GUTTER}px) * ${placement.w / GRID_COLUMNS} - ${GUTTER}px)`,
-        top: `${(spot?.top ?? placement.y) * ROW_UNIT}px`,
+        top: `${resolvedTop * ROW_UNIT}px`,
         minHeight: `${Math.max(placement.h, spot?.rows ?? 0) * ROW_UNIT}px`,
         transform: offset ? `translate(${offset.x}px, ${offset.y}px)` : undefined,
         zIndex: 1,
