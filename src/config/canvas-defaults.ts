@@ -174,110 +174,136 @@ export const SITE_CANVAS: CanvasDefaults = {
     "work-rule-forgekind": { "x": 7, "y": 74, "w": 5, "h": 1 },
     "work-rule-nestive": { "x": 7, "y": 90, "w": 5, "h": 1 },
     "work-rule-pollenate": { "x": 7, "y": 106, "w": 5, "h": 1 },
-    "project-header": {
+    "project-header-background": {
       "x": 0,
       "y": 0,
       "w": 12,
-      "h": 12
+      "h": 18
     },
-    "project-details": {
+    "project-title": {
       "x": 0,
-      "y": 16,
-      "w": 3,
-      "h": 20
+      "y": 1,
+      "w": 12,
+      "h": 6
+    },
+    "project-client": {
+      "x": 0,
+      "y": 11,
+      "w": 2,
+      "h": 4
+    },
+    "project-role": {
+      "x": 2,
+      "y": 11,
+      "w": 2,
+      "h": 4
+    },
+    "project-summary": {
+      "x": 6,
+      "y": 11,
+      "w": 6,
+      "h": 6
     },
     "project-overview": {
       "x": 4,
-      "y": 16,
+      "y": 22,
       "w": 8,
-      "h": 20
+      "h": 16
     },
     "project-next": {
       "x": 0,
-      "y": 40,
+      "y": 42,
       "w": 12,
       "h": 20
     },
-    "grocery-title": {
+    "grocery-header-background": {
       "x": 0,
       "y": 0,
       "w": 12,
-      "h": 5
+      "h": 18
+    },
+    "grocery-title": {
+      "x": 0,
+      "y": 1,
+      "w": 12,
+      "h": 6
     },
     "grocery-client": {
       "x": 0,
-      "y": 6,
+      "y": 11,
       "w": 2,
       "h": 3
     },
     "grocery-role": {
       "x": 2,
-      "y": 6,
+      "y": 11,
       "w": 2,
       "h": 3
     },
     "grocery-summary": {
-      "x": 5,
-      "y": 6,
+      "x": 6,
+      "y": 11,
       "w": 6,
-      "h": 5
+      "h": 6
     },
     "grocery-hero": {
       "x": 0,
-      "y": 12,
+      "y": 18,
       "w": 12,
       "h": 36
     },
     "grocery-story-title": {
       "x": 3,
-      "y": 53,
+      "y": 59,
       "w": 6,
       "h": 3
     },
     "grocery-story-intro": {
       "x": 4,
-      "y": 57,
+      "y": 63,
       "w": 4,
       "h": 4
     },
     "grocery-story-detail": {
       "x": 4,
-      "y": 62,
+      "y": 68,
       "w": 4,
       "h": 6
     },
     "grocery-oranges": {
       "x": 0,
-      "y": 69,
+      "y": 75,
       "w": 6,
       "h": 32
     },
     "grocery-blueberries": {
       "x": 6,
-      "y": 69,
+      "y": 75,
       "w": 6,
       "h": 32
     },
     "grocery-tomatoes": {
       "x": 0,
-      "y": 102,
+      "y": 108,
       "w": 6,
       "h": 32
     },
     "grocery-eggs": {
       "x": 6,
-      "y": 102,
+      "y": 108,
       "w": 6,
       "h": 32
     },
     "grocery-campaign": {
       "x": 0,
-      "y": 143,
+      "y": 149,
       "w": 12,
       "h": 24
     }
   },
   "blocks": [
+    { "id": "project-header-background", "page": "project:*", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "#ecece6", "opacity": 1, "radius": 0 },
+    { "id": "grocery-header-background", "page": "project:driftwell", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "#f0f0e9", "opacity": 1, "radius": 0 },
     { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2" },
     { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Design,\nArt Direction", "year": "2025" },
     { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2" },

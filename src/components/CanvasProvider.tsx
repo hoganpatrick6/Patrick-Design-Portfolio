@@ -196,7 +196,10 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const blocksFor = useCallback(
-    (page: string) => blocks.filter((b) => b.page === page),
+    (page: string) =>
+      blocks.filter(
+        (block) => block.page === page || (block.page === "project:*" && page.startsWith("project:")),
+      ),
     [blocks],
   );
 
