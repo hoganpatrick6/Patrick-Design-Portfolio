@@ -195,6 +195,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       if (ro && typeof ro === "object") {
         setOverrides(ro as Record<string, MediaOverride>);
       }
+      const rt = values[SITE_KEYS.canvasTexts];
+      if (rt && typeof rt === "object") setTexts(rt as Record<string, string>);
     });
   }, []);
 
