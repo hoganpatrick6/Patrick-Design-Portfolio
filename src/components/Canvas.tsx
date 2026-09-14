@@ -824,7 +824,7 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
         left: "calc(50% - 50vw)",
         width: "100vw",
         top: `${placement.y * ROW_UNIT}px`,
-        height: `${placement.h * ROW_UNIT}px`,
+        height: `${Math.max(placement.h, stacked ? 24 : placement.h) * ROW_UNIT}px`,
         zIndex: 0,
         pointerEvents: editing ? "auto" : "none",
       }}
