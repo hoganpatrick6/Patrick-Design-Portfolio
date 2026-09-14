@@ -51,7 +51,7 @@ export const projects: Project[] = [
     title: "Uber Color System",
     category: "Product Design",
     year: "2023",
-    description: "A strategic consolidation to Uber's global color theory.",
+    description: "A strategic consolidation of Uber's global color theory.",
     image: clyraThumb,
     role: "Product Design, Web Design",
     client: "Uber",
