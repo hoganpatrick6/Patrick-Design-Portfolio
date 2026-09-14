@@ -62,6 +62,11 @@ type CanvasContextValue = {
   hideBlock: (id: string) => void;
   showBlock: (id: string) => void;
 
+  /** Words typed straight onto the page, keyed by `blockId#path`. */
+  texts: Record<string, string>;
+  textFor: (key: string) => string | undefined;
+  setText: (key: string, value: string) => void;
+
   overrideFor: (id: string) => MediaOverride | undefined;
   setOverride: (id: string, value: MediaOverride) => void;
   clearOverride: (id: string) => void;
