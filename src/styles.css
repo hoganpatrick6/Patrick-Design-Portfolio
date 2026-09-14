@@ -386,3 +386,14 @@
   outline-offset: 3px;
   border-radius: 2px;
 }
+
+/* Type that can be written into straight on the page. */
+.canvas-block.is-editing [data-inline-editable] {
+  cursor: text;
+}
+
+.canvas-block.is-editing [data-inline-editable]:focus {
+  outline: 1px solid color-mix(in oklab, var(--color-foreground) 35%, transparent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
