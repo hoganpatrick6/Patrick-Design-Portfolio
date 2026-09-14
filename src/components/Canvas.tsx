@@ -35,6 +35,7 @@ type Resolved = { top: number; rows: number; order: number };
 type CanvasLayout = {
   stacked: boolean;
   colWidth: number;
+  documentTop: number;
   resolved: Record<string, Resolved>;
   register: (id: string) => void;
   unregister: (id: string) => void;
@@ -128,6 +129,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   } = useCanvas();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
+  const [documentTop, setDocumentTop] = useState(0);
   const [ids, setIds] = useState<string[]>([]);
   const [heights, setHeights] = useState<Record<string, number>>({});
   const [dropping, setDropping] = useState(false);
@@ -135,12 +137,26 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   useLayoutEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      if (entry) setWidth(entry.contentRect.width);
-    });
+    let active = true;
+    const measure = () => {
+      const rect = el.getBoundingClientRect();
+      setWidth(rect.width);
+      setDocumentTop(rect.top + window.scrollY);
+    };
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    setWidth(el.getBoundingClientRect().width);
-    return () => ro.disconnect();
+    const header = el.closest("main")?.previousElementSibling;
+    if (header instanceof HTMLElement) ro.observe(header);
+    window.addEventListener("resize", measure);
+    void document.fonts?.ready.then(() => {
+      if (active) measure();
+    });
+    measure();
+    return () => {
+      active = false;
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, []);
 
   const register = useCallback((id: string) => {
@@ -233,8 +249,8 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   }, [ids, heights, page, placementFor]);
 
   const value = useMemo<CanvasLayout>(
-    () => ({ stacked, colWidth, resolved, register, unregister, reportHeight, page }),
-    [stacked, colWidth, resolved, register, unregister, reportHeight, page],
+    () => ({ stacked, colWidth, documentTop, resolved, register, unregister, reportHeight, page }),
+    [stacked, colWidth, documentTop, resolved, register, unregister, reportHeight, page],
   );
 
   useEffect(() => {
@@ -775,10 +791,12 @@ function MediaBlockView({ block }: { block: CanvasBlockData }) {
 function ShapeBlock({ block }: { block: CanvasBlockData }) {
   const { editing, placementFor, setPlacement, selectedId, setSelectedId, removeBlock } =
     useCanvas();
-  const { colWidth, stacked } = useCanvasLayout();
+  const { colWidth, documentTop, stacked } = useCanvasLayout();
   const [drag, setDrag] = useState<DragMode | null>(null);
   const placement = placementFor(block.id);
   const selected = editing && selectedId === block.id;
+  const extendsToPageTop = block.id.endsWith("header-background");
+  const topExtension = extendsToPageTop ? documentTop : 0;
 
   const startDrag = useCallback(
     (event: React.PointerEvent, mode: DragMode) => {
@@ -823,8 +841,8 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
         position: "absolute",
         left: "calc(50% - 50vw)",
         width: "100vw",
-        top: `${placement.y * ROW_UNIT}px`,
-        height: `${Math.max(placement.h, stacked ? 24 : placement.h) * ROW_UNIT}px`,
+        top: `${placement.y * ROW_UNIT - topExtension}px`,
+        height: `${Math.max(placement.h, stacked ? 24 : placement.h) * ROW_UNIT + topExtension}px`,
         zIndex: 0,
         pointerEvents: editing ? "auto" : "none",
       }}
