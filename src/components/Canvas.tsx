@@ -460,22 +460,23 @@ export function CanvasBlock({
 
   useEffect(() => {
     const root = innerRef.current;
-    if (!root || !editing) return;
-    const marked = textElementsIn(root);
-    marked.forEach((el) => {
+    if (!root) return;
+    const wanted = editing ? textElementsIn(root) : [];
+    const keep = new Set(wanted);
+    editableRef.current.forEach((el) => {
+      if (keep.has(el)) return;
+      el.removeAttribute("contenteditable");
+      el.removeAttribute("data-no-drag");
+      el.removeAttribute("data-inline-editable");
+    });
+    wanted.forEach((el) => {
+      if (el.getAttribute("contenteditable") === "plaintext-only") return;
       el.setAttribute("contenteditable", "plaintext-only");
       el.setAttribute("data-no-drag", "");
       el.setAttribute("spellcheck", "false");
       el.setAttribute("data-inline-editable", "");
     });
-    return () => {
-      marked.forEach((el) => {
-        el.removeAttribute("contenteditable");
-        el.removeAttribute("data-no-drag");
-        el.removeAttribute("spellcheck");
-        el.removeAttribute("data-inline-editable");
-      });
-    };
+    editableRef.current = wanted;
   });
 
 
