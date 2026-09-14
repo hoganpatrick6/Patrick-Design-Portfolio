@@ -109,7 +109,7 @@ function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; chan
       return {
         ...block,
         title: "Uber Color System",
-        description: "A strategic consolidation to Uber's global color theory.",
+        description: "A strategic consolidation of Uber's global color theory.",
       };
     }
     return block;
