@@ -97,6 +97,30 @@ function elementAt(root: HTMLElement, path: string): HTMLElement | null {
   return node;
 }
 
+/** True when this element holds words of its own (not just other elements). */
+function carriesWords(el: HTMLElement) {
+  return Array.from(el.childNodes).some(
+    (n) => n.nodeType === 3 && (n.textContent ?? "").trim().length > 0,
+  );
+}
+
+/** Every piece of type inside a block that can be typed into directly. */
+function textElementsIn(root: HTMLElement): HTMLElement[] {
+  const found: HTMLElement[] = [];
+  const walk = (node: HTMLElement) => {
+    Array.from(node.children).forEach((child) => {
+      const el = child as HTMLElement;
+      if (el.hasAttribute("data-editor-ui")) return;
+      const tag = el.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "SVG") return;
+      if (carriesWords(el)) found.push(el);
+      else walk(el);
+    });
+  };
+  walk(root);
+  return found;
+}
+
 /** The nearest thing around a click that actually carries words. */
 function textElementFrom(root: HTMLElement, start: HTMLElement): HTMLElement | null {
   let node: HTMLElement | null = start;
