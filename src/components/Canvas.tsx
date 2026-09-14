@@ -54,6 +54,13 @@ function overlapsX(a: Placement, b: Placement) {
   return a.x < b.x + b.w && b.x < a.x + a.w;
 }
 
+/** Matching Work thumbnails and descriptions share one responsive layout row. */
+function workProjectPairKey(page: string, id: string) {
+  if (page !== "work") return null;
+  const match = id.match(/^work-project-(.+)-(image|copy)$/);
+  return match?.[1] ?? null;
+}
+
 /* ------------------------------------------------------------------ */
 /* Picking out one piece of type inside a block                        */
 /* ------------------------------------------------------------------ */
@@ -157,23 +164,56 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
       .map((id) => ({ id, p: placementFor(id), h: heights[id] ?? 0 }))
       .sort((a, b) => a.p.y - b.p.y || a.p.x - b.p.x);
 
+    type Item = (typeof items)[number];
+    type LayoutUnit = { items: Item[]; p: Placement; rows: number };
+    const paired = new Map<string, Item[]>();
+    const units: LayoutUnit[] = [];
+
+    items.forEach((item) => {
+      const key = workProjectPairKey(page, item.id);
+      if (!key) {
+        const contentRows = Math.ceil((item.h + GUTTER) / ROW_UNIT);
+        units.push({ items: [item], p: item.p, rows: Math.max(item.p.h, contentRows || 1) });
+        return;
+      }
+      paired.set(key, [...(paired.get(key) ?? []), item]);
+    });
+
+    paired.forEach((pairItems) => {
+      const left = Math.min(...pairItems.map((item) => item.p.x));
+      const right = Math.max(...pairItems.map((item) => item.p.x + item.p.w));
+      const top = Math.min(...pairItems.map((item) => item.p.y));
+      const rows = Math.max(
+        ...pairItems.map((item) => {
+          const contentRows = Math.ceil((item.h + GUTTER) / ROW_UNIT);
+          return Math.max(item.p.h, contentRows || 1);
+        }),
+      );
+      units.push({
+        items: pairItems.sort((a, b) => a.p.x - b.p.x),
+        p: { x: left, y: top, w: right - left, h: rows },
+        rows,
+      });
+    });
+
+    units.sort((a, b) => a.p.y - b.p.y || a.p.x - b.p.x);
+
     const out: Record<string, Resolved> = {};
     const placed: { p: Placement; top: number; rows: number }[] = [];
     let bottom = 0;
 
-    items.forEach((item, index) => {
-      const contentRows = Math.ceil((item.h + GUTTER) / ROW_UNIT);
-      const rows = Math.max(item.p.h, contentRows || 1);
+    units.forEach((unit, unitIndex) => {
+      const { p, rows } = unit;
       // Keep the block where it was dropped, and only slide it down far
       // enough to clear something it would actually sit on top of.
-      let top = item.p.y;
+      let top = p.y;
       let moved = true;
       let guard = 0;
       while (moved && guard++ < 40) {
         moved = false;
         placed.forEach((prev) => {
           const clash =
-            overlapsX(prev.p, item.p) &&
+            overlapsX(prev.p, p) &&
             top < prev.top + prev.rows &&
             top + rows > prev.top;
           if (clash) {
@@ -182,13 +222,15 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
           }
         });
       }
-      out[item.id] = { top, rows, order: index };
-      placed.push({ p: item.p, top, rows });
+      unit.items.forEach((item, itemIndex) => {
+        out[item.id] = { top, rows, order: unitIndex * 10 + itemIndex };
+      });
+      placed.push({ p, top, rows });
       bottom = Math.max(bottom, top + rows);
     });
 
     return { resolved: out, totalRows: bottom };
-  }, [ids, heights, placementFor]);
+  }, [ids, heights, page, placementFor]);
 
   const value = useMemo<CanvasLayout>(
     () => ({ stacked, colWidth, resolved, register, unregister, reportHeight, page }),
