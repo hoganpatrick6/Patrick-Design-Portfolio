@@ -395,6 +395,18 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const textFor = useCallback((key: string) => texts[key], [texts]);
+
+  const setText = useCallback((key: string, value: string) => {
+    setTexts((prev) => {
+      if (prev[key] === value) return prev;
+      const next = { ...prev, [key]: value };
+      store(TEXTS_STORAGE_KEY, next);
+      writeSiteValue(SITE_KEYS.canvasTexts, next);
+      return next;
+    });
+  }, []);
+
   const bottomOf = useCallback((page: string) => bottoms.current[page] ?? 0, []);
 
   const setPageBottom = useCallback((page: string, rows: number) => {
