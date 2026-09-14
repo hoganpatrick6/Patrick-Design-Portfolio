@@ -90,7 +90,7 @@ function ProjectNotFound() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
       <Header />
-      <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
+      <main className="px-8 pb-32 pt-0 md:px-16">
         <h1 className="type-display">
           That project doesn’t exist.
         </h1>
@@ -109,6 +109,7 @@ function ProjectPage() {
   const { project } = Route.useLoaderData();
   const index = projects.findIndex((p) => p.slug === project.slug);
   const next = projects[(index + 1) % projects.length];
+  const headerId = (part: string) => `project-${project.slug}-${part}`;
 
   if (project.slug === "driftwell") {
     return <GroceryFreshPage />;
@@ -120,53 +121,30 @@ function ProjectPage() {
 
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
         <Canvas page={`project:${project.slug}`}>
-          <CanvasBlock id="project-header" label="Title">
-            <div className="border-t border-[var(--color-border)] pt-8">
-              <Link
-                to="/work"
-                className="type-label tracking-wide text-[var(--color-foreground-subtle)] transition-colors hover:text-foreground"
-              >
-                ← Projects
-              </Link>
-              <h1
-                className="mt-8 type-display text-foreground"
-              >
-                {project.title}
-              </h1>
-              <p className="mt-6 max-w-2xl type-body text-[var(--color-foreground-muted)]">
-                {project.description}
-              </p>
-            </div>
+          <CanvasBlock id={headerId("title")} label="Project title">
+            <h1 className="type-display text-foreground">{project.title}</h1>
           </CanvasBlock>
 
-
-          <CanvasBlock id="project-details" label="Details">
-            <dl className="space-y-8">
-              <div>
-                <dt className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
-                  Client
-                </dt>
-                <dd className="mt-2 type-body">{project.client}</dd>
-              </div>
-              <div>
-                <dt className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
-                  Discipline
-                </dt>
-                <dd className="mt-2 type-body">{project.category}</dd>
-              </div>
-              <div>
-                <dt className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
-                  Role
-                </dt>
-                <dd className="mt-2 type-body">{project.role}</dd>
-              </div>
-              <div>
-                <dt className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
-                  Year
-                </dt>
-                <dd className="mt-2 type-body">{project.year}</dd>
-              </div>
+          <CanvasBlock id={headerId("client")} label="Client details">
+            <dl>
+              <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
+              <dd className="mt-1 type-label text-foreground">{project.client}</dd>
             </dl>
+          </CanvasBlock>
+
+          <CanvasBlock id={headerId("role")} label="Role details">
+            <dl>
+              <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
+              <dd className="mt-1 whitespace-pre-line type-label text-foreground">
+                {project.role}
+              </dd>
+            </dl>
+          </CanvasBlock>
+
+          <CanvasBlock id={headerId("summary")} label="Project summary">
+            <p className="max-w-xl type-label text-foreground">
+              {project.description || project.overview[0]}
+            </p>
           </CanvasBlock>
 
           <CanvasBlock id="project-overview" label="Overview">
@@ -221,7 +199,7 @@ function GroceryFreshPage() {
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
       <Header page={page} />
 
-      <main className="px-4 pb-32 pt-12 sm:px-8 md:px-16 md:pt-20">
+      <main className="px-4 pb-32 pt-0 sm:px-8 md:px-16">
         <Canvas page={page}>
           <CanvasBlock id="grocery-title" label="Project title">
             <h1 className="type-display text-foreground">Grocery Fresh</h1>

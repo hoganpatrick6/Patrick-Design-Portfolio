@@ -636,7 +636,7 @@ export function BlockInspector() {
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[var(--color-border)] pt-3">
-        {block && block.kind !== "shape" && (
+        {block && (
           <>
             <button type="button" onClick={() => duplicateBlock(id, "above")} className={chip}>
               Duplicate above
