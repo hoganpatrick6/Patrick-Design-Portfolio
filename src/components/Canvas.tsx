@@ -694,6 +694,22 @@ function TextBlockView({ block }: { block: CanvasBlockData }) {
   const role = block.role || "body";
   const text = block.text ?? "";
   const selected = selectedId === block.id;
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+
+  // Keep the editing surface identical to the text's rendered height. This
+  // also reruns when the canvas handle changes the block width and text wraps.
+  useLayoutEffect(() => {
+    const editor = editorRef.current;
+    if (!editor || !editing) return;
+    const fit = () => {
+      editor.style.height = "0px";
+      editor.style.height = `${editor.scrollHeight}px`;
+    };
+    const observer = new ResizeObserver(fit);
+    observer.observe(editor);
+    fit();
+    return () => observer.disconnect();
+  }, [editing, text]);
 
   if (!editing) {
     if (!text.trim()) return null;
@@ -702,15 +718,21 @@ function TextBlockView({ block }: { block: CanvasBlockData }) {
 
   return (
     <textarea
+      ref={editorRef}
       data-no-drag=""
       value={text}
-      rows={Math.max(2, text.split("\n").length)}
+      rows={1}
       placeholder="Write here…"
-      onChange={(e) => updateBlock(block.id, { text: e.target.value })}
-      className={`type-${role} w-full resize-none rounded-sm border bg-transparent p-1 text-inherit outline-none ${
-        selected ? "border-foreground/40" : "border-transparent"
+      aria-label="Text block content"
+      onChange={(event) => {
+        event.currentTarget.style.height = "0px";
+        event.currentTarget.style.height = `${event.currentTarget.scrollHeight}px`;
+        updateBlock(block.id, { text: event.currentTarget.value });
+      }}
+      className={`type-${role} block w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-inherit outline-none ${
+        selected ? "caret-current" : ""
       }`}
-      style={{ font: "inherit", color: "inherit", minHeight: "3em" }}
+      style={{ font: "inherit", color: "inherit", minHeight: "1lh" }}
     />
   );
 }
