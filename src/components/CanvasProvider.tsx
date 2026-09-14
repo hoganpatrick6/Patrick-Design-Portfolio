@@ -117,41 +117,6 @@ function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; chan
   return { blocks: next, changed };
 }
 
-/** Moves only untouched legacy project-header positions into the new band. */
-function repairSavedPlacements(placements: PlacementMap): {
-  placements: PlacementMap;
-  changed: boolean;
-} {
-  const legacy: Record<string, Placement> = {
-    "project-header": { x: 0, y: 0, w: 12, h: 12 },
-    "project-details": { x: 0, y: 16, w: 3, h: 20 },
-    "project-overview": { x: 4, y: 16, w: 8, h: 20 },
-    "project-next": { x: 0, y: 40, w: 12, h: 20 },
-    "grocery-title": { x: 0, y: 0, w: 12, h: 5 },
-    "grocery-client": { x: 0, y: 6, w: 2, h: 3 },
-    "grocery-role": { x: 2, y: 6, w: 2, h: 3 },
-    "grocery-summary": { x: 5, y: 6, w: 6, h: 5 },
-    "grocery-hero": { x: 0, y: 12, w: 12, h: 36 },
-  };
-  let changed = false;
-  const next = { ...placements };
-  Object.entries(legacy).forEach(([id, oldPlacement]) => {
-    const saved = next[id];
-    const intermediateGroceryHero =
-      id === "grocery-hero" &&
-      saved &&
-      JSON.stringify(saved) === JSON.stringify({ x: 0, y: 16, w: 12, h: 36 });
-    if (
-      saved &&
-      (JSON.stringify(saved) === JSON.stringify(oldPlacement) || intermediateGroceryHero)
-    ) {
-      next[id] = SITE_CANVAS.placements[id] ?? saved;
-      changed = true;
-    }
-  });
-  return { placements: next, changed };
-}
-
 export function CanvasProvider({ children }: { children: ReactNode }) {
   const [editing, setEditing] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -165,14 +130,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   // Pick up this browser's copy after hydration, then anything saved site-wide.
   useEffect(() => {
     const p = read<PlacementMap>(CANVAS_KEYS.placements);
-    if (p) {
-      const repaired = repairSavedPlacements({ ...SITE_CANVAS.placements, ...p });
-      setPlacements(repaired.placements);
-      if (repaired.changed) {
-        store(CANVAS_KEYS.placements, repaired.placements);
-        writeSiteValue(SITE_KEYS.canvasPlacements, repaired.placements);
-      }
-    }
+    if (p) setPlacements({ ...SITE_CANVAS.placements, ...p });
     const b = read<CanvasBlock[]>(CANVAS_KEYS.blocks);
     if (Array.isArray(b)) {
       const savedIds = new Set(b.map((block) => block.id));
@@ -194,15 +152,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     void siteContent().then((values) => {
       const rp = values[SITE_KEYS.canvasPlacements];
       if (rp && typeof rp === "object") {
-        const repaired = repairSavedPlacements({
-          ...SITE_CANVAS.placements,
-          ...(rp as PlacementMap),
-        });
-        setPlacements(repaired.placements);
-        if (repaired.changed) {
-          store(CANVAS_KEYS.placements, repaired.placements);
-          writeSiteValue(SITE_KEYS.canvasPlacements, repaired.placements);
-        }
+        setPlacements({ ...SITE_CANVAS.placements, ...(rp as PlacementMap) });
       }
       const rb = values[SITE_KEYS.canvasBlocks];
       if (Array.isArray(rb)) {

@@ -302,7 +302,8 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
         }
       >
         {editing && !stacked && <CanvasGuides />}
-        {shapes.map((block) => <ShapeBlock key={block.id} block={block} />)}
+        {!stacked &&
+          shapes.map((block) => <ShapeBlock key={block.id} block={block} />)}
         {children}
         {contentBlocks.map((block) => (
           <PlacedBlock key={block.id} block={block} />
@@ -365,7 +366,7 @@ export function CanvasBlock({
     styleFor,
     styles,
   } = useCanvas();
-  const { stacked, colWidth, resolved, register, unregister, reportHeight, page } =
+  const { stacked, colWidth, resolved, register, unregister, reportHeight } =
     useCanvasLayout();
 
   const outerRef = useRef<HTMLDivElement>(null);
@@ -502,17 +503,13 @@ export function CanvasBlock({
   if (hidden) return null;
 
   const styled = blockStyleToCss(style);
-  const resolvedTop =
-    page === "project:driftwell" && id === "grocery-hero" && placement.y <= 16
-      ? 17
-      : (spot?.top ?? placement.y);
   const positioned: CSSProperties = stacked
-    ? { order: spot?.order ?? 0, position: "relative", zIndex: 1 }
+    ? { order: spot?.order ?? 0 }
     : {
         position: "absolute",
         left: `calc((100% + ${GUTTER}px) * ${placement.x / GRID_COLUMNS})`,
         width: `calc((100% + ${GUTTER}px) * ${placement.w / GRID_COLUMNS} - ${GUTTER}px)`,
-        top: `${resolvedTop * ROW_UNIT}px`,
+        top: `${(spot?.top ?? placement.y) * ROW_UNIT}px`,
         minHeight: `${Math.max(placement.h, spot?.rows ?? 0) * ROW_UNIT}px`,
         transform: offset ? `translate(${offset.x}px, ${offset.y}px)` : undefined,
         zIndex: 1,
@@ -828,10 +825,7 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
         left: "calc(50% - 50vw)",
         width: "100vw",
         top: `${placement.y * ROW_UNIT}px`,
-        height:
-          stacked && block.id.startsWith("project-header-bg:")
-            ? "32rem"
-            : `${placement.h * ROW_UNIT}px`,
+        height: `${placement.h * ROW_UNIT}px`,
         zIndex: 0,
         pointerEvents: editing ? "auto" : "none",
       }}

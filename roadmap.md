@@ -7,4 +7,3 @@
 - [x] Separate Grocery Fresh content and images into independent canvas blocks.
 - [x] Break Work project images and descriptions out of the Project List block with above/below duplication.
 - [x] Keep each Work project thumbnail and its copy aligned as one responsive row.
-- [x] Build editable colored header bands across every project page.

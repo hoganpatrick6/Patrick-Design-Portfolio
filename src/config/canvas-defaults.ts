@@ -176,64 +176,58 @@ export const SITE_CANVAS: CanvasDefaults = {
     "work-rule-pollenate": { "x": 7, "y": 106, "w": 5, "h": 1 },
     "project-header": {
       "x": 0,
-      "y": 2,
+      "y": 0,
       "w": 12,
-      "h": 4
+      "h": 12
     },
     "project-details": {
       "x": 0,
-      "y": 8,
-      "w": 4,
-      "h": 6
+      "y": 16,
+      "w": 3,
+      "h": 20
     },
     "project-overview": {
-      "x": 6,
-      "y": 8,
-      "w": 6,
-      "h": 6
+      "x": 4,
+      "y": 16,
+      "w": 8,
+      "h": 20
     },
     "project-next": {
       "x": 0,
-      "y": 18,
+      "y": 40,
       "w": 12,
       "h": 20
     },
     "grocery-title": {
       "x": 0,
-      "y": 2,
+      "y": 0,
       "w": 12,
       "h": 5
     },
     "grocery-client": {
       "x": 0,
-      "y": 8,
+      "y": 6,
       "w": 2,
       "h": 3
     },
     "grocery-role": {
       "x": 2,
-      "y": 8,
+      "y": 6,
       "w": 2,
       "h": 3
     },
     "grocery-summary": {
-      "x": 6,
-      "y": 8,
+      "x": 5,
+      "y": 6,
       "w": 6,
       "h": 5
     },
     "grocery-hero": {
       "x": 0,
-      "y": 17,
+      "y": 12,
       "w": 12,
       "h": 36
     },
-    "project-header-bg:lunethra": { "x": 0, "y": 0, "w": 12, "h": 15 },
-    "project-header-bg:driftwell": { "x": 0, "y": 0, "w": 12, "h": 15 },
-    "project-header-bg:clyra": { "x": 0, "y": 0, "w": 12, "h": 15 },
-    "project-header-bg:forgekind": { "x": 0, "y": 0, "w": 12, "h": 15 },
-    "project-header-bg:nestive": { "x": 0, "y": 0, "w": 12, "h": 15 },
-    "project-header-bg:pollenate": { "x": 0, "y": 0, "w": 12, "h": 15 },
     "grocery-story-title": {
       "x": 3,
       "y": 53,
@@ -284,12 +278,6 @@ export const SITE_CANVAS: CanvasDefaults = {
     }
   },
   "blocks": [
-    { "id": "project-header-bg:lunethra", "page": "project:lunethra", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-project-band)", "opacity": 1, "radius": 0 },
-    { "id": "project-header-bg:driftwell", "page": "project:driftwell", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-project-band)", "opacity": 1, "radius": 0 },
-    { "id": "project-header-bg:clyra", "page": "project:clyra", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-project-band-cool)", "opacity": 1, "radius": 0 },
-    { "id": "project-header-bg:forgekind", "page": "project:forgekind", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-project-band-warm)", "opacity": 1, "radius": 0 },
-    { "id": "project-header-bg:nestive", "page": "project:nestive", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-project-band-soft)", "opacity": 1, "radius": 0 },
-    { "id": "project-header-bg:pollenate", "page": "project:pollenate", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-project-band-warm)", "opacity": 1, "radius": 0 },
     { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2" },
     { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Design,\nArt Direction", "year": "2025" },
     { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2" },
@@ -425,8 +413,7 @@ export const SHAPE_FILLS: { label: string; value: string }[] = [
   { label: "Paper", value: "var(--color-foreground)" },
   { label: "Page", value: "var(--color-background)" },
   { label: "Accent", value: "var(--color-chart-1)" },
-  { label: "Warm", value: "var(--color-project-band-warm)" },
-  { label: "Cool", value: "var(--color-project-band-cool)" },
-  { label: "Soft", value: "var(--color-project-band-soft)" },
-  { label: "Ink", value: "var(--color-project-band-ink)" },
+  { label: "Warm", value: "#e8dfd2" },
+  { label: "Cool", value: "#d7e0e6" },
+  { label: "Ink", value: "#1b1b1b" },
 ];
