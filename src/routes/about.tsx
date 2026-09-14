@@ -145,13 +145,13 @@ function AboutPage() {
             <nav className="flex gap-6 type-nav">
               <Link
                 to="/work"
-                className="font-medium text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
+                className="text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
               >
                 Work
               </Link>
               <Link
                 to="/about"
-                className="font-medium text-foreground transition-colors hover:text-[var(--color-foreground-muted)]"
+                className="text-foreground transition-colors hover:text-[var(--color-foreground-muted)]"
               >
                 About
               </Link>

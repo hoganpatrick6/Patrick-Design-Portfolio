@@ -128,21 +128,21 @@ function ProjectPage() {
           <CanvasBlock id={headerId("client")} label="Client details">
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
-              <dd className="mt-1 type-label text-foreground">{project.client}</dd>
+              <dd className="mt-1 type-body text-foreground">{project.client}</dd>
             </dl>
           </CanvasBlock>
 
           <CanvasBlock id={headerId("role")} label="Role details">
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
-              <dd className="mt-1 whitespace-pre-line type-label text-foreground">
+              <dd className="mt-1 whitespace-pre-line type-body text-foreground">
                 {project.role}
               </dd>
             </dl>
           </CanvasBlock>
 
           <CanvasBlock id={headerId("summary")} label="Project summary">
-            <p className="max-w-xl type-label text-foreground">
+            <p className="max-w-xl type-body text-foreground">
               {project.description || project.overview[0]}
             </p>
           </CanvasBlock>
