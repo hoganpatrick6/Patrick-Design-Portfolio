@@ -224,7 +224,7 @@ export const SITE_CANVAS: CanvasDefaults = {
     },
     "grocery-hero": {
       "x": 0,
-      "y": 16,
+      "y": 17,
       "w": 12,
       "h": 36
     },
