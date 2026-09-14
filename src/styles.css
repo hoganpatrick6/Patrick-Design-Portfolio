@@ -61,6 +61,11 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-project-band: var(--project-band);
+  --color-project-band-warm: var(--project-band-warm);
+  --color-project-band-cool: var(--project-band-cool);
+  --color-project-band-soft: var(--project-band-soft);
+  --color-project-band-ink: var(--project-band-ink);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -101,6 +106,11 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+  --project-band: oklch(0.955 0.012 108);
+  --project-band-warm: oklch(0.9 0.035 64);
+  --project-band-cool: oklch(0.9 0.03 225);
+  --project-band-soft: oklch(0.91 0.035 345);
+  --project-band-ink: oklch(0.2 0.01 255);
   --sidebar: oklch(0.968 0.007 115.623);
   --sidebar-foreground: oklch(0.12 0 0);
   --sidebar-primary: oklch(0.12 0 0);
@@ -139,6 +149,11 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+  --project-band: oklch(0.24 0.015 108);
+  --project-band-warm: oklch(0.29 0.035 64);
+  --project-band-cool: oklch(0.27 0.035 225);
+  --project-band-soft: oklch(0.28 0.035 345);
+  --project-band-ink: oklch(0.11 0.005 255);
   --sidebar: oklch(0.984 0.003 247.858);
   --sidebar-foreground: oklch(0.129 0.042 264.695);
   --sidebar-primary: oklch(0.208 0.042 265.755);
