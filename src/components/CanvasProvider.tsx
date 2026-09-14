@@ -143,6 +143,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   const [styles, setStyles] = useState<StyleMap>(SITE_CANVAS.styles);
   const [hidden, setHidden] = useState<string[]>(SITE_CANVAS.hidden);
   const [overrides, setOverrides] = useState<Record<string, MediaOverride>>({});
+  const [texts, setTexts] = useState<Record<string, string>>({});
   const bottoms = useRef<Record<string, number>>({});
 
   // Pick up this browser's copy after hydration, then anything saved site-wide.
