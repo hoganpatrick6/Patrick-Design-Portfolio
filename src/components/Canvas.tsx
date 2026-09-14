@@ -302,8 +302,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
         }
       >
         {editing && !stacked && <CanvasGuides />}
-        {!stacked &&
-          shapes.map((block) => <ShapeBlock key={block.id} block={block} />)}
+        {shapes.map((block) => <ShapeBlock key={block.id} block={block} />)}
         {children}
         {contentBlocks.map((block) => (
           <PlacedBlock key={block.id} block={block} />
@@ -825,7 +824,10 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
         left: "calc(50% - 50vw)",
         width: "100vw",
         top: `${placement.y * ROW_UNIT}px`,
-        height: `${placement.h * ROW_UNIT}px`,
+        height:
+          stacked && block.id.startsWith("project-header-bg:")
+            ? "32rem"
+            : `${placement.h * ROW_UNIT}px`,
         zIndex: 0,
         pointerEvents: editing ? "auto" : "none",
       }}

@@ -121,27 +121,14 @@ function ProjectPage() {
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
         <Canvas page={`project:${project.slug}`}>
           <CanvasBlock id="project-header" label="Title">
-            <div className="border-t border-[var(--color-border)] pt-8">
-              <Link
-                to="/work"
-                className="type-label tracking-wide text-[var(--color-foreground-subtle)] transition-colors hover:text-foreground"
-              >
-                ← Projects
-              </Link>
-              <h1
-                className="mt-8 type-display text-foreground"
-              >
-                {project.title}
-              </h1>
-              <p className="mt-6 max-w-2xl type-body text-[var(--color-foreground-muted)]">
-                {project.description}
-              </p>
-            </div>
+            <h1 className="fragment-name text-5xl leading-none text-foreground md:text-7xl">
+              {project.title}
+            </h1>
           </CanvasBlock>
 
 
           <CanvasBlock id="project-details" label="Details">
-            <dl className="space-y-8">
+            <dl className="grid grid-cols-2 gap-6">
               <div>
                 <dt className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
                   Client
@@ -150,33 +137,17 @@ function ProjectPage() {
               </div>
               <div>
                 <dt className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
-                  Discipline
-                </dt>
-                <dd className="mt-2 type-body">{project.category}</dd>
-              </div>
-              <div>
-                <dt className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
                   Role
                 </dt>
                 <dd className="mt-2 type-body">{project.role}</dd>
-              </div>
-              <div>
-                <dt className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
-                  Year
-                </dt>
-                <dd className="mt-2 type-body">{project.year}</dd>
               </div>
             </dl>
           </CanvasBlock>
 
           <CanvasBlock id="project-overview" label="Overview">
-            <div className="max-w-2xl space-y-6">
-              {project.overview.map((paragraph) => (
-                <p key={paragraph} className="type-body text-[var(--color-foreground-muted)]">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+            <p className="max-w-2xl type-body text-foreground">
+              {project.description || project.overview[0]}
+            </p>
           </CanvasBlock>
 
           <CanvasBlock id="project-next" label="Next project">
@@ -221,10 +192,12 @@ function GroceryFreshPage() {
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
       <Header page={page} />
 
-      <main className="px-4 pb-32 pt-12 sm:px-8 md:px-16 md:pt-20">
+      <main className="px-4 pb-32 sm:px-8 md:px-16">
         <Canvas page={page}>
           <CanvasBlock id="grocery-title" label="Project title">
-            <h1 className="type-display text-foreground">Grocery Fresh</h1>
+            <h1 className="fragment-name text-5xl leading-none text-foreground md:text-7xl">
+              Grocery Fresh
+            </h1>
           </CanvasBlock>
 
           <CanvasBlock id="grocery-client" label="Client details">
