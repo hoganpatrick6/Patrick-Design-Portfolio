@@ -97,6 +97,30 @@ function elementAt(root: HTMLElement, path: string): HTMLElement | null {
   return node;
 }
 
+/** True when this element holds words of its own (not just other elements). */
+function carriesWords(el: HTMLElement) {
+  return Array.from(el.childNodes).some(
+    (n) => n.nodeType === 3 && (n.textContent ?? "").trim().length > 0,
+  );
+}
+
+/** Every piece of type inside a block that can be typed into directly. */
+function textElementsIn(root: HTMLElement): HTMLElement[] {
+  const found: HTMLElement[] = [];
+  const walk = (node: HTMLElement) => {
+    Array.from(node.children).forEach((child) => {
+      const el = child as HTMLElement;
+      if (el.hasAttribute("data-editor-ui")) return;
+      const tag = el.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || tag === "SVG") return;
+      if (carriesWords(el)) found.push(el);
+      else walk(el);
+    });
+  };
+  walk(root);
+  return found;
+}
+
 /** The nearest thing around a click that actually carries words. */
 function textElementFrom(root: HTMLElement, start: HTMLElement): HTMLElement | null {
   let node: HTMLElement | null = start;
@@ -363,12 +387,15 @@ export function CanvasBlock({
   children,
   className = "",
   onDelete,
+  onTextEdit,
 }: {
   id: string;
   label: string;
   children: ReactNode;
   className?: string;
   onDelete?: () => void;
+  /** Lets a block store typed words on itself instead of as a page override. */
+  onTextEdit?: (field: string, value: string) => void;
 }) {
   const {
     editing,
@@ -380,6 +407,8 @@ export function CanvasBlock({
     setSelectedId,
     styleFor,
     styles,
+    texts,
+    setText,
   } = useCanvas();
   const { stacked, colWidth, resolved, register, unregister, reportHeight } =
     useCanvasLayout();
@@ -387,6 +416,7 @@ export function CanvasBlock({
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const touchedRef = useRef<{ el: HTMLElement; css: string }[]>([]);
+  const editableRef = useRef<HTMLElement[]>([]);
   const justDragged = useRef(false);
   const [drag, setDrag] = useState<DragMode | null>(null);
   const [offset, setOffset] = useState<{ x: number; y: number } | null>(null);
@@ -443,6 +473,43 @@ export function CanvasBlock({
     }
     touchedRef.current = touched;
   });
+
+  // Put any words typed straight onto the page back where they belong, and in
+  // edit mode let every piece of type be typed into directly.
+  useEffect(() => {
+    const root = innerRef.current;
+    if (!root) return;
+    const prefix = `${id}#`;
+    Object.entries(texts).forEach(([key, value]) => {
+      if (!key.startsWith(prefix)) return;
+      const el = elementAt(root, key.slice(prefix.length));
+      if (!el || el === document.activeElement) return;
+      if (el.textContent !== value) el.textContent = value;
+    });
+  });
+
+  useEffect(() => {
+    const root = innerRef.current;
+    if (!root) return;
+    const wanted = editing ? textElementsIn(root) : [];
+    const keep = new Set(wanted);
+    editableRef.current.forEach((el) => {
+      if (keep.has(el)) return;
+      el.removeAttribute("contenteditable");
+      el.removeAttribute("data-no-drag");
+      el.removeAttribute("data-inline-editable");
+    });
+    wanted.forEach((el) => {
+      if (el.getAttribute("contenteditable") === "plaintext-only") return;
+      el.setAttribute("contenteditable", "plaintext-only");
+      el.setAttribute("data-no-drag", "");
+      el.setAttribute("spellcheck", "false");
+      el.setAttribute("data-inline-editable", "");
+    });
+    editableRef.current = wanted;
+  });
+
+
 
 
   const startDrag = useCallback(
@@ -614,6 +681,27 @@ export function CanvasBlock({
           e.stopPropagation();
           setSelectedId(`${id}#${path}`);
         }}
+        onInput={(e) => {
+          if (!editing) return;
+          const root = innerRef.current;
+          const el = (e.target as HTMLElement).closest(
+            "[data-inline-editable]",
+          ) as HTMLElement | null;
+          if (!root || !el) return;
+          const value = el.textContent ?? "";
+          const field = el.getAttribute("data-field");
+          if (field && onTextEdit) {
+            onTextEdit(field, value);
+            return;
+          }
+          const path = pathTo(root, el);
+          if (path === null) return;
+          setText(`${id}#${path}`, value);
+        }}
+        onKeyDown={(e) => {
+          if (!editing) return;
+          if (e.key === "Enter" && !e.shiftKey) e.stopPropagation();
+        }}
       >
         {children}
       </div>
@@ -626,7 +714,7 @@ export function CanvasBlock({
 /* ------------------------------------------------------------------ */
 
 function PlacedBlock({ block }: { block: CanvasBlockData }) {
-  const { removeBlock } = useCanvas();
+  const { removeBlock, updateBlock } = useCanvas();
   const label = block.kind === "video"
     ? "Video"
     : block.kind === "text"
@@ -637,7 +725,12 @@ function PlacedBlock({ block }: { block: CanvasBlockData }) {
           ? "Project description"
           : "Image";
   return (
-    <CanvasBlock id={block.id} label={label} onDelete={() => removeBlock(block.id)}>
+    <CanvasBlock
+      id={block.id}
+      label={label}
+      onDelete={() => removeBlock(block.id)}
+      onTextEdit={(field, value) => updateBlock(block.id, { [field]: value })}
+    >
       {block.kind === "text" ? (
         <TextBlockView block={block} />
       ) : block.kind === "rule" ? (
@@ -669,18 +762,26 @@ function ProjectDescriptionBlockView({ block }: { block: CanvasBlockData }) {
   const content = (
     <div className="grid grid-cols-1 gap-4 pb-8 md:grid-cols-5">
       <div className="md:col-span-3">
-        <h2 className="type-heading font-medium text-foreground">{block.title}</h2>
+        <h2 data-field="title" className="type-heading font-medium text-foreground">
+          {block.title}
+        </h2>
         {block.description && (
-          <p className="mt-2 type-body text-[var(--color-foreground-muted)]">
+          <p
+            data-field="description"
+            className="mt-2 type-body text-[var(--color-foreground-muted)]"
+          >
             {block.description}
           </p>
         )}
       </div>
       <div className="md:col-span-2 md:text-right">
-        <span className="block type-body text-[var(--color-foreground-muted)]">
+        <span
+          data-field="category"
+          className="block type-body text-[var(--color-foreground-muted)]"
+        >
           {block.category}
         </span>
-        <span className="block type-body text-[var(--color-foreground-subtle)]">
+        <span data-field="year" className="block type-body text-[var(--color-foreground-subtle)]">
           {block.year}
         </span>
       </div>

@@ -11,6 +11,7 @@ export const SITE_KEYS = {
   canvasPlacements: "canvas.placements",
   canvasBlocks: "canvas.blocks",
   canvasStyles: "canvas.styles",
+  canvasTexts: "canvas.texts",
   canvasHidden: "canvas.hidden",
   type: "type.settings",
   bullets: (id: string) => `bullets.${id}`,

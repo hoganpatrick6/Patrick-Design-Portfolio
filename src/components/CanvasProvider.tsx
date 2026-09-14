@@ -31,6 +31,7 @@ export type MediaOverride = {
 };
 
 const OVERRIDES_STORAGE_KEY = "media-overrides";
+const TEXTS_STORAGE_KEY = "canvas-texts";
 
 type CanvasContextValue = {
   editing: boolean;
@@ -60,6 +61,11 @@ type CanvasContextValue = {
   isHidden: (id: string) => boolean;
   hideBlock: (id: string) => void;
   showBlock: (id: string) => void;
+
+  /** Words typed straight onto the page, keyed by `blockId#path`. */
+  texts: Record<string, string>;
+  textFor: (key: string) => string | undefined;
+  setText: (key: string, value: string) => void;
 
   overrideFor: (id: string) => MediaOverride | undefined;
   setOverride: (id: string, value: MediaOverride) => void;
@@ -137,6 +143,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   const [styles, setStyles] = useState<StyleMap>(SITE_CANVAS.styles);
   const [hidden, setHidden] = useState<string[]>(SITE_CANVAS.hidden);
   const [overrides, setOverrides] = useState<Record<string, MediaOverride>>({});
+  const [texts, setTexts] = useState<Record<string, string>>({});
   const bottoms = useRef<Record<string, number>>({});
 
   // Pick up this browser's copy after hydration, then anything saved site-wide.
@@ -160,6 +167,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     if (Array.isArray(h)) setHidden(h);
     const o = read<Record<string, MediaOverride>>(OVERRIDES_STORAGE_KEY);
     if (o) setOverrides(o);
+    const t = read<Record<string, string>>(TEXTS_STORAGE_KEY);
+    if (t) setTexts(t);
 
     void siteContent().then((values) => {
       const rp = values[SITE_KEYS.canvasPlacements];
@@ -186,6 +195,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       if (ro && typeof ro === "object") {
         setOverrides(ro as Record<string, MediaOverride>);
       }
+      const rt = values[SITE_KEYS.canvasTexts];
+      if (rt && typeof rt === "object") setTexts(rt as Record<string, string>);
     });
   }, []);
 
@@ -384,6 +395,18 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const textFor = useCallback((key: string) => texts[key], [texts]);
+
+  const setText = useCallback((key: string, value: string) => {
+    setTexts((prev) => {
+      if (prev[key] === value) return prev;
+      const next = { ...prev, [key]: value };
+      store(TEXTS_STORAGE_KEY, next);
+      writeSiteValue(SITE_KEYS.canvasTexts, next);
+      return next;
+    });
+  }, []);
+
   const bottomOf = useCallback((page: string) => bottoms.current[page] ?? 0, []);
 
   const setPageBottom = useCallback((page: string, rows: number) => {
@@ -400,12 +423,15 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     setBlocks(SITE_CANVAS.blocks);
     setStyles(SITE_CANVAS.styles);
     setHidden(SITE_CANVAS.hidden);
+    setTexts({});
     setSelectedId(null);
     try {
       Object.values(CANVAS_KEYS).forEach((k) => localStorage.removeItem(k));
+      localStorage.removeItem(TEXTS_STORAGE_KEY);
     } catch {
       /* ignore */
     }
+    writeSiteValue(SITE_KEYS.canvasTexts, {});
     writeSiteValue(SITE_KEYS.canvasPlacements, SITE_CANVAS.placements);
     writeSiteValue(SITE_KEYS.canvasBlocks, SITE_CANVAS.blocks);
     writeSiteValue(SITE_KEYS.canvasStyles, SITE_CANVAS.styles);
@@ -436,6 +462,9 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       isHidden,
       hideBlock,
       showBlock,
+      texts,
+      textFor,
+      setText,
       overrideFor,
       setOverride,
       clearOverride,
@@ -465,6 +494,9 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       isHidden,
       hideBlock,
       showBlock,
+      texts,
+      textFor,
+      setText,
       overrideFor,
       setOverride,
       clearOverride,
