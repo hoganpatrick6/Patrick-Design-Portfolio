@@ -302,8 +302,8 @@ export const SITE_CANVAS: CanvasDefaults = {
     }
   },
   "blocks": [
-    { "id": "project-header-background", "page": "project:*", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "#ecece6", "opacity": 1, "radius": 0 },
-    { "id": "grocery-header-background", "page": "project:driftwell", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "#f0f0e9", "opacity": 1, "radius": 0 },
+    { "id": "project-header-background", "page": "project:*", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-foreground)", "opacity": 0.06, "radius": 0 },
+    { "id": "grocery-header-background", "page": "project:driftwell", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-foreground)", "opacity": 0.06, "radius": 0 },
     { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2" },
     { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Design,\nArt Direction", "year": "2025" },
     { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2" },

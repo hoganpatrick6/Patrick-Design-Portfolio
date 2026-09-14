@@ -302,8 +302,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
         }
       >
         {editing && !stacked && <CanvasGuides />}
-        {!stacked &&
-          shapes.map((block) => <ShapeBlock key={block.id} block={block} />)}
+        {shapes.map((block) => <ShapeBlock key={block.id} block={block} />)}
         {children}
         {contentBlocks.map((block) => (
           <PlacedBlock key={block.id} block={block} />
