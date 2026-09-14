@@ -48,7 +48,7 @@ export const Route = createFileRoute("/work/$slug")({
 
 function Header({ page = "project" }: { page?: string }) {
   return (
-    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-[var(--color-border)] px-8 py-5 md:px-16 md:py-6">
+    <header className="sticky top-0 z-50 glass-header border-b border-[var(--color-border)] px-8 py-5 md:px-16 md:py-6">
       <div className="flex items-start justify-between gap-4 md:grid md:grid-cols-12 md:gap-12">
         <div className="md:col-span-4 lg:col-span-3">
           <Link to="/about" className="block leading-tight">
