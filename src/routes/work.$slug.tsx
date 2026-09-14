@@ -109,6 +109,7 @@ function ProjectPage() {
   const { project } = Route.useLoaderData();
   const index = projects.findIndex((p) => p.slug === project.slug);
   const next = projects[(index + 1) % projects.length];
+  const headerId = (part: string) => `project-${project.slug}-${part}`;
 
   if (project.slug === "driftwell") {
     return <GroceryFreshPage />;
@@ -120,18 +121,18 @@ function ProjectPage() {
 
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
         <Canvas page={`project:${project.slug}`}>
-          <CanvasBlock id="project-title" label="Project title">
+          <CanvasBlock id={headerId("title")} label="Project title">
             <h1 className="type-display text-foreground">{project.title}</h1>
           </CanvasBlock>
 
-          <CanvasBlock id="project-client" label="Client details">
+          <CanvasBlock id={headerId("client")} label="Client details">
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
               <dd className="mt-1 type-label text-foreground">{project.client}</dd>
             </dl>
           </CanvasBlock>
 
-          <CanvasBlock id="project-role" label="Role details">
+          <CanvasBlock id={headerId("role")} label="Role details">
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
               <dd className="mt-1 whitespace-pre-line type-label text-foreground">
@@ -140,7 +141,7 @@ function ProjectPage() {
             </dl>
           </CanvasBlock>
 
-          <CanvasBlock id="project-summary" label="Project summary">
+          <CanvasBlock id={headerId("summary")} label="Project summary">
             <p className="max-w-xl type-label text-foreground">
               {project.description || project.overview[0]}
             </p>
