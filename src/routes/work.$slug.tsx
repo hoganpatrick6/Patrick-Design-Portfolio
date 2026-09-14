@@ -90,7 +90,7 @@ function ProjectNotFound() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
       <Header />
-      <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
+      <main className="px-8 pb-32 md:px-16">
         <h1 className="type-display">
           That project doesn’t exist.
         </h1>
