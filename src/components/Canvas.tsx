@@ -681,6 +681,27 @@ export function CanvasBlock({
           e.stopPropagation();
           setSelectedId(`${id}#${path}`);
         }}
+        onInput={(e) => {
+          if (!editing) return;
+          const root = innerRef.current;
+          const el = (e.target as HTMLElement).closest(
+            "[data-inline-editable]",
+          ) as HTMLElement | null;
+          if (!root || !el) return;
+          const value = el.textContent ?? "";
+          const field = el.getAttribute("data-field");
+          if (field && onTextEdit) {
+            onTextEdit(field, value);
+            return;
+          }
+          const path = pathTo(root, el);
+          if (path === null) return;
+          setText(`${id}#${path}`, value);
+        }}
+        onKeyDown={(e) => {
+          if (!editing) return;
+          if (e.key === "Enter" && !e.shiftKey) e.stopPropagation();
+        }}
       >
         {children}
       </div>
