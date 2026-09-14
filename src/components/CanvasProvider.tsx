@@ -99,20 +99,32 @@ function read<T>(key: string): T | null {
  */
 function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; changed: boolean } {
   let changed = false;
-  const next = blocks.map((block) => {
+  const projectHeaderBackgroundIds = new Set([
+    "project-lunethra-header-background",
+    "project-clyra-header-background",
+    "project-forgekind-header-background",
+    "project-nestive-header-background",
+    "project-pollenate-header-background",
+    "grocery-header-background",
+  ]);
+  const next = blocks.flatMap((block) => {
+    if (projectHeaderBackgroundIds.has(block.id)) {
+      changed = true;
+      return [];
+    }
     if (
       block.id === "work-project-clyra-copy" &&
       block.title === "Clyra" &&
       block.description === "UI system and marketing site for a B2B SaaS product."
     ) {
       changed = true;
-      return {
+      return [{
         ...block,
         title: "Uber Color System",
         description: "A strategic consolidation of Uber's global color theory.",
-      };
+      }];
     }
-    return block;
+    return [block];
   });
   return { blocks: next, changed };
 }

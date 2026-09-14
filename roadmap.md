@@ -8,3 +8,4 @@
 - [x] Break Work project images and descriptions out of the Project List block with above/below duplication.
 - [x] Keep each Work project thumbnail and its copy aligned as one responsive row.
 - [x] Reformat every project header as independent text blocks over a full-bleed editable colour field.
+- [x] Remove project header colour fields and restore black and warm off-white page backgrounds.
