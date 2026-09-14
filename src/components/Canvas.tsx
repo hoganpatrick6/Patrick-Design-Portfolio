@@ -444,6 +444,42 @@ export function CanvasBlock({
     touchedRef.current = touched;
   });
 
+  // Put any words typed straight onto the page back where they belong, and in
+  // edit mode let every piece of type be typed into directly.
+  useEffect(() => {
+    const root = innerRef.current;
+    if (!root) return;
+    const prefix = `${id}#`;
+    Object.entries(texts).forEach(([key, value]) => {
+      if (!key.startsWith(prefix)) return;
+      const el = elementAt(root, key.slice(prefix.length));
+      if (!el || el === document.activeElement) return;
+      if (el.textContent !== value) el.textContent = value;
+    });
+  });
+
+  useEffect(() => {
+    const root = innerRef.current;
+    if (!root || !editing) return;
+    const marked = textElementsIn(root);
+    marked.forEach((el) => {
+      el.setAttribute("contenteditable", "plaintext-only");
+      el.setAttribute("data-no-drag", "");
+      el.setAttribute("spellcheck", "false");
+      el.setAttribute("data-inline-editable", "");
+    });
+    return () => {
+      marked.forEach((el) => {
+        el.removeAttribute("contenteditable");
+        el.removeAttribute("data-no-drag");
+        el.removeAttribute("spellcheck");
+        el.removeAttribute("data-inline-editable");
+      });
+    };
+  });
+
+
+
 
   const startDrag = useCallback(
     (event: React.PointerEvent, mode: DragMode) => {
