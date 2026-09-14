@@ -31,6 +31,7 @@ export type MediaOverride = {
 };
 
 const OVERRIDES_STORAGE_KEY = "media-overrides";
+const TEXTS_STORAGE_KEY = "canvas-texts";
 
 type CanvasContextValue = {
   editing: boolean;
