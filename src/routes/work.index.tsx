@@ -79,7 +79,7 @@ function WorkPage() {
           </CanvasBlock>
 
           <CanvasBlock id="work-projects-label" label="Projects label">
-            <div className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
+            <div className="type-label text-[var(--color-foreground-subtle)]">
               Projects
             </div>
           </CanvasBlock>

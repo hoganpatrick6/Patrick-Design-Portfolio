@@ -762,7 +762,7 @@ function ProjectDescriptionBlockView({ block }: { block: CanvasBlockData }) {
   const content = (
     <div className="grid grid-cols-1 gap-4 pb-8 md:grid-cols-5">
       <div className="md:col-span-3">
-        <h2 data-field="title" className="type-heading font-medium text-foreground">
+        <h2 data-field="title" className="type-heading text-foreground">
           {block.title}
         </h2>
         {block.description && (

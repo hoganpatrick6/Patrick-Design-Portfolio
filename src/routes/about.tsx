@@ -110,7 +110,7 @@ function Arrow() {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="type-label text-[var(--color-foreground-subtle)] tracking-wide">{children}</div>
+    <div className="type-label text-[var(--color-foreground-subtle)]">{children}</div>
   );
 }
 
@@ -128,7 +128,7 @@ function AboutPage() {
         <div className="flex items-start justify-between gap-4 md:grid md:grid-cols-12 md:gap-12">
           <div className="md:col-span-4 lg:col-span-3">
             <Link to="/about" className="block leading-tight">
-              <div className="type-nav font-medium">
+              <div className="type-nav">
                 <FragmentName text="Patrick Hogan" />
               </div>
               <div className="type-nav text-[var(--color-foreground-muted)]">
@@ -213,7 +213,7 @@ function AboutPage() {
                     )}
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-10">
                       <div className="space-y-1">
-                        <h3 className="type-heading font-medium text-foreground">{role.title}</h3>
+                        <h3 className="type-heading text-foreground">{role.title}</h3>
                         <a
                           href={role.url}
                           className="block type-body text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
@@ -242,7 +242,7 @@ function AboutPage() {
               <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
                 {skills.map((group) => (
                   <div key={group.heading} className="space-y-4">
-                    <h4 className="type-heading font-medium text-foreground">{group.heading}</h4>
+                    <h4 className="type-heading text-foreground">{group.heading}</h4>
                     <ul className="space-y-2">
                       {group.items.map((item) => (
                         <li
@@ -263,7 +263,7 @@ function AboutPage() {
                 <SectionLabel>Education</SectionLabel>
               </div>
               <div className="space-y-2">
-                <h3 className="type-heading font-medium text-foreground">
+                <h3 className="type-heading text-foreground">
                   University of California, Los Angeles (UCLA)
                 </h3>
                 <p className="type-body text-[var(--color-foreground-muted)]">
