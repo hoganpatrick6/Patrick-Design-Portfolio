@@ -19,8 +19,14 @@ const PRELOADED = new Set([
   "PP Fragment Glare",
 ]);
 
-/** Extra Google families offered in the picker out of the box. */
+/** Families that aren't on Google Fonts, with their stylesheet URL. */
+const SPECIAL_FONT_SOURCES: Record<string, string> = {
+  "SF Pro Display": "https://fonts.cdnfonts.com/css/sf-pro-display",
+};
+
+/** Extra families offered in the picker out of the box. */
 export const CURATED_GOOGLE_FONTS: string[] = [
+  "SF Pro Display",
   "Inter",
   "DM Sans",
   "Manrope",
@@ -75,9 +81,11 @@ export function loadGoogleFont(family: string) {
   const link = document.createElement("link");
   link.id = id;
   link.rel = "stylesheet";
-  link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
-    name,
-  ).replace(/%20/g, "+")}:ital,wght@0,100..900;1,100..900&display=swap`;
+  link.href =
+    SPECIAL_FONT_SOURCES[name] ??
+    `https://fonts.googleapis.com/css2?family=${encodeURIComponent(
+      name,
+    ).replace(/%20/g, "+")}:ital,wght@0,100..900;1,100..900&display=swap`;
   document.head.appendChild(link);
 }
 
