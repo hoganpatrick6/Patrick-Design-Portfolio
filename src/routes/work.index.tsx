@@ -52,13 +52,13 @@ function WorkPage() {
             <nav className="flex gap-6 type-nav">
               <Link
                 to="/work"
-                className="font-medium text-foreground transition-colors hover:text-[var(--color-foreground-muted)]"
+                className="text-foreground transition-colors hover:text-[var(--color-foreground-muted)]"
               >
                 Work
               </Link>
               <Link
                 to="/about"
-                className="font-medium text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
+                className="text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
               >
                 About
               </Link>
@@ -79,7 +79,7 @@ function WorkPage() {
           </CanvasBlock>
 
           <CanvasBlock id="work-projects-label" label="Projects label">
-            <div className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
+            <div className="type-label text-[var(--color-foreground-subtle)]">
               Projects
             </div>
           </CanvasBlock>

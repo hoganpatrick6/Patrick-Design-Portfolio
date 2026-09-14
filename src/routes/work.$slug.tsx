@@ -128,21 +128,21 @@ function ProjectPage() {
           <CanvasBlock id={headerId("client")} label="Client details">
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
-              <dd className="mt-1 type-label text-foreground">{project.client}</dd>
+              <dd className="mt-1 type-body text-foreground">{project.client}</dd>
             </dl>
           </CanvasBlock>
 
           <CanvasBlock id={headerId("role")} label="Role details">
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
-              <dd className="mt-1 whitespace-pre-line type-label text-foreground">
+              <dd className="mt-1 whitespace-pre-line type-body text-foreground">
                 {project.role}
               </dd>
             </dl>
           </CanvasBlock>
 
           <CanvasBlock id={headerId("summary")} label="Project summary">
-            <p className="max-w-xl type-label text-foreground">
+            <p className="max-w-xl type-body text-foreground">
               {project.description || project.overview[0]}
             </p>
           </CanvasBlock>
@@ -159,7 +159,7 @@ function ProjectPage() {
 
           <CanvasBlock id="project-next" label="Next project">
             <div className="border-t border-[var(--color-border)] pt-8">
-          <div className="type-label tracking-wide text-[var(--color-foreground-subtle)]">
+          <div className="type-label text-[var(--color-foreground-subtle)]">
             Next project
           </div>
           <Link
@@ -176,7 +176,7 @@ function ProjectPage() {
               />
             </div>
             <div className="md:col-span-7">
-              <h2 className="type-heading font-medium transition-colors group-hover:text-[var(--color-foreground-muted)]">
+              <h2 className="type-heading transition-colors group-hover:text-[var(--color-foreground-muted)]">
                 {next.title}
               </h2>
               <p className="mt-2 max-w-md type-body text-[var(--color-foreground-muted)]">
@@ -208,19 +208,19 @@ function GroceryFreshPage() {
           <CanvasBlock id="grocery-client" label="Client details">
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
-              <dd className="mt-1 type-label text-foreground">Uber</dd>
+              <dd className="mt-1 type-body text-foreground">Uber</dd>
             </dl>
           </CanvasBlock>
 
           <CanvasBlock id="grocery-role" label="Role details">
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
-              <dd className="mt-1 type-label text-foreground">Art Direction</dd>
+              <dd className="mt-1 type-body text-foreground">Art Direction</dd>
             </dl>
           </CanvasBlock>
 
           <CanvasBlock id="grocery-summary" label="Project summary">
-            <p className="type-label max-w-xl">
+            <p className="type-body max-w-xl">
               Why would anyone want a stranger to do their shopping for them? To build
               more trust and attract more attention to Uber Eats’ grocery business, we
               created a library of images focused specifically on produce and our
@@ -242,20 +242,20 @@ function GroceryFreshPage() {
           </CanvasBlock>
 
           <CanvasBlock id="grocery-story-title" label="Image library title">
-            <h2 className="fragment-name text-center text-2xl leading-tight">
+            <h2 className="type-subhead text-center">
               Global Image Library
             </h2>
           </CanvasBlock>
 
           <CanvasBlock id="grocery-story-intro" label="Image library introduction">
-            <p className="type-label text-center">
+            <p className="type-body text-center">
               We partnered with photographers to shoot in four different grocery stores
               across Los Angeles, each representing a different region of the world.
             </p>
           </CanvasBlock>
 
           <CanvasBlock id="grocery-story-detail" label="Image library details">
-            <p className="type-label text-center">
+            <p className="type-body text-center">
               It was important for us to shoot in real Eats grocery locations with real
               Eats couriers. We wanted to give our audience an authentic look into who
               is behind their shopping and how they do it—while also making each produce
