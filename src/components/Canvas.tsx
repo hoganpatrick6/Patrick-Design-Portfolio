@@ -714,7 +714,7 @@ export function CanvasBlock({
 /* ------------------------------------------------------------------ */
 
 function PlacedBlock({ block }: { block: CanvasBlockData }) {
-  const { removeBlock } = useCanvas();
+  const { removeBlock, updateBlock } = useCanvas();
   const label = block.kind === "video"
     ? "Video"
     : block.kind === "text"
@@ -725,7 +725,12 @@ function PlacedBlock({ block }: { block: CanvasBlockData }) {
           ? "Project description"
           : "Image";
   return (
-    <CanvasBlock id={block.id} label={label} onDelete={() => removeBlock(block.id)}>
+    <CanvasBlock
+      id={block.id}
+      label={label}
+      onDelete={() => removeBlock(block.id)}
+      onTextEdit={(field, value) => updateBlock(block.id, { [field]: value })}
+    >
       {block.kind === "text" ? (
         <TextBlockView block={block} />
       ) : block.kind === "rule" ? (
@@ -757,18 +762,26 @@ function ProjectDescriptionBlockView({ block }: { block: CanvasBlockData }) {
   const content = (
     <div className="grid grid-cols-1 gap-4 pb-8 md:grid-cols-5">
       <div className="md:col-span-3">
-        <h2 className="type-heading font-medium text-foreground">{block.title}</h2>
+        <h2 data-field="title" className="type-heading font-medium text-foreground">
+          {block.title}
+        </h2>
         {block.description && (
-          <p className="mt-2 type-body text-[var(--color-foreground-muted)]">
+          <p
+            data-field="description"
+            className="mt-2 type-body text-[var(--color-foreground-muted)]"
+          >
             {block.description}
           </p>
         )}
       </div>
       <div className="md:col-span-2 md:text-right">
-        <span className="block type-body text-[var(--color-foreground-muted)]">
+        <span
+          data-field="category"
+          className="block type-body text-[var(--color-foreground-muted)]"
+        >
           {block.category}
         </span>
-        <span className="block type-body text-[var(--color-foreground-subtle)]">
+        <span data-field="year" className="block type-body text-[var(--color-foreground-subtle)]">
           {block.year}
         </span>
       </div>
