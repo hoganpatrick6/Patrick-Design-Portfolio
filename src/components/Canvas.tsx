@@ -387,12 +387,15 @@ export function CanvasBlock({
   children,
   className = "",
   onDelete,
+  onTextEdit,
 }: {
   id: string;
   label: string;
   children: ReactNode;
   className?: string;
   onDelete?: () => void;
+  /** Lets a block store typed words on itself instead of as a page override. */
+  onTextEdit?: (field: string, value: string) => void;
 }) {
   const {
     editing,
@@ -404,6 +407,8 @@ export function CanvasBlock({
     setSelectedId,
     styleFor,
     styles,
+    texts,
+    setText,
   } = useCanvas();
   const { stacked, colWidth, resolved, register, unregister, reportHeight } =
     useCanvasLayout();
@@ -411,6 +416,7 @@ export function CanvasBlock({
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const touchedRef = useRef<{ el: HTMLElement; css: string }[]>([]);
+  const editableRef = useRef<HTMLElement[]>([]);
   const justDragged = useRef(false);
   const [drag, setDrag] = useState<DragMode | null>(null);
   const [offset, setOffset] = useState<{ x: number; y: number } | null>(null);
