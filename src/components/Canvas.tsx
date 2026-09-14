@@ -244,7 +244,6 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   const pageBlocks = blocksFor(page).filter((b) => !isHidden(b.id));
   const shapes = pageBlocks.filter((b) => b.kind === "shape");
   const contentBlocks = pageBlocks.filter((b) => b.kind !== "shape");
-  const projectHeaderShapes = shapes.filter((b) => b.id.startsWith("project-header-bg:"));
   const shapeBottom = shapes.reduce((max, b) => {
     const p = placementFor(b.id);
     return Math.max(max, p.y + p.h);
@@ -298,9 +297,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
         }`}
         style={
           stacked
-            ? projectHeaderShapes.length
-              ? { paddingTop: "32rem" }
-              : undefined
+            ? undefined
             : { minHeight: `${Math.max(totalRows, shapeBottom, 8) * ROW_UNIT}px` }
         }
       >
@@ -506,7 +503,7 @@ export function CanvasBlock({
 
   const styled = blockStyleToCss(style);
   const positioned: CSSProperties = stacked
-    ? { order: spot?.order ?? 0 }
+    ? { order: spot?.order ?? 0, position: "relative", zIndex: 1 }
     : {
         position: "absolute",
         left: `calc((100% + ${GUTTER}px) * ${placement.x / GRID_COLUMNS})`,
@@ -831,10 +828,6 @@ function ShapeBlock({ block }: { block: CanvasBlockData }) {
           stacked && block.id.startsWith("project-header-bg:")
             ? "32rem"
             : `${placement.h * ROW_UNIT}px`,
-        transform:
-          stacked && block.id.startsWith("project-header-bg:")
-            ? "translateY(-32rem)"
-            : undefined,
         zIndex: 0,
         pointerEvents: editing ? "auto" : "none",
       }}

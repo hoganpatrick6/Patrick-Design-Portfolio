@@ -137,7 +137,14 @@ function repairSavedPlacements(placements: PlacementMap): {
   const next = { ...placements };
   Object.entries(legacy).forEach(([id, oldPlacement]) => {
     const saved = next[id];
-    if (saved && JSON.stringify(saved) === JSON.stringify(oldPlacement)) {
+    const intermediateGroceryHero =
+      id === "grocery-hero" &&
+      saved &&
+      JSON.stringify(saved) === JSON.stringify({ x: 0, y: 16, w: 12, h: 36 });
+    if (
+      saved &&
+      (JSON.stringify(saved) === JSON.stringify(oldPlacement) || intermediateGroceryHero)
+    ) {
       next[id] = SITE_CANVAS.placements[id] ?? saved;
       changed = true;
     }
