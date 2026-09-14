@@ -167,6 +167,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     if (Array.isArray(h)) setHidden(h);
     const o = read<Record<string, MediaOverride>>(OVERRIDES_STORAGE_KEY);
     if (o) setOverrides(o);
+    const t = read<Record<string, string>>(TEXTS_STORAGE_KEY);
+    if (t) setTexts(t);
 
     void siteContent().then((values) => {
       const rp = values[SITE_KEYS.canvasPlacements];
