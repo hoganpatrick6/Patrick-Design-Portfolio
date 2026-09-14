@@ -423,12 +423,15 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     setBlocks(SITE_CANVAS.blocks);
     setStyles(SITE_CANVAS.styles);
     setHidden(SITE_CANVAS.hidden);
+    setTexts({});
     setSelectedId(null);
     try {
       Object.values(CANVAS_KEYS).forEach((k) => localStorage.removeItem(k));
+      localStorage.removeItem(TEXTS_STORAGE_KEY);
     } catch {
       /* ignore */
     }
+    writeSiteValue(SITE_KEYS.canvasTexts, {});
     writeSiteValue(SITE_KEYS.canvasPlacements, SITE_CANVAS.placements);
     writeSiteValue(SITE_KEYS.canvasBlocks, SITE_CANVAS.blocks);
     writeSiteValue(SITE_KEYS.canvasStyles, SITE_CANVAS.styles);
