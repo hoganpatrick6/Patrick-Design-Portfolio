@@ -174,12 +174,6 @@ export const SITE_CANVAS: CanvasDefaults = {
     "work-rule-forgekind": { "x": 7, "y": 74, "w": 5, "h": 1 },
     "work-rule-nestive": { "x": 7, "y": 90, "w": 5, "h": 1 },
     "work-rule-pollenate": { "x": 7, "y": 106, "w": 5, "h": 1 },
-    "project-lunethra-header-background": {
-      "x": 0,
-      "y": 0,
-      "w": 12,
-      "h": 18
-    },
     "project-lunethra-title": {
       "x": 0,
       "y": 1,
@@ -204,22 +198,18 @@ export const SITE_CANVAS: CanvasDefaults = {
       "w": 6,
       "h": 6
     },
-    "project-clyra-header-background": { "x": 0, "y": 0, "w": 12, "h": 18 },
     "project-clyra-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
     "project-clyra-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-clyra-role": { "x": 2, "y": 11, "w": 2, "h": 4 },
     "project-clyra-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
-    "project-forgekind-header-background": { "x": 0, "y": 0, "w": 12, "h": 18 },
     "project-forgekind-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
     "project-forgekind-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-forgekind-role": { "x": 2, "y": 11, "w": 2, "h": 4 },
     "project-forgekind-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
-    "project-nestive-header-background": { "x": 0, "y": 0, "w": 12, "h": 18 },
     "project-nestive-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
     "project-nestive-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-nestive-role": { "x": 2, "y": 11, "w": 2, "h": 4 },
     "project-nestive-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
-    "project-pollenate-header-background": { "x": 0, "y": 0, "w": 12, "h": 18 },
     "project-pollenate-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
     "project-pollenate-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-pollenate-role": { "x": 2, "y": 11, "w": 2, "h": 4 },
@@ -235,12 +225,6 @@ export const SITE_CANVAS: CanvasDefaults = {
       "y": 42,
       "w": 12,
       "h": 20
-    },
-    "grocery-header-background": {
-      "x": 0,
-      "y": 0,
-      "w": 12,
-      "h": 18
     },
     "grocery-title": {
       "x": 0,
@@ -322,12 +306,6 @@ export const SITE_CANVAS: CanvasDefaults = {
     }
   },
   "blocks": [
-    { "id": "project-lunethra-header-background", "page": "project:lunethra", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-foreground)", "opacity": 0.06, "radius": 0 },
-    { "id": "project-clyra-header-background", "page": "project:clyra", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-foreground)", "opacity": 0.06, "radius": 0 },
-    { "id": "project-forgekind-header-background", "page": "project:forgekind", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-foreground)", "opacity": 0.06, "radius": 0 },
-    { "id": "project-nestive-header-background", "page": "project:nestive", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-foreground)", "opacity": 0.06, "radius": 0 },
-    { "id": "project-pollenate-header-background", "page": "project:pollenate", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-foreground)", "opacity": 0.06, "radius": 0 },
-    { "id": "grocery-header-background", "page": "project:driftwell", "kind": "shape", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-foreground)", "opacity": 0.06, "radius": 0 },
     { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2" },
     { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Design,\nArt Direction", "year": "2025" },
     { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2" },
