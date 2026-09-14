@@ -757,7 +757,11 @@ function MediaBlockView({ block }: { block: CanvasBlockData }) {
       )}
     </figure>
   );
-  return block.href ? <a href={block.href} aria-label={`View ${block.alt}`}>{media}</a> : media;
+  return block.href && block.kind !== "image" ? (
+    <a href={block.href} aria-label={`View ${block.alt}`}>{media}</a>
+  ) : (
+    media
+  );
 }
 
 /* ------------------------------------------------------------------ */
