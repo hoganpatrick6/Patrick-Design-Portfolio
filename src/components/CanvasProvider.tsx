@@ -383,11 +383,12 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setSelectedId(copy.id);
       return copy;
     },
-    [blocks, persistBlocks, placementFor, setPlacement, styles],
+    [blocks, persistBlocks, placementFor, pushHistory, setPlacement, styles],
   );
 
   const removeBlock = useCallback(
     (id: string) => {
+      pushHistory();
       setBlocks((prev) => {
         const next = prev.filter((b) => b.id !== id);
         persistBlocks(next);
@@ -395,7 +396,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       });
       setSelectedId((current) => (current === id ? null : current));
     },
-    [persistBlocks],
+    [persistBlocks, pushHistory],
   );
 
   const styleFor = useCallback((id: string) => styles[id], [styles]);
