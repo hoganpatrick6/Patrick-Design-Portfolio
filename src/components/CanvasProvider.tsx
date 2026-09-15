@@ -294,7 +294,10 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   /** Applies shared site content on top of the code defaults. */
   const applyShared = useCallback((values: Record<string, unknown>) => {
     const rr = values[SITE_KEYS.canvasRemoved];
-    if (Array.isArray(rr)) removed.current = rr as string[];
+    // Union, not overwrite: a deletion made in any tab wins.
+    if (Array.isArray(rr)) {
+      removed.current = [...new Set([...removed.current, ...(rr as string[])])];
+    }
     const rp = values[SITE_KEYS.canvasPlacements];
     if (rp && typeof rp === "object") {
       setPlacements({ ...SITE_CANVAS.placements, ...(rp as PlacementMap) });
