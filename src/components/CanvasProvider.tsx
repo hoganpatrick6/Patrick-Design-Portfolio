@@ -282,7 +282,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       writeSiteValue(SITE_KEYS.canvasPlacements, merged);
       return merged;
     });
-  }, []);
+  }, [pushHistory]);
+
 
   const blocksFor = useCallback(
     (page: string) => blocks.filter((block) => block.page === page),
