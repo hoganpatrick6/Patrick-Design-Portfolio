@@ -296,7 +296,6 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
 
   /** Applies shared site content on top of the code defaults. */
-  const applySharedRef = useRef<(values: Record<string, unknown>) => void>(() => {});
   const applyShared = useCallback((values: Record<string, unknown>) => {
     const rr = values[SITE_KEYS.canvasRemoved];
     // Union, not overwrite: a deletion made in any tab wins.
@@ -558,7 +557,10 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     });
   }, [pushHistory]);
 
-  const isHidden = useCallback((id: string) => hidden.includes(id), [hidden]);
+  const isHidden = useCallback(
+    (id: string) => hidden.includes(id) || removedIds.includes(id),
+    [hidden, removedIds],
+  );
 
   const hideBlock = useCallback((id: string) => {
     pushHistory();
@@ -635,14 +637,13 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     setHidden(SITE_CANVAS.hidden);
     setTexts({});
     setSelectedId(null);
-    removed.current = [];
     try {
       Object.values(CANVAS_KEYS).forEach((k) => localStorage.removeItem(k));
       localStorage.removeItem(TEXTS_STORAGE_KEY);
     } catch {
       /* ignore */
     }
-    writeSiteValue(SITE_KEYS.canvasRemoved, []);
+    applyRemoved([]);
     writeSiteValue(SITE_KEYS.canvasTexts, {});
     writeSiteValue(SITE_KEYS.canvasPlacements, SITE_CANVAS.placements);
     writeSiteValue(SITE_KEYS.canvasBlocks, SITE_CANVAS.blocks);
