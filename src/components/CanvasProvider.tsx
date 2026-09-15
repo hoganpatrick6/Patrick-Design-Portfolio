@@ -77,6 +77,18 @@ type CanvasContextValue = {
 
   snapshot: () => CanvasDefaults;
   reset: () => void;
+
+  /** Step back through recent page changes. */
+  canUndo: boolean;
+  undo: () => void;
+};
+
+type HistoryEntry = {
+  placements: PlacementMap;
+  blocks: CanvasBlock[];
+  styles: StyleMap;
+  hidden: string[];
+  texts: Record<string, string>;
 };
 
 const CanvasContext = createContext<CanvasContextValue | null>(null);
