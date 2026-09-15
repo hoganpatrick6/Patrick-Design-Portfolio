@@ -296,6 +296,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
 
   /** Applies shared site content on top of the code defaults. */
+  const applySharedRef = useRef<(values: Record<string, unknown>) => void>(() => {});
   const applyShared = useCallback((values: Record<string, unknown>) => {
     const rr = values[SITE_KEYS.canvasRemoved];
     // Union, not overwrite: a deletion made in any tab wins.
