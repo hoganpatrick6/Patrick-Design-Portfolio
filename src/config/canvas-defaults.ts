@@ -109,13 +109,17 @@ export const STACK_BREAKPOINT = 768;
 export const PROJECT_HEADER_SLOTS = ["title", "client", "role", "summary"] as const;
 export type ProjectHeaderSlot = (typeof PROJECT_HEADER_SLOTS)[number];
 
-const PROJECT_SLUGS = ["lunethra", "clyra", "forgekind", "nestive", "pollenate"] as const;
+const PROJECT_SLUGS = [
+  "uber-credit-card",
+  "grocery-fresh",
+  "uber-color-system",
+  "carbon-health-rebrand",
+  "nestive",
+  "pollenate",
+] as const;
 
 export function projectHeaderIds(slot: ProjectHeaderSlot): string[] {
-  return [
-    ...PROJECT_SLUGS.map((slug) => `project-${slug}-${slot}`),
-    `grocery-${slot}`,
-  ];
+  return PROJECT_SLUGS.map((slug) => `project-${slug}-${slot}`);
 }
 
 /** Finds the shared header field represented by a block or nested type target. */
