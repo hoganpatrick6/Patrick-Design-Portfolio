@@ -275,6 +275,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   );
 
   const setPlacement = useCallback((id: string, next: Placement) => {
+    pushHistory(true);
     setPlacements((prev) => {
       const merged = { ...prev, [id]: clampPlacement(next) };
       store(CANVAS_KEYS.placements, merged);
