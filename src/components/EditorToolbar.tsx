@@ -129,6 +129,15 @@ export function EditorToolbar({ page }: { page: string }) {
           >
             + Line
           </button>
+          <button
+            type="button"
+            onClick={undo}
+            disabled={!canUndo}
+            title="Undo last change (⌘Z)"
+            className={`${chip} disabled:cursor-not-allowed disabled:opacity-40`}
+          >
+            ↺ Undo
+          </button>
           <button type="button" onClick={onSave} className={chip}>
             Publish layout
           </button>
