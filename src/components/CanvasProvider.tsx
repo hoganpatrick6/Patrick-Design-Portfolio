@@ -41,6 +41,73 @@ const TEXTS_STORAGE_KEY = "canvas-texts";
 const HEADER_TEMPLATE_STORAGE_KEY = "canvas-header-template";
 const HEADER_TEMPLATE_VERSION = 3;
 
+/** Placeholder project names from before the URLs matched the project titles. */
+const SLUG_RENAMES: Record<string, string> = {
+  lunethra: "uber-credit-card",
+  driftwell: "grocery-fresh",
+  clyra: "uber-color-system",
+  forgekind: "carbon-health-rebrand",
+};
+
+const GROCERY_ID_RENAMES: Record<string, string> = {
+  "grocery-title": "project-grocery-fresh-title",
+  "grocery-client": "project-grocery-fresh-client",
+  "grocery-role": "project-grocery-fresh-role",
+  "grocery-summary": "project-grocery-fresh-summary",
+  "grocery-hero": "grocery-fresh-hero",
+  "grocery-story-title": "grocery-fresh-story-title",
+  "grocery-story-intro": "grocery-fresh-story-intro",
+  "grocery-story-detail": "grocery-fresh-story-detail",
+  "grocery-oranges": "grocery-fresh-oranges",
+  "grocery-blueberries": "grocery-fresh-blueberries",
+  "grocery-tomatoes": "grocery-fresh-tomatoes",
+  "grocery-eggs": "grocery-fresh-eggs",
+  "grocery-campaign": "grocery-fresh-campaign",
+};
+
+function renamedBlockId(id: string): string {
+  const grocery = GROCERY_ID_RENAMES[id];
+  if (grocery) return grocery;
+  for (const [oldSlug, newSlug] of Object.entries(SLUG_RENAMES)) {
+    if (id === `work-rule-${oldSlug}`) return `work-rule-${newSlug}`;
+    if (id === `work-project-${oldSlug}-image`) return `work-project-${newSlug}-image`;
+    if (id === `work-project-${oldSlug}-copy`) return `work-project-${newSlug}-copy`;
+    for (const slot of PROJECT_HEADER_SLOTS) {
+      if (id === `project-${oldSlug}-${slot}`) return `project-${newSlug}-${slot}`;
+    }
+  }
+  return id;
+}
+
+/** Renames the block-id portion of keys like `blockId#0.1`. */
+function renamedKey(key: string): string {
+  const hash = key.indexOf("#");
+  const base = hash === -1 ? key : key.slice(0, hash);
+  const renamed = renamedBlockId(base);
+  return hash === -1 ? renamed : `${renamed}${key.slice(hash)}`;
+}
+
+function migrateRecordKeys<T>(obj: T): { value: T; changed: boolean } {
+  let changed = false;
+  const next: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(obj as Record<string, unknown>)) {
+    const nk = renamedKey(key);
+    if (nk !== key) changed = true;
+    next[nk] = val;
+  }
+  return { value: next as T, changed };
+}
+
+function migrateIdList(ids: string[]): { value: string[]; changed: boolean } {
+  let changed = false;
+  const value = ids.map((id) => {
+    const nk = renamedKey(id);
+    if (nk !== id) changed = true;
+    return nk;
+  });
+  return { value, changed };
+}
+
 function synchronizedHeaderPlacements(source: PlacementMap, reset: boolean): PlacementMap {
   const next = { ...source };
   PROJECT_HEADER_SLOTS.forEach((slot) => {
@@ -169,20 +236,35 @@ function read<T>(key: string): T | null {
 function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; changed: boolean } {
   let changed = false;
   const projectHeaderBackgroundIds = new Set([
-    "project-lunethra-header-background",
-    "project-clyra-header-background",
-    "project-forgekind-header-background",
+    "project-uber-credit-card-header-background",
+    "project-grocery-fresh-header-background",
+    "project-uber-color-system-header-background",
+    "project-carbon-health-rebrand-header-background",
     "project-nestive-header-background",
     "project-pollenate-header-background",
     "grocery-header-background",
   ]);
   const next = blocks.flatMap((block) => {
+    // Project URLs were renamed to match their titles; carry saved edits over.
+    const renamedId = renamedBlockId(block.id);
+    const pageMatch = block.page.match(/^project:(.+)$/);
+    const renamedPage = pageMatch && SLUG_RENAMES[pageMatch[1]]
+      ? `project:${SLUG_RENAMES[pageMatch[1]]}`
+      : block.page;
+    const hrefMatch = block.href?.match(/^\/work\/(.+)$/);
+    const renamedHref = hrefMatch && SLUG_RENAMES[hrefMatch[1]]
+      ? `/work/${SLUG_RENAMES[hrefMatch[1]]}`
+      : block.href;
+    if (renamedId !== block.id || renamedPage !== block.page || renamedHref !== block.href) {
+      changed = true;
+      block = { ...block, id: renamedId, page: renamedPage, href: renamedHref };
+    }
     if (projectHeaderBackgroundIds.has(block.id)) {
       changed = true;
       return [];
     }
     if (
-      block.id === "work-project-clyra-copy" &&
+      block.id === "work-project-uber-color-system-copy" &&
       block.title === "Clyra" &&
       block.description === "UI system and marketing site for a B2B SaaS product."
     ) {
