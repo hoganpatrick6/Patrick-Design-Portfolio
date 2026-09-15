@@ -337,24 +337,26 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setSelectedId(block.id);
       return block;
     },
-    [persistBlocks],
+    [persistBlocks, pushHistory],
   );
 
   const updateBlock = useCallback(
     (id: string, patch: Partial<CanvasBlock>) => {
+      pushHistory(true);
       setBlocks((prev) => {
         const next = prev.map((b) => (b.id === id ? { ...b, ...patch } : b));
         persistBlocks(next);
         return next;
       });
     },
-    [persistBlocks],
+    [persistBlocks, pushHistory],
   );
 
   const duplicateBlock = useCallback(
     (id: string, direction: "above" | "below") => {
       const source = blocks.find((block) => block.id === id);
       if (!source) return undefined;
+      pushHistory();
       const copy: CanvasBlock = {
         ...source,
         id: `block-${Math.random().toString(36).slice(2, 8)}`,
