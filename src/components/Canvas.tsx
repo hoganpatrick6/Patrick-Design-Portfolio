@@ -270,7 +270,13 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
       });
     });
 
-    units.sort((a, b) => a.p.y - b.p.y || a.p.x - b.p.x);
+    units.sort((a, b) => {
+      const rowOrder = a.p.y - b.p.y;
+      if (rowOrder) return rowOrder;
+      const aHeader = a.items.some((item) => projectHeaderSlotFor(item.id)) ? 0 : 1;
+      const bHeader = b.items.some((item) => projectHeaderSlotFor(item.id)) ? 0 : 1;
+      return aHeader - bHeader || a.p.x - b.p.x;
+    });
 
     const out: Record<string, Resolved> = {};
     const placed: { p: Placement; top: number; rows: number }[] = [];
