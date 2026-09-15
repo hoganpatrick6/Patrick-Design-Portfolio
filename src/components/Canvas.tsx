@@ -905,18 +905,15 @@ function MediaBlockView({ block }: { block: CanvasBlockData }) {
   const media = (
     <figure className="w-full">
       {block.src && block.kind === "image" ? (
-        <div className="relative">
-          <CroppableImage
-            src={block.src}
-            alt={block.alt}
-            ratio={ratio}
-            crop={block.crop}
-            editable={editing && selected}
-            onChange={(crop) => updateBlock(block.id, { crop })}
-            className="bg-foreground/[0.05]"
-          />
-          {block.id === "block-nudgw0" && <PortraitDoodle />}
-        </div>
+        <CroppableImage
+          src={block.src}
+          alt={block.alt}
+          ratio={ratio}
+          crop={block.crop}
+          editable={editing && selected}
+          onChange={(crop) => updateBlock(block.id, { crop })}
+          className="bg-foreground/[0.05]"
+        />
       ) : (
         <div
           className="relative w-full overflow-hidden bg-foreground/[0.05]"
@@ -960,29 +957,6 @@ function MediaBlockView({ block }: { block: CanvasBlockData }) {
     <a href={block.href} aria-label={`View ${block.alt}`}>{media}</a>
   ) : (
     media
-  );
-}
-
-/** Hand-drawn marker loop fitted to the portrait on the About page. */
-function PortraitDoodle() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="portrait-doodle pointer-events-none absolute inset-0 z-10 h-full w-full"
-      viewBox="0 0 100 125"
-      preserveAspectRatio="none"
-    >
-      <g className="portrait-doodle-glasses">
-        <circle className="portrait-doodle-stroke portrait-doodle-stroke-1" cx="34" cy="42" r="7.5" pathLength="1" />
-        <path className="portrait-doodle-stroke portrait-doodle-stroke-2" d="M41.5 41.4 Q45 39.6 48 41" pathLength="1" />
-        <circle className="portrait-doodle-stroke portrait-doodle-stroke-3" cx="55.5" cy="40.5" r="7.5" pathLength="1" />
-        <path className="portrait-doodle-stroke portrait-doodle-stroke-4" d="M26.5 40.2 Q23 38 20.5 37.8 M63 38.5 Q66 36.8 68 35.7" pathLength="1" />
-      </g>
-      <g className="portrait-doodle-mustache">
-        <path className="portrait-doodle-stroke portrait-doodle-stroke-5" d="M43.8 53.8 C40.7 50.7 34.6 52.4 31.8 56.3 C36.5 58.3 41.5 57.6 44.4 54.8" pathLength="1" />
-        <path className="portrait-doodle-stroke portrait-doodle-stroke-6" d="M44.2 53.8 C47.6 50.2 53.4 50.8 56.7 54.3 C52.8 57.4 47.8 57.7 44.2 54.8" pathLength="1" />
-      </g>
-    </svg>
   );
 }
 

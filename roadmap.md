@@ -15,7 +15,6 @@
 - [x] Keep edits and deletions of built-in blocks persistent across reloads and tabs.
 - [x] Synchronize project header placement and typography across every project page.
 - [x] Use Uber Credit Card's current top section and typography as the project-page reference.
-- [x] Animate marker-drawn glasses and a mustache over the About portrait.
 
 ## Rename project URLs to match titles — DONE
 - Slugs renamed (uber-credit-card, grocery-fresh, uber-color-system, carbon-health-rebrand); old slugs redirect.
