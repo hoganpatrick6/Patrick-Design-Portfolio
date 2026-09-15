@@ -15,3 +15,8 @@
 - [x] Keep edits and deletions of built-in blocks persistent across reloads and tabs.
 - [x] Synchronize project header placement and typography across every project page.
 - [x] Use Uber Credit Card's current top section and typography as the project-page reference.
+
+## Rename project URLs to match titles — DONE
+- Slugs renamed (uber-credit-card, grocery-fresh, uber-color-system, carbon-health-rebrand); old slugs redirect.
+- Saved content migrated to new block ids; build OK; all six new URLs verified.
+- NOTE: saved edits have Uber Credit Card title/client/summary hidden (pre-existing user state, migrated intact).

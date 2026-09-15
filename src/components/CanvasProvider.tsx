@@ -41,6 +41,73 @@ const TEXTS_STORAGE_KEY = "canvas-texts";
 const HEADER_TEMPLATE_STORAGE_KEY = "canvas-header-template";
 const HEADER_TEMPLATE_VERSION = 3;
 
+/** Placeholder project names from before the URLs matched the project titles. */
+const SLUG_RENAMES: Record<string, string> = {
+  lunethra: "uber-credit-card",
+  driftwell: "grocery-fresh",
+  clyra: "uber-color-system",
+  forgekind: "carbon-health-rebrand",
+};
+
+const GROCERY_ID_RENAMES: Record<string, string> = {
+  "grocery-title": "project-grocery-fresh-title",
+  "grocery-client": "project-grocery-fresh-client",
+  "grocery-role": "project-grocery-fresh-role",
+  "grocery-summary": "project-grocery-fresh-summary",
+  "grocery-hero": "grocery-fresh-hero",
+  "grocery-story-title": "grocery-fresh-story-title",
+  "grocery-story-intro": "grocery-fresh-story-intro",
+  "grocery-story-detail": "grocery-fresh-story-detail",
+  "grocery-oranges": "grocery-fresh-oranges",
+  "grocery-blueberries": "grocery-fresh-blueberries",
+  "grocery-tomatoes": "grocery-fresh-tomatoes",
+  "grocery-eggs": "grocery-fresh-eggs",
+  "grocery-campaign": "grocery-fresh-campaign",
+};
+
+function renamedBlockId(id: string): string {
+  const grocery = GROCERY_ID_RENAMES[id];
+  if (grocery) return grocery;
+  for (const [oldSlug, newSlug] of Object.entries(SLUG_RENAMES)) {
+    if (id === `work-rule-${oldSlug}`) return `work-rule-${newSlug}`;
+    if (id === `work-project-${oldSlug}-image`) return `work-project-${newSlug}-image`;
+    if (id === `work-project-${oldSlug}-copy`) return `work-project-${newSlug}-copy`;
+    for (const slot of PROJECT_HEADER_SLOTS) {
+      if (id === `project-${oldSlug}-${slot}`) return `project-${newSlug}-${slot}`;
+    }
+  }
+  return id;
+}
+
+/** Renames the block-id portion of keys like `blockId#0.1`. */
+function renamedKey(key: string): string {
+  const hash = key.indexOf("#");
+  const base = hash === -1 ? key : key.slice(0, hash);
+  const renamed = renamedBlockId(base);
+  return hash === -1 ? renamed : `${renamed}${key.slice(hash)}`;
+}
+
+function migrateRecordKeys<T>(obj: T): { value: T; changed: boolean } {
+  let changed = false;
+  const next: Record<string, unknown> = {};
+  for (const [key, val] of Object.entries(obj as Record<string, unknown>)) {
+    const nk = renamedKey(key);
+    if (nk !== key) changed = true;
+    next[nk] = val;
+  }
+  return { value: next as T, changed };
+}
+
+function migrateIdList(ids: string[]): { value: string[]; changed: boolean } {
+  let changed = false;
+  const value = ids.map((id) => {
+    const nk = renamedKey(id);
+    if (nk !== id) changed = true;
+    return nk;
+  });
+  return { value, changed };
+}
+
 function synchronizedHeaderPlacements(source: PlacementMap, reset: boolean): PlacementMap {
   const next = { ...source };
   PROJECT_HEADER_SLOTS.forEach((slot) => {
@@ -169,20 +236,35 @@ function read<T>(key: string): T | null {
 function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; changed: boolean } {
   let changed = false;
   const projectHeaderBackgroundIds = new Set([
-    "project-lunethra-header-background",
-    "project-clyra-header-background",
-    "project-forgekind-header-background",
+    "project-uber-credit-card-header-background",
+    "project-grocery-fresh-header-background",
+    "project-uber-color-system-header-background",
+    "project-carbon-health-rebrand-header-background",
     "project-nestive-header-background",
     "project-pollenate-header-background",
     "grocery-header-background",
   ]);
   const next = blocks.flatMap((block) => {
+    // Project URLs were renamed to match their titles; carry saved edits over.
+    const renamedId = renamedBlockId(block.id);
+    const pageMatch = block.page.match(/^project:(.+)$/);
+    const renamedPage = pageMatch && SLUG_RENAMES[pageMatch[1]]
+      ? `project:${SLUG_RENAMES[pageMatch[1]]}`
+      : block.page;
+    const hrefMatch = block.href?.match(/^\/work\/(.+)$/);
+    const renamedHref = hrefMatch && SLUG_RENAMES[hrefMatch[1]]
+      ? `/work/${SLUG_RENAMES[hrefMatch[1]]}`
+      : block.href;
+    if (renamedId !== block.id || renamedPage !== block.page || renamedHref !== block.href) {
+      changed = true;
+      block = { ...block, id: renamedId, page: renamedPage, href: renamedHref };
+    }
     if (projectHeaderBackgroundIds.has(block.id)) {
       changed = true;
       return [];
     }
     if (
-      block.id === "work-project-clyra-copy" &&
+      block.id === "work-project-uber-color-system-copy" &&
       block.title === "Clyra" &&
       block.description === "UI system and marketing site for a B2B SaaS product."
     ) {
@@ -343,10 +425,15 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   /** Applies shared site content on top of the code defaults. */
   const applyShared = useCallback((values: Record<string, unknown>) => {
     const resetHeaderTemplate = values[SITE_KEYS.canvasHeaderTemplate] !== HEADER_TEMPLATE_VERSION;
-    const rr = values[SITE_KEYS.canvasRemoved];
+    const rrRaw = values[SITE_KEYS.canvasRemoved];
     // Union, not overwrite: a deletion made in any tab wins.
-    if (Array.isArray(rr)) {
-      const combined = [...new Set([...removed.current, ...(rr as string[])])];
+    if (Array.isArray(rrRaw)) {
+      const migrated = migrateIdList(rrRaw as string[]);
+      if (migrated.changed) {
+        store(CANVAS_KEYS.removed, migrated.value);
+        writeSiteValue(SITE_KEYS.canvasRemoved, migrated.value);
+      }
+      const combined = [...new Set([...removed.current, ...migrated.value])];
       const next = resetHeaderTemplate ? withoutProjectHeaderIds(combined) : combined;
       applyRemoved(next, false);
       if (resetHeaderTemplate) {
@@ -354,10 +441,15 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         writeSiteValue(SITE_KEYS.canvasRemoved, next);
       }
     }
-    const rp = values[SITE_KEYS.canvasPlacements];
-    if (rp && typeof rp === "object") {
+    const rpRaw = values[SITE_KEYS.canvasPlacements];
+    if (rpRaw && typeof rpRaw === "object") {
+      const migrated = migrateRecordKeys(rpRaw as PlacementMap);
+      if (migrated.changed) {
+        store(CANVAS_KEYS.placements, migrated.value);
+        writeSiteValue(SITE_KEYS.canvasPlacements, migrated.value);
+      }
       const next = synchronizedHeaderPlacements(
-        { ...SITE_CANVAS.placements, ...(rp as PlacementMap) },
+        { ...SITE_CANVAS.placements, ...migrated.value },
         resetHeaderTemplate,
       );
       setPlacements(next);
@@ -376,20 +468,30 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
       }
     }
-    const rs = values[SITE_KEYS.canvasStyles];
-    if (rs && typeof rs === "object") {
-      const next = synchronizedHeaderStyles(rs as StyleMap, resetHeaderTemplate);
+    const rsRaw = values[SITE_KEYS.canvasStyles];
+    if (rsRaw && typeof rsRaw === "object") {
+      const migrated = migrateRecordKeys(rsRaw as StyleMap);
+      if (migrated.changed) {
+        store(CANVAS_KEYS.styles, migrated.value);
+        writeSiteValue(SITE_KEYS.canvasStyles, migrated.value);
+      }
+      const next = synchronizedHeaderStyles(migrated.value, resetHeaderTemplate);
       setStyles(next);
       if (resetHeaderTemplate) {
         store(CANVAS_KEYS.styles, next);
         writeSiteValue(SITE_KEYS.canvasStyles, next);
       }
     }
-    const rh = values[SITE_KEYS.canvasHidden];
-    if (Array.isArray(rh)) {
+    const rhRaw = values[SITE_KEYS.canvasHidden];
+    if (Array.isArray(rhRaw)) {
+      const migrated = migrateIdList(rhRaw as string[]);
+      if (migrated.changed) {
+        store(CANVAS_KEYS.hidden, migrated.value);
+        writeSiteValue(SITE_KEYS.canvasHidden, migrated.value);
+      }
       const next = resetHeaderTemplate
-        ? withoutProjectHeaderIds(rh as string[])
-        : rh as string[];
+        ? withoutProjectHeaderIds(migrated.value)
+        : migrated.value;
       setHidden(next);
       if (resetHeaderTemplate) {
         store(CANVAS_KEYS.hidden, next);
@@ -398,10 +500,22 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     }
     const ro = values[SITE_KEYS.mediaOverrides];
     if (ro && typeof ro === "object") {
-      setOverrides(ro as Record<string, MediaOverride>);
+      const migrated = migrateRecordKeys(ro as Record<string, MediaOverride>);
+      if (migrated.changed) {
+        store(OVERRIDES_STORAGE_KEY, migrated.value);
+        writeSiteValue(SITE_KEYS.mediaOverrides, migrated.value);
+      }
+      setOverrides(migrated.value);
     }
     const rt = values[SITE_KEYS.canvasTexts];
-    if (rt && typeof rt === "object") setTexts(rt as Record<string, string>);
+    if (rt && typeof rt === "object") {
+      const migrated = migrateRecordKeys(rt as Record<string, string>);
+      if (migrated.changed) {
+        store(TEXTS_STORAGE_KEY, migrated.value);
+        writeSiteValue(SITE_KEYS.canvasTexts, migrated.value);
+      }
+      setTexts(migrated.value);
+    }
     if (resetHeaderTemplate) {
       store(HEADER_TEMPLATE_STORAGE_KEY, HEADER_TEMPLATE_VERSION);
       writeSiteValue(SITE_KEYS.canvasHeaderTemplate, HEADER_TEMPLATE_VERSION);
@@ -410,15 +524,19 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
   // Pick up this browser's copy after hydration, then anything saved site-wide.
   useEffect(() => {
-    const removedLocal = read<string[]>(CANVAS_KEYS.removed);
+    const removedLocalRaw = read<string[]>(CANVAS_KEYS.removed);
     const resetHeaderTemplate = read<number>(HEADER_TEMPLATE_STORAGE_KEY) !== HEADER_TEMPLATE_VERSION;
-    if (Array.isArray(removedLocal)) {
-      applyRemoved(resetHeaderTemplate ? withoutProjectHeaderIds(removedLocal) : removedLocal, false);
+    if (Array.isArray(removedLocalRaw)) {
+      const migrated = migrateIdList(removedLocalRaw);
+      if (migrated.changed) store(CANVAS_KEYS.removed, migrated.value);
+      applyRemoved(resetHeaderTemplate ? withoutProjectHeaderIds(migrated.value) : migrated.value, false);
     }
-    const p = read<PlacementMap>(CANVAS_KEYS.placements);
-    if (p) {
+    const pRaw = read<PlacementMap>(CANVAS_KEYS.placements);
+    if (pRaw) {
+      const migrated = migrateRecordKeys(pRaw);
+      if (migrated.changed) store(CANVAS_KEYS.placements, migrated.value);
       setPlacements(synchronizedHeaderPlacements(
-        { ...SITE_CANVAS.placements, ...p },
+        { ...SITE_CANVAS.placements, ...migrated.value },
         resetHeaderTemplate,
       ));
     }
@@ -434,14 +552,30 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
       }
     }
-    const s = read<StyleMap>(CANVAS_KEYS.styles);
-    if (s) setStyles(synchronizedHeaderStyles(s, resetHeaderTemplate));
-    const h = read<string[]>(CANVAS_KEYS.hidden);
-    if (Array.isArray(h)) setHidden(resetHeaderTemplate ? withoutProjectHeaderIds(h) : h);
-    const o = read<Record<string, MediaOverride>>(OVERRIDES_STORAGE_KEY);
-    if (o) setOverrides(o);
-    const t = read<Record<string, string>>(TEXTS_STORAGE_KEY);
-    if (t) setTexts(t);
+    const sRaw = read<StyleMap>(CANVAS_KEYS.styles);
+    if (sRaw) {
+      const migrated = migrateRecordKeys(sRaw);
+      if (migrated.changed) store(CANVAS_KEYS.styles, migrated.value);
+      setStyles(synchronizedHeaderStyles(migrated.value, resetHeaderTemplate));
+    }
+    const hRaw = read<string[]>(CANVAS_KEYS.hidden);
+    if (Array.isArray(hRaw)) {
+      const migrated = migrateIdList(hRaw);
+      if (migrated.changed) store(CANVAS_KEYS.hidden, migrated.value);
+      setHidden(resetHeaderTemplate ? withoutProjectHeaderIds(migrated.value) : migrated.value);
+    }
+    const oRaw = read<Record<string, MediaOverride>>(OVERRIDES_STORAGE_KEY);
+    if (oRaw) {
+      const migrated = migrateRecordKeys(oRaw);
+      if (migrated.changed) store(OVERRIDES_STORAGE_KEY, migrated.value);
+      setOverrides(migrated.value);
+    }
+    const tRaw = read<Record<string, string>>(TEXTS_STORAGE_KEY);
+    if (tRaw) {
+      const migrated = migrateRecordKeys(tRaw);
+      if (migrated.changed) store(TEXTS_STORAGE_KEY, migrated.value);
+      setTexts(migrated.value);
+    }
 
     void siteContent().then(async (values) => {
       applyShared(values);
@@ -452,10 +586,11 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         ? repairSavedBlocks(mergeWithDefaults(sharedBlocks as CanvasBlock[], new Set(removed.current))).blocks
         : (localBlocks ?? SITE_CANVAS.blocks);
       const sharedOverrides = values[SITE_KEYS.mediaOverrides];
-      const currentOverrides =
+      const currentOverrides = migrateRecordKeys(
         sharedOverrides && typeof sharedOverrides === "object"
           ? (sharedOverrides as Record<string, MediaOverride>)
-          : (o ?? {});
+          : (oRaw ?? {}),
+      ).value;
       const migrated = await extractEmbeddedMedia(currentBlocks, currentOverrides);
       if (migrated.blocks) {
         setBlocks(migrated.blocks);

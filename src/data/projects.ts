@@ -19,7 +19,7 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    slug: "lunethra",
+    slug: "uber-credit-card",
     title: "Uber Credit Card",
     category: "Brand Identity\n2025",
     year: "2025",
@@ -33,7 +33,7 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "driftwell",
+    slug: "grocery-fresh",
     title: "Grocery Fresh",
     category: "Art Direction",
     year: "2023",
@@ -47,7 +47,7 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "clyra",
+    slug: "uber-color-system",
     title: "Uber Color System",
     category: "Product Design",
     year: "2023",
@@ -61,7 +61,7 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "forgekind",
+    slug: "carbon-health-rebrand",
     title: "Forgekind",
     category: "Brand & Web",
     year: "2022",

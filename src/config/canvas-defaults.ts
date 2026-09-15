@@ -109,13 +109,17 @@ export const STACK_BREAKPOINT = 768;
 export const PROJECT_HEADER_SLOTS = ["title", "client", "role", "summary"] as const;
 export type ProjectHeaderSlot = (typeof PROJECT_HEADER_SLOTS)[number];
 
-const PROJECT_SLUGS = ["lunethra", "clyra", "forgekind", "nestive", "pollenate"] as const;
+const PROJECT_SLUGS = [
+  "uber-credit-card",
+  "grocery-fresh",
+  "uber-color-system",
+  "carbon-health-rebrand",
+  "nestive",
+  "pollenate",
+] as const;
 
 export function projectHeaderIds(slot: ProjectHeaderSlot): string[] {
-  return [
-    ...PROJECT_SLUGS.map((slug) => `project-${slug}-${slot}`),
-    `grocery-${slot}`,
-  ];
+  return PROJECT_SLUGS.map((slug) => `project-${slug}-${slot}`);
 }
 
 /** Finds the shared header field represented by a block or nested type target. */
@@ -185,57 +189,57 @@ export const SITE_CANVAS: CanvasDefaults = {
       "w": 2,
       "h": 2
     },
-    "work-project-lunethra-image": { "x": 2, "y": 12, "w": 5, "h": 14 },
-    "work-project-lunethra-copy": { "x": 7, "y": 12, "w": 5, "h": 14 },
-    "work-project-driftwell-image": { "x": 2, "y": 28, "w": 5, "h": 14 },
-    "work-project-driftwell-copy": { "x": 7, "y": 28, "w": 5, "h": 14 },
-    "work-project-clyra-image": { "x": 2, "y": 44, "w": 5, "h": 14 },
-    "work-project-clyra-copy": { "x": 7, "y": 44, "w": 5, "h": 14 },
-    "work-project-forgekind-image": { "x": 2, "y": 60, "w": 5, "h": 14 },
-    "work-project-forgekind-copy": { "x": 7, "y": 60, "w": 5, "h": 14 },
+    "work-project-uber-credit-card-image": { "x": 2, "y": 12, "w": 5, "h": 14 },
+    "work-project-uber-credit-card-copy": { "x": 7, "y": 12, "w": 5, "h": 14 },
+    "work-project-grocery-fresh-image": { "x": 2, "y": 28, "w": 5, "h": 14 },
+    "work-project-grocery-fresh-copy": { "x": 7, "y": 28, "w": 5, "h": 14 },
+    "work-project-uber-color-system-image": { "x": 2, "y": 44, "w": 5, "h": 14 },
+    "work-project-uber-color-system-copy": { "x": 7, "y": 44, "w": 5, "h": 14 },
+    "work-project-carbon-health-rebrand-image": { "x": 2, "y": 60, "w": 5, "h": 14 },
+    "work-project-carbon-health-rebrand-copy": { "x": 7, "y": 60, "w": 5, "h": 14 },
     "work-project-nestive-image": { "x": 2, "y": 76, "w": 5, "h": 14 },
     "work-project-nestive-copy": { "x": 7, "y": 76, "w": 5, "h": 14 },
     "work-project-pollenate-image": { "x": 2, "y": 92, "w": 5, "h": 14 },
     "work-project-pollenate-copy": { "x": 7, "y": 92, "w": 5, "h": 14 },
     "work-rule-intro": { "x": 0, "y": 0, "w": 12, "h": 1 },
-    "work-rule-lunethra": { "x": 7, "y": 26, "w": 5, "h": 1 },
-    "work-rule-driftwell": { "x": 7, "y": 42, "w": 5, "h": 1 },
-    "work-rule-clyra": { "x": 7, "y": 58, "w": 5, "h": 1 },
-    "work-rule-forgekind": { "x": 7, "y": 74, "w": 5, "h": 1 },
+    "work-rule-uber-credit-card": { "x": 7, "y": 26, "w": 5, "h": 1 },
+    "work-rule-grocery-fresh": { "x": 7, "y": 42, "w": 5, "h": 1 },
+    "work-rule-uber-color-system": { "x": 7, "y": 58, "w": 5, "h": 1 },
+    "work-rule-carbon-health-rebrand": { "x": 7, "y": 74, "w": 5, "h": 1 },
     "work-rule-nestive": { "x": 7, "y": 90, "w": 5, "h": 1 },
     "work-rule-pollenate": { "x": 7, "y": 106, "w": 5, "h": 1 },
-    "project-lunethra-title": {
+    "project-uber-credit-card-title": {
       "x": 0,
       "y": 1,
       "w": 12,
       "h": 6
     },
-    "project-lunethra-client": {
+    "project-uber-credit-card-client": {
       "x": 0,
       "y": 11,
       "w": 2,
       "h": 4
     },
-    "project-lunethra-role": {
+    "project-uber-credit-card-role": {
       "x": 0,
       "y": 11,
       "w": 2,
       "h": 4
     },
-    "project-lunethra-summary": {
+    "project-uber-credit-card-summary": {
       "x": 6,
       "y": 11,
       "w": 6,
       "h": 6
     },
-    "project-clyra-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
-    "project-clyra-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
-    "project-clyra-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
-    "project-clyra-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
-    "project-forgekind-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
-    "project-forgekind-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
-    "project-forgekind-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
-    "project-forgekind-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
+    "project-uber-color-system-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
+    "project-uber-color-system-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
+    "project-uber-color-system-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
+    "project-uber-color-system-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
+    "project-carbon-health-rebrand-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
+    "project-carbon-health-rebrand-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
+    "project-carbon-health-rebrand-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
+    "project-carbon-health-rebrand-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
     "project-nestive-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
     "project-nestive-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-nestive-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
@@ -256,79 +260,79 @@ export const SITE_CANVAS: CanvasDefaults = {
       "w": 12,
       "h": 20
     },
-    "grocery-title": {
+    "project-grocery-fresh-title": {
       "x": 0,
       "y": 1,
       "w": 12,
       "h": 6
     },
-    "grocery-client": {
+    "project-grocery-fresh-client": {
       "x": 0,
       "y": 11,
       "w": 2,
       "h": 3
     },
-    "grocery-role": {
+    "project-grocery-fresh-role": {
       "x": 0,
       "y": 11,
       "w": 2,
       "h": 3
     },
-    "grocery-summary": {
+    "project-grocery-fresh-summary": {
       "x": 6,
       "y": 11,
       "w": 6,
       "h": 6
     },
-    "grocery-hero": {
+    "grocery-fresh-hero": {
       "x": 0,
       "y": 18,
       "w": 12,
       "h": 36
     },
-    "grocery-story-title": {
+    "grocery-fresh-story-title": {
       "x": 3,
       "y": 59,
       "w": 6,
       "h": 3
     },
-    "grocery-story-intro": {
+    "grocery-fresh-story-intro": {
       "x": 4,
       "y": 63,
       "w": 4,
       "h": 4
     },
-    "grocery-story-detail": {
+    "grocery-fresh-story-detail": {
       "x": 4,
       "y": 68,
       "w": 4,
       "h": 6
     },
-    "grocery-oranges": {
+    "grocery-fresh-oranges": {
       "x": 0,
       "y": 75,
       "w": 6,
       "h": 32
     },
-    "grocery-blueberries": {
+    "grocery-fresh-blueberries": {
       "x": 6,
       "y": 75,
       "w": 6,
       "h": 32
     },
-    "grocery-tomatoes": {
+    "grocery-fresh-tomatoes": {
       "x": 0,
       "y": 108,
       "w": 6,
       "h": 32
     },
-    "grocery-eggs": {
+    "grocery-fresh-eggs": {
       "x": 6,
       "y": 108,
       "w": 6,
       "h": 32
     },
-    "grocery-campaign": {
+    "grocery-fresh-campaign": {
       "x": 0,
       "y": 149,
       "w": 12,
@@ -336,24 +340,24 @@ export const SITE_CANVAS: CanvasDefaults = {
     }
   },
   "blocks": [
-    { "id": "work-project-lunethra-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2" },
-    { "id": "work-project-lunethra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/lunethra", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Design,\nArt Direction", "year": "2025" },
-    { "id": "work-project-driftwell-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2" },
-    { "id": "work-project-driftwell-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/driftwell", "title": "Grocery Fresh", "description": "", "category": "Art Direction", "year": "2023" },
-    { "id": "work-project-clyra-image", "page": "work", "kind": "image", "src": clyraThumb, "alt": "Clyra", "caption": "", "aspect": "3:2" },
-    { "id": "work-project-clyra-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/clyra", "title": "Uber Color System", "description": "A strategic consolidation of Uber's global color theory.", "category": "Product Design", "year": "2023" },
-    { "id": "work-project-forgekind-image", "page": "work", "kind": "image", "src": forgekindThumb, "alt": "Forgekind", "caption": "", "aspect": "3:2" },
-    { "id": "work-project-forgekind-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/forgekind", "title": "Forgekind", "description": "Identity, typography, and web experience for a creative studio.", "category": "Brand & Web", "year": "2022" },
+    { "id": "work-project-uber-credit-card-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2" },
+    { "id": "work-project-uber-credit-card-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/uber-credit-card", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Design,\nArt Direction", "year": "2025" },
+    { "id": "work-project-grocery-fresh-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2" },
+    { "id": "work-project-grocery-fresh-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/grocery-fresh", "title": "Grocery Fresh", "description": "", "category": "Art Direction", "year": "2023" },
+    { "id": "work-project-uber-color-system-image", "page": "work", "kind": "image", "src": clyraThumb, "alt": "Clyra", "caption": "", "aspect": "3:2" },
+    { "id": "work-project-uber-color-system-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/uber-color-system", "title": "Uber Color System", "description": "A strategic consolidation of Uber's global color theory.", "category": "Product Design", "year": "2023" },
+    { "id": "work-project-carbon-health-rebrand-image", "page": "work", "kind": "image", "src": forgekindThumb, "alt": "Forgekind", "caption": "", "aspect": "3:2" },
+    { "id": "work-project-carbon-health-rebrand-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/carbon-health-rebrand", "title": "Forgekind", "description": "Identity, typography, and web experience for a creative studio.", "category": "Brand & Web", "year": "2022" },
     { "id": "work-project-nestive-image", "page": "work", "kind": "image", "src": nestiveThumb, "alt": "Nestive", "caption": "", "aspect": "3:2" },
     { "id": "work-project-nestive-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/nestive", "title": "Nestive", "description": "Magazine design and digital editorial direction.", "category": "Editorial", "year": "2022" },
     { "id": "work-project-pollenate-image", "page": "work", "kind": "image", "src": pollenateThumb, "alt": "Pollenate", "caption": "", "aspect": "3:2" },
     { "id": "work-project-pollenate-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/pollenate", "title": "Pollenate", "description": "Visual direction and packaging for a consumer goods launch.", "category": "Art Direction", "year": "2021" }
     ,
     { "id": "work-rule-intro", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
-    { "id": "work-rule-lunethra", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
-    { "id": "work-rule-driftwell", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
-    { "id": "work-rule-clyra", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
-    { "id": "work-rule-forgekind", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-uber-credit-card", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-grocery-fresh", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-uber-color-system", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
+    { "id": "work-rule-carbon-health-rebrand", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
     { "id": "work-rule-nestive", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
     { "id": "work-rule-pollenate", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 }
   ],
