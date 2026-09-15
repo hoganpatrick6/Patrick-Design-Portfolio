@@ -6,24 +6,24 @@ import { EditorToolbar } from "../components/EditorToolbar";
 import { Canvas, CanvasBlock } from "../components/Canvas";
 import { EditableBullets } from "../components/EditableBullets";
 
-export const Route = createFileRoute("/about")({
+export const Route = createFileRoute("/resume")({
   head: () => ({
     meta: [
-      { title: "About — Patrick Hogan" },
+      { title: "Resume — Patrick Hogan" },
       {
         name: "description",
         content:
-          "About Patrick Hogan, a multidisciplinary designer with 10+ years leading brand, product, and editorial work from concept to launch.",
+          "Resume of Patrick Hogan, a multidisciplinary designer with 10+ years leading brand, product, and editorial work from concept to launch.",
       },
-      { property: "og:title", content: "About — Patrick Hogan" },
+      { property: "og:title", content: "Resume — Patrick Hogan" },
       {
         property: "og:description",
         content:
-          "About Patrick Hogan, a multidisciplinary designer with 10+ years leading brand, product, and editorial work from concept to launch.",
+          "Resume of Patrick Hogan, a multidisciplinary designer with 10+ years leading brand, product, and editorial work from concept to launch.",
       },
     ],
   }),
-  component: AboutPage,
+  component: ResumePage,
 });
 
 type Role = {
@@ -118,9 +118,9 @@ function Divider() {
   return <div className="h-px w-full bg-[var(--color-border)]" />;
 }
 
-const PAGE = "about";
+const PAGE = "resume";
 
-function AboutPage() {
+function ResumePage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
       {/* Sticky top bar */}
@@ -151,13 +151,13 @@ function AboutPage() {
               </Link>
               <Link
                 to="/about"
-                className="text-foreground transition-colors hover:text-[var(--color-foreground-muted)]"
+                className="text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
               >
                 About
               </Link>
               <Link
                 to="/resume"
-                className="text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
+                className="text-foreground transition-colors hover:text-[var(--color-foreground-muted)]"
               >
                 Resume
               </Link>
@@ -169,7 +169,7 @@ function AboutPage() {
       {/* Main grid */}
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
         <Canvas page={PAGE}>
-          <CanvasBlock id="about-intro" label="Intro" autoHeight>
+          <CanvasBlock id="resume-intro" label="Intro" autoHeight>
             <div className="border-t border-[var(--color-border)] pt-8">
               <p className="type-body text-foreground">
                 A multidisciplinary designer with 10+ years of experience, I lead brand, product,
@@ -178,7 +178,7 @@ function AboutPage() {
             </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-contact" label="Contact" autoHeight>
+          <CanvasBlock id="resume-contact" label="Contact" autoHeight>
             <div className="space-y-3 border-t border-[var(--color-border)] pt-6">
               <a
                 href="mailto:hoganpatrick6@gmail.com"
@@ -186,12 +186,6 @@ function AboutPage() {
               >
                 hoganpatrick6@gmail.com
                 <Arrow />
-              </a>
-              <a
-                href="tel:#"
-                className="block type-body text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
-              >
-                {"\n"}
               </a>
               <a
                 href="https://linkedin.com"
@@ -205,7 +199,7 @@ function AboutPage() {
             </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-experience" label="Experience" autoHeight>
+          <CanvasBlock id="resume-experience" label="Experience" autoHeight>
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Experience</SectionLabel>
               </div>
@@ -234,14 +228,14 @@ function AboutPage() {
                           {role.location}
                         </div>
                       </div>
-                      <EditableBullets id={`about-experience-${i}`} bullets={role.bullets} />
+                      <EditableBullets id={`resume-experience-${i}`} bullets={role.bullets} />
                     </div>
                   </div>
                 ))}
               </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-skills" label="Skills" autoHeight>
+          <CanvasBlock id="resume-skills" label="Skills" autoHeight>
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Skills</SectionLabel>
               </div>
@@ -264,7 +258,7 @@ function AboutPage() {
               </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-education" label="Education" autoHeight>
+          <CanvasBlock id="resume-education" label="Education" autoHeight>
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Education</SectionLabel>
               </div>
@@ -281,7 +275,7 @@ function AboutPage() {
               </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-recommendations" label="Recommendations" autoHeight>
+          <CanvasBlock id="resume-recommendations" label="Recommendations" autoHeight>
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Recommendations</SectionLabel>
               </div>

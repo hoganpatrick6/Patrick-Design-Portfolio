@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResumeRouteImport } from './routes/resume'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkIndexRouteImport } from './routes/work.index'
 import { Route as WorkSlugRouteImport } from './routes/work.$slug'
 import { Route as ApiPublicMediaIdRouteImport } from './routes/api/public/media.$id'
 
+const ResumeRoute = ResumeRouteImport.update({
+  id: '/resume',
+  path: '/resume',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -44,6 +50,7 @@ const ApiPublicMediaIdRoute = ApiPublicMediaIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/resume': typeof ResumeRoute
   '/work/$slug': typeof WorkSlugRoute
   '/work/': typeof WorkIndexRoute
   '/api/public/media/$id': typeof ApiPublicMediaIdRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/resume': typeof ResumeRoute
   '/work/$slug': typeof WorkSlugRoute
   '/work': typeof WorkIndexRoute
   '/api/public/media/$id': typeof ApiPublicMediaIdRoute
@@ -59,19 +67,33 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/resume': typeof ResumeRoute
   '/work/$slug': typeof WorkSlugRoute
   '/work/': typeof WorkIndexRoute
   '/api/public/media/$id': typeof ApiPublicMediaIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/work/$slug' | '/work/' | '/api/public/media/$id'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/resume'
+    | '/work/$slug'
+    | '/work/'
+    | '/api/public/media/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/work/$slug' | '/work' | '/api/public/media/$id'
+  to:
+    | '/'
+    | '/about'
+    | '/resume'
+    | '/work/$slug'
+    | '/work'
+    | '/api/public/media/$id'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/resume'
     | '/work/$slug'
     | '/work/'
     | '/api/public/media/$id'
@@ -80,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ResumeRoute: typeof ResumeRoute
   WorkSlugRoute: typeof WorkSlugRoute
   WorkIndexRoute: typeof WorkIndexRoute
   ApiPublicMediaIdRoute: typeof ApiPublicMediaIdRoute
@@ -87,6 +110,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/resume': {
+      id: '/resume'
+      path: '/resume'
+      fullPath: '/resume'
+      preLoaderRoute: typeof ResumeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -128,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ResumeRoute: ResumeRoute,
   WorkSlugRoute: WorkSlugRoute,
   WorkIndexRoute: WorkIndexRoute,
   ApiPublicMediaIdRoute: ApiPublicMediaIdRoute,
