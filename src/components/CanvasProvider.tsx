@@ -423,11 +423,12 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       writeSiteValue(SITE_KEYS.canvasStyles, merged);
       return merged;
     });
-  }, []);
+  }, [pushHistory]);
 
   const isHidden = useCallback((id: string) => hidden.includes(id), [hidden]);
 
   const hideBlock = useCallback((id: string) => {
+    pushHistory();
     setHidden((prev) => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
@@ -436,16 +437,17 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       return next;
     });
     setSelectedId((current) => (current === id ? null : current));
-  }, []);
+  }, [pushHistory]);
 
   const showBlock = useCallback((id: string) => {
+    pushHistory();
     setHidden((prev) => {
       const next = prev.filter((h) => h !== id);
       store(CANVAS_KEYS.hidden, next);
       writeSiteValue(SITE_KEYS.canvasHidden, next);
       return next;
     });
-  }, []);
+  }, [pushHistory]);
 
   const overrideFor = useCallback((id: string) => overrides[id], [overrides]);
 
