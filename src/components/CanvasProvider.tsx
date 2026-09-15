@@ -91,6 +91,7 @@ type HistoryEntry = {
   styles: StyleMap;
   hidden: string[];
   texts: Record<string, string>;
+  removed: string[];
 };
 
 const CanvasContext = createContext<CanvasContextValue | null>(null);
