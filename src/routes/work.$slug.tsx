@@ -128,7 +128,7 @@ function ProjectPage() {
         <Canvas page={`project:${project.slug}`}>
           <ProjectHeader project={project} />
 
-          <CanvasBlock id="project-overview" label="Overview" autoHeight>
+          <CanvasBlock id={`project-${project.slug}-overview`} label="Overview" autoHeight>
             <div className="max-w-2xl space-y-6">
               {project.overview.map((paragraph) => (
                 <p key={paragraph} className="type-body text-[var(--color-foreground-muted)]">

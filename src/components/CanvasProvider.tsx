@@ -15,6 +15,7 @@ import {
   defaultPlacement,
   PROJECT_HEADER_SLOTS,
   projectHeaderIds,
+  projectOverviewIds,
   projectHeaderPeerIds,
   projectHeaderSlotFor,
   type BlockKind,
@@ -87,10 +88,29 @@ function renamedKey(key: string): string {
   return hash === -1 ? renamed : `${renamed}${key.slice(hash)}`;
 }
 
+const SHARED_OVERVIEW_ID = "project-overview";
+
+/** The overview block used to be shared by all projects; it is now per project. */
+function expandedOverviewKeys(key: string): string[] | null {
+  const hash = key.indexOf("#");
+  const base = hash === -1 ? key : key.slice(0, hash);
+  if (base !== SHARED_OVERVIEW_ID) return null;
+  const suffix = hash === -1 ? "" : key.slice(hash);
+  return projectOverviewIds().map((id) => `${id}${suffix}`);
+}
+
 function migrateRecordKeys<T>(obj: T): { value: T; changed: boolean } {
   let changed = false;
   const next: Record<string, unknown> = {};
   for (const [key, val] of Object.entries(obj as Record<string, unknown>)) {
+    const expanded = expandedOverviewKeys(key);
+    if (expanded) {
+      changed = true;
+      expanded.forEach((id) => {
+        if (next[id] === undefined) next[id] = val;
+      });
+      continue;
+    }
     const nk = renamedKey(key);
     if (nk !== key) changed = true;
     next[nk] = val;
@@ -100,11 +120,36 @@ function migrateRecordKeys<T>(obj: T): { value: T; changed: boolean } {
 
 function migrateIdList(ids: string[]): { value: string[]; changed: boolean } {
   let changed = false;
-  const value = ids.map((id) => {
+  const value: string[] = [];
+  ids.forEach((id) => {
+    const expanded = expandedOverviewKeys(id);
+    if (expanded) {
+      changed = true;
+      expanded.forEach((next) => {
+        if (!value.includes(next)) value.push(next);
+      });
+      return;
+    }
     const nk = renamedKey(id);
     if (nk !== id) changed = true;
-    return nk;
+    if (!value.includes(nk)) value.push(nk);
   });
+  return { value, changed };
+}
+
+/** Blank saved copy would wipe the written wording, so it is dropped. */
+function withoutBlankTexts(
+  texts: Record<string, string>,
+): { value: Record<string, string>; changed: boolean } {
+  let changed = false;
+  const value: Record<string, string> = {};
+  for (const [key, val] of Object.entries(texts)) {
+    if (typeof val !== "string" || val.trim() === "") {
+      changed = true;
+      continue;
+    }
+    value[key] = val;
+  }
   return { value, changed };
 }
 
@@ -510,11 +555,12 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const rt = values[SITE_KEYS.canvasTexts];
     if (rt && typeof rt === "object") {
       const migrated = migrateRecordKeys(rt as Record<string, string>);
-      if (migrated.changed) {
-        store(TEXTS_STORAGE_KEY, migrated.value);
-        writeSiteValue(SITE_KEYS.canvasTexts, migrated.value);
+      const cleaned = withoutBlankTexts(migrated.value);
+      if (migrated.changed || cleaned.changed) {
+        store(TEXTS_STORAGE_KEY, cleaned.value);
+        writeSiteValue(SITE_KEYS.canvasTexts, cleaned.value);
       }
-      setTexts(migrated.value);
+      setTexts(cleaned.value);
     }
     if (resetHeaderTemplate) {
       store(HEADER_TEMPLATE_STORAGE_KEY, HEADER_TEMPLATE_VERSION);
@@ -573,8 +619,9 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const tRaw = read<Record<string, string>>(TEXTS_STORAGE_KEY);
     if (tRaw) {
       const migrated = migrateRecordKeys(tRaw);
-      if (migrated.changed) store(TEXTS_STORAGE_KEY, migrated.value);
-      setTexts(migrated.value);
+      const cleaned = withoutBlankTexts(migrated.value);
+      if (migrated.changed || cleaned.changed) store(TEXTS_STORAGE_KEY, cleaned.value);
+      setTexts(cleaned.value);
     }
 
     void siteContent().then(async (values) => {
@@ -841,7 +888,12 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     pushHistory(true);
     setTexts((prev) => {
       if (prev[key] === value) return prev;
-      const next = { ...prev, [key]: value };
+      // Clearing a field falls back to the written wording rather than saving blank.
+      const blank = value.trim() === "";
+      if (blank && prev[key] === undefined) return prev;
+      const next = { ...prev };
+      if (blank) delete next[key];
+      else next[key] = value;
       store(TEXTS_STORAGE_KEY, next);
       writeSiteValue(SITE_KEYS.canvasTexts, next);
       return next;
