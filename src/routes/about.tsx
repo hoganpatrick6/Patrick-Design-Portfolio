@@ -175,10 +175,10 @@ function AboutPage() {
           <CanvasBlock id="about-contact" label="Contact" autoHeight>
             <div className="space-y-3 border-t border-[var(--color-border)] pt-6">
               <a
-                href="mailto:hello@patrickhogan.com"
+                href="mailto:hoganpatrick6@gmail.com"
                 className="block type-body text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
               >
-                hello@patrickhogan.com
+                hoganpatrick6@gmail.com
                 <Arrow />
               </a>
               <a
