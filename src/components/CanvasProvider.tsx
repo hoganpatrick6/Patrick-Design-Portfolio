@@ -402,6 +402,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   const styleFor = useCallback((id: string) => styles[id], [styles]);
 
   const setStyle = useCallback((id: string, patch: BlockStyle) => {
+    pushHistory(true);
     setStyles((prev) => {
       const merged = { ...prev, [id]: { ...prev[id], ...patch } };
       (Object.keys(merged[id]!) as (keyof BlockStyle)[]).forEach((k) => {
