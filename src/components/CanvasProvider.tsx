@@ -513,7 +513,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     writeSiteValue(SITE_KEYS.canvasBlocks, SITE_CANVAS.blocks);
     writeSiteValue(SITE_KEYS.canvasStyles, SITE_CANVAS.styles);
     writeSiteValue(SITE_KEYS.canvasHidden, SITE_CANVAS.hidden);
-  }, []);
+  }, [pushHistory]);
 
   const value = useMemo(
     () => ({
