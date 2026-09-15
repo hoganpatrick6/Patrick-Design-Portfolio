@@ -182,6 +182,42 @@ export const SITE_CANVAS: CanvasDefaults = {
       "w": 8,
       "h": 14
     },
+    "resume-intro": {
+      "x": 0,
+      "y": 0,
+      "w": 4,
+      "h": 6
+    },
+    "resume-contact": {
+      "x": 0,
+      "y": 8,
+      "w": 4,
+      "h": 6
+    },
+    "resume-experience": {
+      "x": 4,
+      "y": 0,
+      "w": 8,
+      "h": 40
+    },
+    "resume-skills": {
+      "x": 4,
+      "y": 44,
+      "w": 8,
+      "h": 16
+    },
+    "resume-education": {
+      "x": 4,
+      "y": 62,
+      "w": 8,
+      "h": 10
+    },
+    "resume-recommendations": {
+      "x": 4,
+      "y": 74,
+      "w": 8,
+      "h": 14
+    },
     "work-intro": {
       "x": 0,
       "y": 0,

@@ -85,6 +85,12 @@ function Header({ page = "project" }: { page?: string }) {
             >
               About
             </Link>
+            <Link
+              to="/resume"
+              className="font-medium text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
+            >
+              Resume
+            </Link>
           </nav>
         </div>
       </div>

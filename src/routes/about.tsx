@@ -155,6 +155,12 @@ function AboutPage() {
               >
                 About
               </Link>
+              <Link
+                to="/resume"
+                className="text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
+              >
+                Resume
+              </Link>
             </nav>
           </div>
         </div>
