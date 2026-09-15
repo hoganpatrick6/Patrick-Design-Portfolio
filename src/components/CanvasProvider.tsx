@@ -527,7 +527,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       }
       setSelectedId((current) => (current === id ? null : current));
     },
-    [persistBlocks, persistRemoved, pushHistory],
+    [persistBlocks, applyRemoved, pushHistory],
   );
 
   const styleFor = useCallback((id: string) => styles[id], [styles]);
