@@ -163,7 +163,7 @@ function AboutPage() {
       {/* Main grid */}
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
         <Canvas page={PAGE}>
-          <CanvasBlock id="about-intro" label="Intro">
+          <CanvasBlock id="about-intro" label="Intro" autoHeight>
             <div className="border-t border-[var(--color-border)] pt-8">
               <p className="type-body text-foreground">
                 A multidisciplinary designer with 10+ years of experience, I lead brand, product,
@@ -172,7 +172,7 @@ function AboutPage() {
             </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-contact" label="Contact">
+          <CanvasBlock id="about-contact" label="Contact" autoHeight>
             <div className="space-y-3 border-t border-[var(--color-border)] pt-6">
               <a
                 href="mailto:hello@patrickhogan.com"
@@ -199,7 +199,7 @@ function AboutPage() {
             </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-experience" label="Experience">
+          <CanvasBlock id="about-experience" label="Experience" autoHeight>
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Experience</SectionLabel>
               </div>
@@ -235,7 +235,7 @@ function AboutPage() {
               </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-skills" label="Skills">
+          <CanvasBlock id="about-skills" label="Skills" autoHeight>
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Skills</SectionLabel>
               </div>
@@ -258,7 +258,7 @@ function AboutPage() {
               </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-education" label="Education">
+          <CanvasBlock id="about-education" label="Education" autoHeight>
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Education</SectionLabel>
               </div>
@@ -275,7 +275,7 @@ function AboutPage() {
               </div>
           </CanvasBlock>
 
-          <CanvasBlock id="about-recommendations" label="Recommendations">
+          <CanvasBlock id="about-recommendations" label="Recommendations" autoHeight>
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Recommendations</SectionLabel>
               </div>
