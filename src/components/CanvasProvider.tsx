@@ -320,6 +320,16 @@ function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; chan
         description: "A strategic consolidation of Uber's global color theory.",
       }];
     }
+    if (
+      block.id === "work-project-grocery-fresh-copy" &&
+      !block.description?.trim()
+    ) {
+      changed = true;
+      return [{
+        ...block,
+        description: "Why would anyone want a stranger to do their shopping for them?",
+      }];
+    }
     return [block];
   });
   return { blocks: next, changed };
