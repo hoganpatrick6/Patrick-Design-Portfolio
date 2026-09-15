@@ -524,15 +524,19 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
   // Pick up this browser's copy after hydration, then anything saved site-wide.
   useEffect(() => {
-    const removedLocal = read<string[]>(CANVAS_KEYS.removed);
+    const removedLocalRaw = read<string[]>(CANVAS_KEYS.removed);
     const resetHeaderTemplate = read<number>(HEADER_TEMPLATE_STORAGE_KEY) !== HEADER_TEMPLATE_VERSION;
-    if (Array.isArray(removedLocal)) {
-      applyRemoved(resetHeaderTemplate ? withoutProjectHeaderIds(removedLocal) : removedLocal, false);
+    if (Array.isArray(removedLocalRaw)) {
+      const migrated = migrateIdList(removedLocalRaw);
+      if (migrated.changed) store(CANVAS_KEYS.removed, migrated.value);
+      applyRemoved(resetHeaderTemplate ? withoutProjectHeaderIds(migrated.value) : migrated.value, false);
     }
-    const p = read<PlacementMap>(CANVAS_KEYS.placements);
-    if (p) {
+    const pRaw = read<PlacementMap>(CANVAS_KEYS.placements);
+    if (pRaw) {
+      const migrated = migrateRecordKeys(pRaw);
+      if (migrated.changed) store(CANVAS_KEYS.placements, migrated.value);
       setPlacements(synchronizedHeaderPlacements(
-        { ...SITE_CANVAS.placements, ...p },
+        { ...SITE_CANVAS.placements, ...migrated.value },
         resetHeaderTemplate,
       ));
     }
@@ -548,14 +552,30 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
       }
     }
-    const s = read<StyleMap>(CANVAS_KEYS.styles);
-    if (s) setStyles(synchronizedHeaderStyles(s, resetHeaderTemplate));
-    const h = read<string[]>(CANVAS_KEYS.hidden);
-    if (Array.isArray(h)) setHidden(resetHeaderTemplate ? withoutProjectHeaderIds(h) : h);
-    const o = read<Record<string, MediaOverride>>(OVERRIDES_STORAGE_KEY);
-    if (o) setOverrides(o);
-    const t = read<Record<string, string>>(TEXTS_STORAGE_KEY);
-    if (t) setTexts(t);
+    const sRaw = read<StyleMap>(CANVAS_KEYS.styles);
+    if (sRaw) {
+      const migrated = migrateRecordKeys(sRaw);
+      if (migrated.changed) store(CANVAS_KEYS.styles, migrated.value);
+      setStyles(synchronizedHeaderStyles(migrated.value, resetHeaderTemplate));
+    }
+    const hRaw = read<string[]>(CANVAS_KEYS.hidden);
+    if (Array.isArray(hRaw)) {
+      const migrated = migrateIdList(hRaw);
+      if (migrated.changed) store(CANVAS_KEYS.hidden, migrated.value);
+      setHidden(resetHeaderTemplate ? withoutProjectHeaderIds(migrated.value) : migrated.value);
+    }
+    const oRaw = read<Record<string, MediaOverride>>(OVERRIDES_STORAGE_KEY);
+    if (oRaw) {
+      const migrated = migrateRecordKeys(oRaw);
+      if (migrated.changed) store(OVERRIDES_STORAGE_KEY, migrated.value);
+      setOverrides(migrated.value);
+    }
+    const tRaw = read<Record<string, string>>(TEXTS_STORAGE_KEY);
+    if (tRaw) {
+      const migrated = migrateRecordKeys(tRaw);
+      if (migrated.changed) store(TEXTS_STORAGE_KEY, migrated.value);
+      setTexts(migrated.value);
+    }
 
     void siteContent().then(async (values) => {
       applyShared(values);
