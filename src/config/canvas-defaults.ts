@@ -122,6 +122,11 @@ export function projectHeaderIds(slot: ProjectHeaderSlot): string[] {
   return PROJECT_SLUGS.map((slug) => `project-${slug}-${slot}`);
 }
 
+/** The per-project overview block ids (the overview used to be shared by id). */
+export function projectOverviewIds(): string[] {
+  return PROJECT_SLUGS.map((slug) => `project-${slug}-overview`);
+}
+
 /** Finds the shared header field represented by a block or nested type target. */
 export function projectHeaderSlotFor(id: string): ProjectHeaderSlot | null {
   const blockId = id.split("#")[0] ?? id;
@@ -248,12 +253,12 @@ export const SITE_CANVAS: CanvasDefaults = {
     "project-pollenate-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-pollenate-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-pollenate-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
-    "project-overview": {
-      "x": 4,
-      "y": 22,
-      "w": 8,
-      "h": 16
-    },
+    "project-uber-credit-card-overview": { "x": 4, "y": 22, "w": 8, "h": 16 },
+    "project-grocery-fresh-overview": { "x": 4, "y": 22, "w": 8, "h": 16 },
+    "project-uber-color-system-overview": { "x": 4, "y": 22, "w": 8, "h": 16 },
+    "project-carbon-health-rebrand-overview": { "x": 4, "y": 22, "w": 8, "h": 16 },
+    "project-nestive-overview": { "x": 4, "y": 22, "w": 8, "h": 16 },
+    "project-pollenate-overview": { "x": 4, "y": 22, "w": 8, "h": 16 },
     "project-next": {
       "x": 0,
       "y": 42,
