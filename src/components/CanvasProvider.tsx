@@ -412,9 +412,10 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       writeSiteValue(SITE_KEYS.canvasStyles, merged);
       return merged;
     });
-  }, []);
+  }, [pushHistory]);
 
   const clearStyle = useCallback((id: string) => {
+    pushHistory();
     setStyles((prev) => {
       const merged = { ...prev };
       delete merged[id];
