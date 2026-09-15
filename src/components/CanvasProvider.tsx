@@ -523,8 +523,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       });
       // Remember deleted built-in blocks so they don't come back on reload.
       if (SITE_CANVAS.blocks.some((b) => b.id === id) && !removed.current.includes(id)) {
-        removed.current = [...removed.current, id];
-        persistRemoved();
+        applyRemoved([...removed.current, id]);
       }
       setSelectedId((current) => (current === id ? null : current));
     },
