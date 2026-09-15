@@ -14,3 +14,4 @@
 - [x] Preserve transparent backgrounds when PNG images are added or replaced.- [x] Store uploaded images in a shared media library instead of embedding them in the layout.
 - [x] Keep edits and deletions of built-in blocks persistent across reloads and tabs.
 - [x] Synchronize project header placement and typography across every project page.
+- [x] Use Uber Credit Card's current top section and typography as the project-page reference.
