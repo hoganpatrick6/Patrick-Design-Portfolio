@@ -10,3 +10,4 @@
 - [x] Reformat every project header as independent text blocks over a full-bleed editable colour field.
 - [x] Remove project header colour fields and restore black and warm off-white page backgrounds.
 - [x] Make every text-only canvas frame wrap tightly to its rendered type.
+- [x] Let nearby text boxes use tighter spacing before they change order.

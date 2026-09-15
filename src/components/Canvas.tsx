@@ -45,6 +45,9 @@ type CanvasLayout = {
 
 const LayoutContext = createContext<CanvasLayout | null>(null);
 
+/** Text frames use quarter-baseline steps so nearby copy can be spaced precisely. */
+const TEXT_ROW_STEP = ROW_UNIT / 4;
+
 function useCanvasLayout() {
   const ctx = useContext(LayoutContext);
   if (!ctx) throw new Error("Canvas blocks must live inside <Canvas>");
@@ -226,7 +229,9 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
     items.forEach((item) => {
       const key = workProjectPairKey(page, item.id);
       if (!key) {
-        const contentRows = Math.ceil((item.h + GUTTER) / ROW_UNIT);
+        const contentRows = item.autoHeight
+          ? Math.ceil(item.h / TEXT_ROW_STEP) / 4
+          : Math.ceil((item.h + GUTTER) / ROW_UNIT);
         units.push({
           items: [item],
           p: item.p,
@@ -243,7 +248,9 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
       const top = Math.min(...pairItems.map((item) => item.p.y));
       const rows = Math.max(
         ...pairItems.map((item) => {
-          const contentRows = Math.ceil((item.h + GUTTER) / ROW_UNIT);
+          const contentRows = item.autoHeight
+            ? Math.ceil(item.h / TEXT_ROW_STEP) / 4
+            : Math.ceil((item.h + GUTTER) / ROW_UNIT);
           return item.autoHeight
             ? Math.max(contentRows, 1)
             : Math.max(item.p.h, contentRows || 1);
@@ -554,7 +561,8 @@ export function CanvasBlock({
         const dy = e.clientY - startY;
         if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
         const cols = Math.round(dx / step);
-        const rows = Math.round(dy / ROW_UNIT);
+        const verticalStep = autoHeight ? TEXT_ROW_STEP : ROW_UNIT;
+        const rows = Math.round(dy / verticalStep) * (verticalStep / ROW_UNIT);
         let next: Placement = start;
         if (mode === "move") {
           next = {
@@ -602,7 +610,7 @@ export function CanvasBlock({
       window.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
     },
-    [colWidth, editing, id, placement, setPlacement, setSelectedId, stacked],
+    [autoHeight, colWidth, editing, id, placement, setPlacement, setSelectedId, stacked],
   );
 
   if (hidden) return null;
