@@ -9,9 +9,23 @@ import { useCanvas } from "./CanvasProvider";
  * page, and publish the current arrangement to everyone.
  */
 export function EditorToolbar({ page }: { page: string }) {
-  const { editing, setEditing, addBlock, bottomOf, snapshot, reset } = useCanvas();
+  const { editing, setEditing, addBlock, bottomOf, snapshot, reset, canUndo, undo } =
+    useCanvas();
   const [allowed, setAllowed] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+
+  // Cmd/Ctrl + Z steps back the last page change while editing.
+  useEffect(() => {
+    if (!editing) return;
+    function onKey(event: KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z" && !event.shiftKey) {
+        event.preventDefault();
+        undo();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [editing, undo]);
 
   const check = useServerFn(checkEditorAccess);
   const save = useServerFn(saveCanvasDefaults);
