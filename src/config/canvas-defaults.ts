@@ -105,6 +105,36 @@ export const GUTTER = 24;
 /** Below this width the canvas stacks into a single readable column. */
 export const STACK_BREAKPOINT = 768;
 
+/** The four editable fields that make up every project-page header. */
+export const PROJECT_HEADER_SLOTS = ["title", "client", "role", "summary"] as const;
+export type ProjectHeaderSlot = (typeof PROJECT_HEADER_SLOTS)[number];
+
+const PROJECT_SLUGS = ["lunethra", "clyra", "forgekind", "nestive", "pollenate"] as const;
+
+export function projectHeaderIds(slot: ProjectHeaderSlot): string[] {
+  return [
+    ...PROJECT_SLUGS.map((slug) => `project-${slug}-${slot}`),
+    `grocery-${slot}`,
+  ];
+}
+
+/** Finds the shared header field represented by a block or nested type target. */
+export function projectHeaderSlotFor(id: string): ProjectHeaderSlot | null {
+  const blockId = id.split("#")[0] ?? id;
+  for (const slot of PROJECT_HEADER_SLOTS) {
+    if (projectHeaderIds(slot).includes(blockId)) return slot;
+  }
+  return null;
+}
+
+/** Every matching field, retaining a nested type path when one is selected. */
+export function projectHeaderPeerIds(id: string): string[] {
+  const slot = projectHeaderSlotFor(id);
+  if (!slot) return [id];
+  const suffix = id.includes("#") ? `#${id.split("#").slice(1).join("#")}` : "";
+  return projectHeaderIds(slot).map((blockId) => `${blockId}${suffix}`);
+}
+
 export const SITE_CANVAS: CanvasDefaults = {
   "placements": {
     "about-intro": {

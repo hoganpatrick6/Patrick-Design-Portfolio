@@ -109,7 +109,6 @@ function ProjectPage() {
   const { project } = Route.useLoaderData();
   const index = projects.findIndex((p) => p.slug === project.slug);
   const next = projects[(index + 1) % projects.length];
-  const headerId = (part: string) => `project-${project.slug}-${part}`;
 
   if (project.slug === "driftwell") {
     return <GroceryFreshPage />;
@@ -119,33 +118,9 @@ function ProjectPage() {
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
       <Header page={`project:${project.slug}`} />
 
-      <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
+      <main className="px-4 pb-32 pt-0 sm:px-8 md:px-16">
         <Canvas page={`project:${project.slug}`}>
-          <CanvasBlock id={headerId("title")} label="Project title" autoHeight>
-            <h1 className="type-display text-foreground">{project.title}</h1>
-          </CanvasBlock>
-
-          <CanvasBlock id={headerId("client")} label="Client details" autoHeight>
-            <dl>
-              <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
-              <dd className="mt-1 type-body text-foreground">{project.client}</dd>
-            </dl>
-          </CanvasBlock>
-
-          <CanvasBlock id={headerId("role")} label="Role details" autoHeight>
-            <dl>
-              <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
-              <dd className="mt-1 whitespace-pre-line type-body text-foreground">
-                {project.role}
-              </dd>
-            </dl>
-          </CanvasBlock>
-
-          <CanvasBlock id={headerId("summary")} label="Project summary" autoHeight>
-            <p className="max-w-xl type-body text-foreground">
-              {project.description || project.overview[0]}
-            </p>
-          </CanvasBlock>
+          <ProjectHeader project={project} />
 
           <CanvasBlock id="project-overview" label="Overview" autoHeight>
             <div className="max-w-2xl space-y-6">
@@ -194,6 +169,8 @@ function ProjectPage() {
 
 function GroceryFreshPage() {
   const page = "project:driftwell";
+  const project = getProject("driftwell");
+  if (!project) return null;
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
@@ -201,32 +178,7 @@ function GroceryFreshPage() {
 
       <main className="px-4 pb-32 pt-0 sm:px-8 md:px-16">
         <Canvas page={page}>
-          <CanvasBlock id="grocery-title" label="Project title" autoHeight>
-            <h1 className="type-display text-foreground">Grocery Fresh</h1>
-          </CanvasBlock>
-
-          <CanvasBlock id="grocery-client" label="Client details" autoHeight>
-            <dl>
-              <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
-              <dd className="mt-1 type-body text-foreground">Uber</dd>
-            </dl>
-          </CanvasBlock>
-
-          <CanvasBlock id="grocery-role" label="Role details" autoHeight>
-            <dl>
-              <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
-              <dd className="mt-1 type-body text-foreground">Art Direction</dd>
-            </dl>
-          </CanvasBlock>
-
-          <CanvasBlock id="grocery-summary" label="Project summary" autoHeight>
-            <p className="type-body max-w-xl">
-              Why would anyone want a stranger to do their shopping for them? To build
-              more trust and attract more attention to Uber Eats’ grocery business, we
-              created a library of images focused specifically on produce and our
-              courier’s process. After all, produce selection takes skill.
-            </p>
-          </CanvasBlock>
+          <ProjectHeader project={project} />
 
           <CanvasBlock id="grocery-hero" label="Carrot photograph">
             <EditableMedia
@@ -327,5 +279,35 @@ function GroceryFreshPage() {
         </Canvas>
       </main>
     </div>
+  );
+}
+
+function ProjectHeader({ project }: { project: (typeof projects)[number] }) {
+  const id = (slot: string) => project.slug === "driftwell"
+    ? `grocery-${slot}`
+    : `project-${project.slug}-${slot}`;
+  return (
+    <>
+      <CanvasBlock id={id("title")} label="Project title" autoHeight>
+        <h1 className="type-display text-foreground">{project.title}</h1>
+      </CanvasBlock>
+      <CanvasBlock id={id("client")} label="Client details" autoHeight>
+        <dl>
+          <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
+          <dd className="mt-1 type-body text-foreground">{project.client}</dd>
+        </dl>
+      </CanvasBlock>
+      <CanvasBlock id={id("role")} label="Role details" autoHeight>
+        <dl>
+          <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
+          <dd className="mt-1 whitespace-pre-line type-body text-foreground">{project.role}</dd>
+        </dl>
+      </CanvasBlock>
+      <CanvasBlock id={id("summary")} label="Project summary" autoHeight>
+        <p className="max-w-xl type-body text-foreground">
+          {project.description || project.overview[0]}
+        </p>
+      </CanvasBlock>
+    </>
   );
 }

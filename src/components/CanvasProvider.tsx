@@ -13,6 +13,10 @@ import {
   SITE_CANVAS,
   clampPlacement,
   defaultPlacement,
+  PROJECT_HEADER_SLOTS,
+  projectHeaderIds,
+  projectHeaderPeerIds,
+  projectHeaderSlotFor,
   type BlockKind,
   type BlockStyle,
   type CanvasBlock,
@@ -34,6 +38,47 @@ export type MediaOverride = {
 
 const OVERRIDES_STORAGE_KEY = "media-overrides";
 const TEXTS_STORAGE_KEY = "canvas-texts";
+const HEADER_TEMPLATE_STORAGE_KEY = "canvas-header-template";
+const HEADER_TEMPLATE_VERSION = 2;
+
+function synchronizedHeaderPlacements(source: PlacementMap, reset: boolean): PlacementMap {
+  const next = { ...source };
+  PROJECT_HEADER_SLOTS.forEach((slot) => {
+    const ids = projectHeaderIds(slot);
+    const canonicalId = ids[0];
+    if (!canonicalId) return;
+    const placement = reset
+      ? SITE_CANVAS.placements[canonicalId]
+      : source[canonicalId] ?? SITE_CANVAS.placements[canonicalId];
+    if (!placement) return;
+    ids.forEach((id) => {
+      next[id] = { ...placement };
+    });
+  });
+  return next;
+}
+
+function synchronizedHeaderStyles(source: StyleMap, reset: boolean): StyleMap {
+  const next: StyleMap = {};
+  Object.entries(source).forEach(([id, style]) => {
+    if (!projectHeaderSlotFor(id)) next[id] = style;
+  });
+  if (reset) return next;
+  Object.entries(source).forEach(([id, style]) => {
+    const slot = projectHeaderSlotFor(id);
+    if (!slot) return;
+    const blockId = id.split("#")[0] ?? id;
+    if (blockId !== projectHeaderIds(slot)[0]) return;
+    projectHeaderPeerIds(id).forEach((peerId) => {
+      next[peerId] = { ...style };
+    });
+  });
+  return next;
+}
+
+function withoutProjectHeaderIds(ids: string[]): string[] {
+  return ids.filter((id) => !projectHeaderSlotFor(id));
+}
 
 type CanvasContextValue = {
   editing: boolean;
@@ -297,14 +342,29 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
   /** Applies shared site content on top of the code defaults. */
   const applyShared = useCallback((values: Record<string, unknown>) => {
+    const resetHeaderTemplate = values[SITE_KEYS.canvasHeaderTemplate] !== HEADER_TEMPLATE_VERSION;
     const rr = values[SITE_KEYS.canvasRemoved];
     // Union, not overwrite: a deletion made in any tab wins.
     if (Array.isArray(rr)) {
-      applyRemoved([...new Set([...removed.current, ...(rr as string[])])], false);
+      const combined = [...new Set([...removed.current, ...(rr as string[])])];
+      const next = resetHeaderTemplate ? withoutProjectHeaderIds(combined) : combined;
+      applyRemoved(next, false);
+      if (resetHeaderTemplate) {
+        store(CANVAS_KEYS.removed, next);
+        writeSiteValue(SITE_KEYS.canvasRemoved, next);
+      }
     }
     const rp = values[SITE_KEYS.canvasPlacements];
     if (rp && typeof rp === "object") {
-      setPlacements({ ...SITE_CANVAS.placements, ...(rp as PlacementMap) });
+      const next = synchronizedHeaderPlacements(
+        { ...SITE_CANVAS.placements, ...(rp as PlacementMap) },
+        resetHeaderTemplate,
+      );
+      setPlacements(next);
+      if (resetHeaderTemplate) {
+        store(CANVAS_KEYS.placements, next);
+        writeSiteValue(SITE_KEYS.canvasPlacements, next);
+      }
     }
     const rb = values[SITE_KEYS.canvasBlocks];
     if (Array.isArray(rb)) {
@@ -317,23 +377,51 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       }
     }
     const rs = values[SITE_KEYS.canvasStyles];
-    if (rs && typeof rs === "object") setStyles(rs as StyleMap);
+    if (rs && typeof rs === "object") {
+      const next = synchronizedHeaderStyles(rs as StyleMap, resetHeaderTemplate);
+      setStyles(next);
+      if (resetHeaderTemplate) {
+        store(CANVAS_KEYS.styles, next);
+        writeSiteValue(SITE_KEYS.canvasStyles, next);
+      }
+    }
     const rh = values[SITE_KEYS.canvasHidden];
-    if (Array.isArray(rh)) setHidden(rh as string[]);
+    if (Array.isArray(rh)) {
+      const next = resetHeaderTemplate
+        ? withoutProjectHeaderIds(rh as string[])
+        : rh as string[];
+      setHidden(next);
+      if (resetHeaderTemplate) {
+        store(CANVAS_KEYS.hidden, next);
+        writeSiteValue(SITE_KEYS.canvasHidden, next);
+      }
+    }
     const ro = values[SITE_KEYS.mediaOverrides];
     if (ro && typeof ro === "object") {
       setOverrides(ro as Record<string, MediaOverride>);
     }
     const rt = values[SITE_KEYS.canvasTexts];
     if (rt && typeof rt === "object") setTexts(rt as Record<string, string>);
+    if (resetHeaderTemplate) {
+      store(HEADER_TEMPLATE_STORAGE_KEY, HEADER_TEMPLATE_VERSION);
+      writeSiteValue(SITE_KEYS.canvasHeaderTemplate, HEADER_TEMPLATE_VERSION);
+    }
   }, []);
 
   // Pick up this browser's copy after hydration, then anything saved site-wide.
   useEffect(() => {
     const removedLocal = read<string[]>(CANVAS_KEYS.removed);
-    if (Array.isArray(removedLocal)) applyRemoved(removedLocal, false);
+    const resetHeaderTemplate = read<number>(HEADER_TEMPLATE_STORAGE_KEY) !== HEADER_TEMPLATE_VERSION;
+    if (Array.isArray(removedLocal)) {
+      applyRemoved(resetHeaderTemplate ? withoutProjectHeaderIds(removedLocal) : removedLocal, false);
+    }
     const p = read<PlacementMap>(CANVAS_KEYS.placements);
-    if (p) setPlacements({ ...SITE_CANVAS.placements, ...p });
+    if (p) {
+      setPlacements(synchronizedHeaderPlacements(
+        { ...SITE_CANVAS.placements, ...p },
+        resetHeaderTemplate,
+      ));
+    }
     let localBlocks: CanvasBlock[] | null = null;
     const b = read<CanvasBlock[]>(CANVAS_KEYS.blocks);
     if (Array.isArray(b)) {
@@ -347,9 +435,9 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       }
     }
     const s = read<StyleMap>(CANVAS_KEYS.styles);
-    if (s) setStyles(s);
+    if (s) setStyles(synchronizedHeaderStyles(s, resetHeaderTemplate));
     const h = read<string[]>(CANVAS_KEYS.hidden);
-    if (Array.isArray(h)) setHidden(h);
+    if (Array.isArray(h)) setHidden(resetHeaderTemplate ? withoutProjectHeaderIds(h) : h);
     const o = read<Record<string, MediaOverride>>(OVERRIDES_STORAGE_KEY);
     if (o) setOverrides(o);
     const t = read<Record<string, string>>(TEXTS_STORAGE_KEY);
@@ -404,7 +492,11 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   const setPlacement = useCallback((id: string, next: Placement) => {
     pushHistory(true);
     setPlacements((prev) => {
-      const merged = { ...prev, [id]: clampPlacement(next) };
+      const merged = { ...prev };
+      const placement = clampPlacement(next);
+      projectHeaderPeerIds(id).forEach((peerId) => {
+        merged[peerId] = placement;
+      });
       store(CANVAS_KEYS.placements, merged);
       writeSiteValue(SITE_KEYS.canvasPlacements, merged);
       return merged;
@@ -535,9 +627,13 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   const setStyle = useCallback((id: string, patch: BlockStyle) => {
     pushHistory(true);
     setStyles((prev) => {
-      const merged = { ...prev, [id]: { ...prev[id], ...patch } };
-      (Object.keys(merged[id]!) as (keyof BlockStyle)[]).forEach((k) => {
-        if (merged[id]![k] === undefined) delete merged[id]![k];
+      const merged = { ...prev };
+      projectHeaderPeerIds(id).forEach((peerId) => {
+        const nextStyle: BlockStyle = { ...prev[peerId], ...patch };
+        (Object.keys(nextStyle) as (keyof BlockStyle)[]).forEach((k) => {
+          if (nextStyle[k] === undefined) delete nextStyle[k];
+        });
+        merged[peerId] = nextStyle;
       });
       store(CANVAS_KEYS.styles, merged);
       writeSiteValue(SITE_KEYS.canvasStyles, merged);
@@ -549,7 +645,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     pushHistory();
     setStyles((prev) => {
       const merged = { ...prev };
-      delete merged[id];
+      projectHeaderPeerIds(id).forEach((peerId) => delete merged[peerId]);
       store(CANVAS_KEYS.styles, merged);
       writeSiteValue(SITE_KEYS.canvasStyles, merged);
       return merged;
@@ -639,6 +735,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     try {
       Object.values(CANVAS_KEYS).forEach((k) => localStorage.removeItem(k));
       localStorage.removeItem(TEXTS_STORAGE_KEY);
+      localStorage.setItem(HEADER_TEMPLATE_STORAGE_KEY, String(HEADER_TEMPLATE_VERSION));
     } catch {
       /* ignore */
     }
@@ -648,6 +745,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     writeSiteValue(SITE_KEYS.canvasBlocks, SITE_CANVAS.blocks);
     writeSiteValue(SITE_KEYS.canvasStyles, SITE_CANVAS.styles);
     writeSiteValue(SITE_KEYS.canvasHidden, SITE_CANVAS.hidden);
+    writeSiteValue(SITE_KEYS.canvasHeaderTemplate, HEADER_TEMPLATE_VERSION);
   }, [pushHistory]);
 
   const value = useMemo(
