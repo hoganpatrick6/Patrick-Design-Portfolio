@@ -242,14 +242,19 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
   /** Default blocks the user deleted; they stay deleted across reloads. */
   const removed = useRef<string[]>([]);
+  const [removedIds, setRemovedIds] = useState<string[]>([]);
 
   useEffect(() => {
     live.current = { placements, blocks, styles, hidden, texts, removed: removed.current };
   }, [placements, blocks, styles, hidden, texts]);
 
-  const persistRemoved = useCallback(() => {
-    store(CANVAS_KEYS.removed, removed.current);
-    writeSiteValue(SITE_KEYS.canvasRemoved, removed.current);
+  const applyRemoved = useCallback((next: string[], persist = true) => {
+    removed.current = next;
+    setRemovedIds(next);
+    if (persist) {
+      store(CANVAS_KEYS.removed, next);
+      writeSiteValue(SITE_KEYS.canvasRemoved, next);
+    }
   }, []);
 
   /**
@@ -286,9 +291,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     setTexts(prev.texts);
     store(TEXTS_STORAGE_KEY, prev.texts);
     writeSiteValue(SITE_KEYS.canvasTexts, prev.texts);
-    removed.current = prev.removed;
-    persistRemoved();
-  }, [persistRemoved]);
+    applyRemoved(prev.removed);
+  }, [applyRemoved]);
 
 
   /** Applies shared site content on top of the code defaults. */
@@ -296,7 +300,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const rr = values[SITE_KEYS.canvasRemoved];
     // Union, not overwrite: a deletion made in any tab wins.
     if (Array.isArray(rr)) {
-      removed.current = [...new Set([...removed.current, ...(rr as string[])])];
+      applyRemoved([...new Set([...removed.current, ...(rr as string[])])], false);
     }
     const rp = values[SITE_KEYS.canvasPlacements];
     if (rp && typeof rp === "object") {
@@ -327,7 +331,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   // Pick up this browser's copy after hydration, then anything saved site-wide.
   useEffect(() => {
     const removedLocal = read<string[]>(CANVAS_KEYS.removed);
-    if (Array.isArray(removedLocal)) removed.current = removedLocal;
+    if (Array.isArray(removedLocal)) applyRemoved(removedLocal, false);
     const p = read<PlacementMap>(CANVAS_KEYS.placements);
     if (p) setPlacements({ ...SITE_CANVAS.placements, ...p });
     let localBlocks: CanvasBlock[] | null = null;
