@@ -548,6 +548,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setPageBottom,
       snapshot,
       reset,
+      canUndo,
+      undo,
     }),
     [
       editing,
