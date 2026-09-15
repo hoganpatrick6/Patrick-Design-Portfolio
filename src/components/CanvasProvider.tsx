@@ -236,11 +236,20 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     styles: SITE_CANVAS.styles,
     hidden: SITE_CANVAS.hidden,
     texts: {},
+    removed: [],
   });
 
+  /** Default blocks the user deleted; they stay deleted across reloads. */
+  const removed = useRef<string[]>([]);
+
   useEffect(() => {
-    live.current = { placements, blocks, styles, hidden, texts };
+    live.current = { placements, blocks, styles, hidden, texts, removed: removed.current };
   }, [placements, blocks, styles, hidden, texts]);
+
+  const persistRemoved = useCallback(() => {
+    store(CANVAS_KEYS.removed, removed.current);
+    writeSiteValue(SITE_KEYS.canvasRemoved, removed.current);
+  }, []);
 
   /**
    * Remembers the current state before a change. Rapid changes of the same
