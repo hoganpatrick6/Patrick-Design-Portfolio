@@ -196,7 +196,7 @@ export const SITE_CANVAS: CanvasDefaults = {
     },
     "resume-experience": {
       "x": 4,
-      "y": 0,
+      "y": 8,
       "w": 8,
       "h": 40
     },
