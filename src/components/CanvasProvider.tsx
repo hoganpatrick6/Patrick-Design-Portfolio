@@ -586,10 +586,11 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         ? repairSavedBlocks(mergeWithDefaults(sharedBlocks as CanvasBlock[], new Set(removed.current))).blocks
         : (localBlocks ?? SITE_CANVAS.blocks);
       const sharedOverrides = values[SITE_KEYS.mediaOverrides];
-      const currentOverrides =
+      const currentOverrides = migrateRecordKeys(
         sharedOverrides && typeof sharedOverrides === "object"
           ? (sharedOverrides as Record<string, MediaOverride>)
-          : (o ?? {});
+          : (oRaw ?? {}),
+      ).value;
       const migrated = await extractEmbeddedMedia(currentBlocks, currentOverrides);
       if (migrated.blocks) {
         setBlocks(migrated.blocks);
