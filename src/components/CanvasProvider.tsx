@@ -21,7 +21,9 @@ import {
   type PlacementMap,
   type StyleMap,
 } from "../config/canvas-defaults";
-import { SITE_KEYS, siteContent, writeSiteValue } from "../lib/site-content";
+import { toast } from "sonner";
+import { SITE_KEYS, refreshSiteContent, siteContent, writeSiteValue } from "../lib/site-content";
+import { storeDataUrl } from "../lib/media-files";
 
 /** A swap applied to a picture that already exists in the page design. */
 export type MediaOverride = {
@@ -97,7 +99,10 @@ function store(key: string, value: unknown) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    /* ignore */
+    toast.error(
+      "This browser's storage is full — your latest change may not survive a reload.",
+      { id: "canvas-store-failed" },
+    );
   }
 }
 
