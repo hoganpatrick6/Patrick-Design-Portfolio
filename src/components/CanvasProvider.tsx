@@ -302,6 +302,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
   const addBlock = useCallback(
     (page: string, kind: BlockKind, at?: Partial<Placement>) => {
+      pushHistory();
       const block: CanvasBlock = {
         id: `block-${Math.random().toString(36).slice(2, 8)}`,
         page,
