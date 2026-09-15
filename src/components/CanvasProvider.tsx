@@ -39,7 +39,7 @@ export type MediaOverride = {
 const OVERRIDES_STORAGE_KEY = "media-overrides";
 const TEXTS_STORAGE_KEY = "canvas-texts";
 const HEADER_TEMPLATE_STORAGE_KEY = "canvas-header-template";
-const HEADER_TEMPLATE_VERSION = 1;
+const HEADER_TEMPLATE_VERSION = 2;
 
 function synchronizedHeaderPlacements(source: PlacementMap, reset: boolean): PlacementMap {
   const next = { ...source };
