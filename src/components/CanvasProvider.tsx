@@ -152,6 +152,68 @@ function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; chan
   return { blocks: next, changed };
 }
 
+/** Saved blocks win over defaults by id, except defaults the user deleted. */
+function mergeWithDefaults(saved: CanvasBlock[], removedIds: Set<string>): CanvasBlock[] {
+  const savedIds = new Set(saved.map((block) => block.id));
+  return [
+    ...SITE_CANVAS.blocks.filter((block) => !savedIds.has(block.id) && !removedIds.has(block.id)),
+    ...saved,
+  ];
+}
+
+/**
+ * One-time cleanup: older saves embedded whole images inside the page layout,
+ * which overflowed browser storage and made later saves silently fail. Move
+ * each embedded file into the shared media library and keep only its URL.
+ */
+async function extractEmbeddedMedia(
+  blocks: CanvasBlock[],
+  overrides: Record<string, MediaOverride>,
+): Promise<{ blocks: CanvasBlock[] | null; overrides: Record<string, MediaOverride> | null }> {
+  const urlCache = new Map<string, string>();
+  const swap = async (src: string): Promise<string> => {
+    if (!src.startsWith("data:")) return src;
+    const cached = urlCache.get(src);
+    if (cached) return cached;
+    const url = await storeDataUrl(src);
+    urlCache.set(src, url);
+    return url;
+  };
+
+  let blocksChanged = false;
+  const nextBlocks: CanvasBlock[] = [];
+  for (const block of blocks) {
+    if (block.src?.startsWith("data:")) {
+      const url = await swap(block.src);
+      if (url !== block.src) {
+        blocksChanged = true;
+        nextBlocks.push({ ...block, src: url });
+        continue;
+      }
+    }
+    nextBlocks.push(block);
+  }
+
+  let overridesChanged = false;
+  const nextOverrides: Record<string, MediaOverride> = {};
+  for (const [key, override] of Object.entries(overrides)) {
+    if (override.src.startsWith("data:")) {
+      const url = await swap(override.src);
+      if (url !== override.src) {
+        overridesChanged = true;
+        nextOverrides[key] = { ...override, src: url };
+        continue;
+      }
+    }
+    nextOverrides[key] = override;
+  }
+
+  return {
+    blocks: blocksChanged ? nextBlocks : null,
+    overrides: overridesChanged ? nextOverrides : null,
+  };
+}
+
 export function CanvasProvider({ children }: { children: ReactNode }) {
   const [editing, setEditing] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
