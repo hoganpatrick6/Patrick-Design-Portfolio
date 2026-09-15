@@ -18,6 +18,7 @@ import {
   aspectToCss,
   blockStyleToCss,
   embedUrl,
+  projectHeaderSlotFor,
   styleTouchesType,
   type CanvasBlock as CanvasBlockData,
   type Placement,
@@ -219,7 +220,13 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
         h: heights[id] ?? 0,
         autoHeight: autoHeightIds[id] ?? false,
       }))
-      .sort((a, b) => a.p.y - b.p.y || a.p.x - b.p.x);
+      .sort((a, b) => {
+        const rowOrder = a.p.y - b.p.y;
+        if (rowOrder) return rowOrder;
+        const aHeader = projectHeaderSlotFor(a.id) ? 0 : 1;
+        const bHeader = projectHeaderSlotFor(b.id) ? 0 : 1;
+        return aHeader - bHeader || a.p.x - b.p.x;
+      });
 
     type Item = (typeof items)[number];
     type LayoutUnit = { items: Item[]; p: Placement; rows: number };
