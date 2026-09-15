@@ -285,7 +285,9 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     setTexts(prev.texts);
     store(TEXTS_STORAGE_KEY, prev.texts);
     writeSiteValue(SITE_KEYS.canvasTexts, prev.texts);
-  }, []);
+    removed.current = prev.removed;
+    persistRemoved();
+  }, [persistRemoved]);
 
 
   // Pick up this browser's copy after hydration, then anything saved site-wide.
