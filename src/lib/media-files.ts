@@ -1,5 +1,34 @@
 /** Shared helpers for turning local files into storable data URLs. */
 
+import { uploadMediaFile } from "./media.functions";
+
+/**
+ * Stores a data URL in the shared media library and returns its permanent URL,
+ * so huge files are never embedded in the page layout (which overflows browser
+ * storage and silently loses edits). Falls back to the data URL when the
+ * upload is unavailable, so the picture still appears in this browser.
+ */
+export async function storeDataUrl(dataUrl: string): Promise<string> {
+  if (!dataUrl.startsWith("data:")) return dataUrl;
+  try {
+    const { url } = await uploadMediaFile({ data: { dataUrl } });
+    if (url) return url;
+  } catch {
+    /* editing not unlocked here; keep the data URL for this browser */
+  }
+  return dataUrl;
+}
+
+/** Processes an image file and stores it in the media library. */
+export async function fileToStoredImage(file: File): Promise<string> {
+  return storeDataUrl(await fileToImageDataUrl(file));
+}
+
+/** Reads a video file and stores it in the media library. */
+export async function fileToStoredVideo(file: File): Promise<string> {
+  return storeDataUrl(await fileToDataUrl(file));
+}
+
 export async function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
