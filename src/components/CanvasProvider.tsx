@@ -155,10 +155,11 @@ function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; chan
 
 /** Saved blocks win over defaults by id, except defaults the user deleted. */
 function mergeWithDefaults(saved: CanvasBlock[], removedIds: Set<string>): CanvasBlock[] {
-  const savedIds = new Set(saved.map((block) => block.id));
+  const kept = saved.filter((block) => !removedIds.has(block.id));
+  const savedIds = new Set(kept.map((block) => block.id));
   return [
     ...SITE_CANVAS.blocks.filter((block) => !savedIds.has(block.id) && !removedIds.has(block.id)),
-    ...saved,
+    ...kept,
   ];
 }
 
