@@ -49,7 +49,7 @@ export const uploadMediaFile = createServerFn({ method: "POST" })
     }
     const { data: row, error } = await (await db())
       .from("media_files")
-      .insert({ content_type: match[1], data: match[2] })
+      .insert({ content_type: match[1] ?? "application/octet-stream", data: match[2] ?? "" })
       .select("id")
       .single();
     if (error || !row) return { url: null };
