@@ -77,6 +77,18 @@ type CanvasContextValue = {
 
   snapshot: () => CanvasDefaults;
   reset: () => void;
+
+  /** Step back through recent page changes. */
+  canUndo: boolean;
+  undo: () => void;
+};
+
+type HistoryEntry = {
+  placements: PlacementMap;
+  blocks: CanvasBlock[];
+  styles: StyleMap;
+  hidden: string[];
+  texts: Record<string, string>;
 };
 
 const CanvasContext = createContext<CanvasContextValue | null>(null);
@@ -146,6 +158,59 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   const [texts, setTexts] = useState<Record<string, string>>({});
   const bottoms = useRef<Record<string, number>>({});
 
+  // Recent states, newest last, so a change can be stepped back.
+  const past = useRef<HistoryEntry[]>([]);
+  const lastPushAt = useRef(0);
+  const [canUndo, setCanUndo] = useState(false);
+  const live = useRef<HistoryEntry>({
+    placements: SITE_CANVAS.placements,
+    blocks: SITE_CANVAS.blocks,
+    styles: SITE_CANVAS.styles,
+    hidden: SITE_CANVAS.hidden,
+    texts: {},
+  });
+
+  useEffect(() => {
+    live.current = { placements, blocks, styles, hidden, texts };
+  }, [placements, blocks, styles, hidden, texts]);
+
+  /**
+   * Remembers the current state before a change. Rapid changes of the same
+   * sort (typing, dragging) collapse into one step.
+   */
+  const pushHistory = useCallback((coalesce = false) => {
+    const now = Date.now();
+    if (coalesce && now - lastPushAt.current < 700) {
+      lastPushAt.current = now;
+      return;
+    }
+    lastPushAt.current = now;
+    past.current = [...past.current.slice(-49), live.current];
+    setCanUndo(true);
+  }, []);
+
+  const undo = useCallback(() => {
+    const prev = past.current.pop();
+    setCanUndo(past.current.length > 0);
+    if (!prev) return;
+    setPlacements(prev.placements);
+    store(CANVAS_KEYS.placements, prev.placements);
+    writeSiteValue(SITE_KEYS.canvasPlacements, prev.placements);
+    setBlocks(prev.blocks);
+    store(CANVAS_KEYS.blocks, prev.blocks);
+    writeSiteValue(SITE_KEYS.canvasBlocks, prev.blocks);
+    setStyles(prev.styles);
+    store(CANVAS_KEYS.styles, prev.styles);
+    writeSiteValue(SITE_KEYS.canvasStyles, prev.styles);
+    setHidden(prev.hidden);
+    store(CANVAS_KEYS.hidden, prev.hidden);
+    writeSiteValue(SITE_KEYS.canvasHidden, prev.hidden);
+    setTexts(prev.texts);
+    store(TEXTS_STORAGE_KEY, prev.texts);
+    writeSiteValue(SITE_KEYS.canvasTexts, prev.texts);
+  }, []);
+
+
   // Pick up this browser's copy after hydration, then anything saved site-wide.
   useEffect(() => {
     const p = read<PlacementMap>(CANVAS_KEYS.placements);
@@ -210,13 +275,15 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   );
 
   const setPlacement = useCallback((id: string, next: Placement) => {
+    pushHistory(true);
     setPlacements((prev) => {
       const merged = { ...prev, [id]: clampPlacement(next) };
       store(CANVAS_KEYS.placements, merged);
       writeSiteValue(SITE_KEYS.canvasPlacements, merged);
       return merged;
     });
-  }, []);
+  }, [pushHistory]);
+
 
   const blocksFor = useCallback(
     (page: string) => blocks.filter((block) => block.page === page),
@@ -235,6 +302,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
   const addBlock = useCallback(
     (page: string, kind: BlockKind, at?: Partial<Placement>) => {
+      pushHistory();
       const block: CanvasBlock = {
         id: `block-${Math.random().toString(36).slice(2, 8)}`,
         page,
@@ -269,24 +337,26 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setSelectedId(block.id);
       return block;
     },
-    [persistBlocks],
+    [persistBlocks, pushHistory],
   );
 
   const updateBlock = useCallback(
     (id: string, patch: Partial<CanvasBlock>) => {
+      pushHistory(true);
       setBlocks((prev) => {
         const next = prev.map((b) => (b.id === id ? { ...b, ...patch } : b));
         persistBlocks(next);
         return next;
       });
     },
-    [persistBlocks],
+    [persistBlocks, pushHistory],
   );
 
   const duplicateBlock = useCallback(
     (id: string, direction: "above" | "below") => {
       const source = blocks.find((block) => block.id === id);
       if (!source) return undefined;
+      pushHistory();
       const copy: CanvasBlock = {
         ...source,
         id: `block-${Math.random().toString(36).slice(2, 8)}`,
@@ -313,11 +383,12 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setSelectedId(copy.id);
       return copy;
     },
-    [blocks, persistBlocks, placementFor, setPlacement, styles],
+    [blocks, persistBlocks, placementFor, pushHistory, setPlacement, styles],
   );
 
   const removeBlock = useCallback(
     (id: string) => {
+      pushHistory();
       setBlocks((prev) => {
         const next = prev.filter((b) => b.id !== id);
         persistBlocks(next);
@@ -325,12 +396,13 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       });
       setSelectedId((current) => (current === id ? null : current));
     },
-    [persistBlocks],
+    [persistBlocks, pushHistory],
   );
 
   const styleFor = useCallback((id: string) => styles[id], [styles]);
 
   const setStyle = useCallback((id: string, patch: BlockStyle) => {
+    pushHistory(true);
     setStyles((prev) => {
       const merged = { ...prev, [id]: { ...prev[id], ...patch } };
       (Object.keys(merged[id]!) as (keyof BlockStyle)[]).forEach((k) => {
@@ -340,9 +412,10 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       writeSiteValue(SITE_KEYS.canvasStyles, merged);
       return merged;
     });
-  }, []);
+  }, [pushHistory]);
 
   const clearStyle = useCallback((id: string) => {
+    pushHistory();
     setStyles((prev) => {
       const merged = { ...prev };
       delete merged[id];
@@ -350,11 +423,12 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       writeSiteValue(SITE_KEYS.canvasStyles, merged);
       return merged;
     });
-  }, []);
+  }, [pushHistory]);
 
   const isHidden = useCallback((id: string) => hidden.includes(id), [hidden]);
 
   const hideBlock = useCallback((id: string) => {
+    pushHistory();
     setHidden((prev) => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
@@ -363,16 +437,17 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       return next;
     });
     setSelectedId((current) => (current === id ? null : current));
-  }, []);
+  }, [pushHistory]);
 
   const showBlock = useCallback((id: string) => {
+    pushHistory();
     setHidden((prev) => {
       const next = prev.filter((h) => h !== id);
       store(CANVAS_KEYS.hidden, next);
       writeSiteValue(SITE_KEYS.canvasHidden, next);
       return next;
     });
-  }, []);
+  }, [pushHistory]);
 
   const overrideFor = useCallback((id: string) => overrides[id], [overrides]);
 
@@ -398,6 +473,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   const textFor = useCallback((key: string) => texts[key], [texts]);
 
   const setText = useCallback((key: string, value: string) => {
+    pushHistory(true);
     setTexts((prev) => {
       if (prev[key] === value) return prev;
       const next = { ...prev, [key]: value };
@@ -405,7 +481,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       writeSiteValue(SITE_KEYS.canvasTexts, next);
       return next;
     });
-  }, []);
+  }, [pushHistory]);
 
   const bottomOf = useCallback((page: string) => bottoms.current[page] ?? 0, []);
 
@@ -419,6 +495,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   );
 
   const reset = useCallback(() => {
+    pushHistory();
     setPlacements(SITE_CANVAS.placements);
     setBlocks(SITE_CANVAS.blocks);
     setStyles(SITE_CANVAS.styles);
@@ -436,7 +513,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     writeSiteValue(SITE_KEYS.canvasBlocks, SITE_CANVAS.blocks);
     writeSiteValue(SITE_KEYS.canvasStyles, SITE_CANVAS.styles);
     writeSiteValue(SITE_KEYS.canvasHidden, SITE_CANVAS.hidden);
-  }, []);
+  }, [pushHistory]);
 
   const value = useMemo(
     () => ({
@@ -472,6 +549,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setPageBottom,
       snapshot,
       reset,
+      canUndo,
+      undo,
     }),
     [
       editing,
@@ -504,6 +583,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setPageBottom,
       snapshot,
       reset,
+      canUndo,
+      undo,
     ],
   );
 
