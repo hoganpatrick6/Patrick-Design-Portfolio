@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      media_files: {
+        Row: {
+          content_type: string
+          created_at: string
+          data: string
+          id: string
+        }
+        Insert: {
+          content_type: string
+          created_at?: string
+          data: string
+          id?: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          data?: string
+          id?: string
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           key: string

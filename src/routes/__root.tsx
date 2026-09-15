@@ -110,7 +110,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     scripts: [
       {
         // Apply saved theme before first paint to avoid a flash.
-        src: `
+        children: `
           (function () {
             try {
               var theme = localStorage.getItem('theme');
@@ -125,7 +125,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         // Apply locally saved type tweaks before first paint.
-        src: `
+        children: `
           (function () {
             try {
               var raw = localStorage.getItem('type-settings');
