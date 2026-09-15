@@ -30,7 +30,7 @@ async function db(): Promise<MediaTable> {
   return supabaseAdmin as unknown as MediaTable;
 }
 
-const MAX_DATA_URL_LENGTH = 14 * 1024 * 1024; // ~10MB of binary
+const MAX_DATA_URL_LENGTH = 50 * 1024 * 1024; // ~36MB of binary
 
 /**
  * Stores one uploaded image/video in the shared media library and returns its

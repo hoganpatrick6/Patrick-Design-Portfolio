@@ -42,7 +42,7 @@ export function EditableMedia({
     setNote("Loading…");
     try {
       if (file.type.startsWith("video/")) {
-        if (file.size > 12 * 1024 * 1024) {
+        if (file.size > 36 * 1024 * 1024) {
           setNote("Video is too large to store — paste a link instead");
           return;
         }
