@@ -194,7 +194,7 @@ function AboutPage() {
                 {"\n"}
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/in/patrick-h-80633584/"
                 target="_blank"
                 rel="noreferrer"
                 className="block type-body text-[var(--color-foreground-muted)] transition-colors hover:text-foreground"
