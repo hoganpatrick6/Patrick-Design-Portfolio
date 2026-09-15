@@ -555,11 +555,12 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const rt = values[SITE_KEYS.canvasTexts];
     if (rt && typeof rt === "object") {
       const migrated = migrateRecordKeys(rt as Record<string, string>);
-      if (migrated.changed) {
-        store(TEXTS_STORAGE_KEY, migrated.value);
-        writeSiteValue(SITE_KEYS.canvasTexts, migrated.value);
+      const cleaned = withoutBlankTexts(migrated.value);
+      if (migrated.changed || cleaned.changed) {
+        store(TEXTS_STORAGE_KEY, cleaned.value);
+        writeSiteValue(SITE_KEYS.canvasTexts, cleaned.value);
       }
-      setTexts(migrated.value);
+      setTexts(cleaned.value);
     }
     if (resetHeaderTemplate) {
       store(HEADER_TEMPLATE_STORAGE_KEY, HEADER_TEMPLATE_VERSION);
@@ -618,8 +619,9 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const tRaw = read<Record<string, string>>(TEXTS_STORAGE_KEY);
     if (tRaw) {
       const migrated = migrateRecordKeys(tRaw);
-      if (migrated.changed) store(TEXTS_STORAGE_KEY, migrated.value);
-      setTexts(migrated.value);
+      const cleaned = withoutBlankTexts(migrated.value);
+      if (migrated.changed || cleaned.changed) store(TEXTS_STORAGE_KEY, cleaned.value);
+      setTexts(cleaned.value);
     }
 
     void siteContent().then(async (values) => {
@@ -886,7 +888,12 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     pushHistory(true);
     setTexts((prev) => {
       if (prev[key] === value) return prev;
-      const next = { ...prev, [key]: value };
+      // Clearing a field falls back to the written wording rather than saving blank.
+      const blank = value.trim() === "";
+      if (blank && prev[key] === undefined) return prev;
+      const next = { ...prev };
+      if (blank) delete next[key];
+      else next[key] = value;
       store(TEXTS_STORAGE_KEY, next);
       writeSiteValue(SITE_KEYS.canvasTexts, next);
       return next;
