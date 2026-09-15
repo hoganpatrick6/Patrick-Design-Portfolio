@@ -76,6 +76,10 @@ function synchronizedHeaderStyles(source: StyleMap, reset: boolean): StyleMap {
   return next;
 }
 
+function withoutProjectHeaderIds(ids: string[]): string[] {
+  return ids.filter((id) => !projectHeaderSlotFor(id));
+}
+
 type CanvasContextValue = {
   editing: boolean;
   setEditing: (v: boolean) => void;
@@ -342,7 +346,13 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const rr = values[SITE_KEYS.canvasRemoved];
     // Union, not overwrite: a deletion made in any tab wins.
     if (Array.isArray(rr)) {
-      applyRemoved([...new Set([...removed.current, ...(rr as string[])])], false);
+      const combined = [...new Set([...removed.current, ...(rr as string[])])];
+      const next = resetHeaderTemplate ? withoutProjectHeaderIds(combined) : combined;
+      applyRemoved(next, false);
+      if (resetHeaderTemplate) {
+        store(CANVAS_KEYS.removed, next);
+        writeSiteValue(SITE_KEYS.canvasRemoved, next);
+      }
     }
     const rp = values[SITE_KEYS.canvasPlacements];
     if (rp && typeof rp === "object") {
@@ -376,7 +386,16 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       }
     }
     const rh = values[SITE_KEYS.canvasHidden];
-    if (Array.isArray(rh)) setHidden(rh as string[]);
+    if (Array.isArray(rh)) {
+      const next = resetHeaderTemplate
+        ? withoutProjectHeaderIds(rh as string[])
+        : rh as string[];
+      setHidden(next);
+      if (resetHeaderTemplate) {
+        store(CANVAS_KEYS.hidden, next);
+        writeSiteValue(SITE_KEYS.canvasHidden, next);
+      }
+    }
     const ro = values[SITE_KEYS.mediaOverrides];
     if (ro && typeof ro === "object") {
       setOverrides(ro as Record<string, MediaOverride>);
@@ -392,8 +411,10 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   // Pick up this browser's copy after hydration, then anything saved site-wide.
   useEffect(() => {
     const removedLocal = read<string[]>(CANVAS_KEYS.removed);
-    if (Array.isArray(removedLocal)) applyRemoved(removedLocal, false);
     const resetHeaderTemplate = read<number>(HEADER_TEMPLATE_STORAGE_KEY) !== HEADER_TEMPLATE_VERSION;
+    if (Array.isArray(removedLocal)) {
+      applyRemoved(resetHeaderTemplate ? withoutProjectHeaderIds(removedLocal) : removedLocal, false);
+    }
     const p = read<PlacementMap>(CANVAS_KEYS.placements);
     if (p) {
       setPlacements(synchronizedHeaderPlacements(
@@ -416,7 +437,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const s = read<StyleMap>(CANVAS_KEYS.styles);
     if (s) setStyles(synchronizedHeaderStyles(s, resetHeaderTemplate));
     const h = read<string[]>(CANVAS_KEYS.hidden);
-    if (Array.isArray(h)) setHidden(h);
+    if (Array.isArray(h)) setHidden(resetHeaderTemplate ? withoutProjectHeaderIds(h) : h);
     const o = read<Record<string, MediaOverride>>(OVERRIDES_STORAGE_KEY);
     if (o) setOverrides(o);
     const t = read<Record<string, string>>(TEXTS_STORAGE_KEY);
