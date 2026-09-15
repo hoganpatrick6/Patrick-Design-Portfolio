@@ -290,15 +290,48 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   }, [persistRemoved]);
 
 
+  /** Applies shared site content on top of the code defaults. */
+  const applyShared = useCallback((values: Record<string, unknown>) => {
+    const rr = values[SITE_KEYS.canvasRemoved];
+    if (Array.isArray(rr)) removed.current = rr as string[];
+    const rp = values[SITE_KEYS.canvasPlacements];
+    if (rp && typeof rp === "object") {
+      setPlacements({ ...SITE_CANVAS.placements, ...(rp as PlacementMap) });
+    }
+    const rb = values[SITE_KEYS.canvasBlocks];
+    if (Array.isArray(rb)) {
+      const merged = mergeWithDefaults(rb as CanvasBlock[], new Set(removed.current));
+      const repaired = repairSavedBlocks(merged);
+      setBlocks(repaired.blocks);
+      if (repaired.changed) {
+        store(CANVAS_KEYS.blocks, repaired.blocks);
+        writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
+      }
+    }
+    const rs = values[SITE_KEYS.canvasStyles];
+    if (rs && typeof rs === "object") setStyles(rs as StyleMap);
+    const rh = values[SITE_KEYS.canvasHidden];
+    if (Array.isArray(rh)) setHidden(rh as string[]);
+    const ro = values[SITE_KEYS.mediaOverrides];
+    if (ro && typeof ro === "object") {
+      setOverrides(ro as Record<string, MediaOverride>);
+    }
+    const rt = values[SITE_KEYS.canvasTexts];
+    if (rt && typeof rt === "object") setTexts(rt as Record<string, string>);
+  }, []);
+
   // Pick up this browser's copy after hydration, then anything saved site-wide.
   useEffect(() => {
+    const removedLocal = read<string[]>(CANVAS_KEYS.removed);
+    if (Array.isArray(removedLocal)) removed.current = removedLocal;
     const p = read<PlacementMap>(CANVAS_KEYS.placements);
     if (p) setPlacements({ ...SITE_CANVAS.placements, ...p });
+    let localBlocks: CanvasBlock[] | null = null;
     const b = read<CanvasBlock[]>(CANVAS_KEYS.blocks);
     if (Array.isArray(b)) {
-      const savedIds = new Set(b.map((block) => block.id));
-      const merged = [...SITE_CANVAS.blocks.filter((block) => !savedIds.has(block.id)), ...b];
+      const merged = mergeWithDefaults(b, new Set(removed.current));
       const repaired = repairSavedBlocks(merged);
+      localBlocks = repaired.blocks;
       setBlocks(repaired.blocks);
       if (repaired.changed) {
         store(CANVAS_KEYS.blocks, repaired.blocks);
@@ -314,35 +347,42 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const t = read<Record<string, string>>(TEXTS_STORAGE_KEY);
     if (t) setTexts(t);
 
-    void siteContent().then((values) => {
-      const rp = values[SITE_KEYS.canvasPlacements];
-      if (rp && typeof rp === "object") {
-        setPlacements({ ...SITE_CANVAS.placements, ...(rp as PlacementMap) });
+    void siteContent().then(async (values) => {
+      applyShared(values);
+      // Shrink older saves: move embedded images into the media library so
+      // layout saves stay small enough to always succeed.
+      const sharedBlocks = values[SITE_KEYS.canvasBlocks];
+      const currentBlocks = Array.isArray(sharedBlocks)
+        ? repairSavedBlocks(mergeWithDefaults(sharedBlocks as CanvasBlock[], new Set(removed.current))).blocks
+        : (localBlocks ?? SITE_CANVAS.blocks);
+      const sharedOverrides = values[SITE_KEYS.mediaOverrides];
+      const currentOverrides =
+        sharedOverrides && typeof sharedOverrides === "object"
+          ? (sharedOverrides as Record<string, MediaOverride>)
+          : (o ?? {});
+      const migrated = await extractEmbeddedMedia(currentBlocks, currentOverrides);
+      if (migrated.blocks) {
+        setBlocks(migrated.blocks);
+        store(CANVAS_KEYS.blocks, migrated.blocks);
+        writeSiteValue(SITE_KEYS.canvasBlocks, migrated.blocks);
       }
-      const rb = values[SITE_KEYS.canvasBlocks];
-      if (Array.isArray(rb)) {
-        const remote = rb as CanvasBlock[];
-        const remoteIds = new Set(remote.map((block) => block.id));
-        const merged = [...SITE_CANVAS.blocks.filter((block) => !remoteIds.has(block.id)), ...remote];
-        const repaired = repairSavedBlocks(merged);
-        setBlocks(repaired.blocks);
-        if (repaired.changed) {
-          store(CANVAS_KEYS.blocks, repaired.blocks);
-          writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
-        }
+      if (migrated.overrides) {
+        setOverrides(migrated.overrides);
+        store(OVERRIDES_STORAGE_KEY, migrated.overrides);
+        writeSiteValue(SITE_KEYS.mediaOverrides, migrated.overrides);
       }
-      const rs = values[SITE_KEYS.canvasStyles];
-      if (rs && typeof rs === "object") setStyles(rs as StyleMap);
-      const rh = values[SITE_KEYS.canvasHidden];
-      if (Array.isArray(rh)) setHidden(rh as string[]);
-      const ro = values[SITE_KEYS.mediaOverrides];
-      if (ro && typeof ro === "object") {
-        setOverrides(ro as Record<string, MediaOverride>);
-      }
-      const rt = values[SITE_KEYS.canvasTexts];
-      if (rt && typeof rt === "object") setTexts(rt as Record<string, string>);
     });
-  }, []);
+  }, [applyShared]);
+
+  // When this tab regains focus, pull the newest shared content so a stale tab
+  // can't overwrite newer edits made in another tab.
+  useEffect(() => {
+    const onFocus = () => {
+      void refreshSiteContent().then(applyShared);
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [applyShared]);
 
   useEffect(() => {
     if (!editing) setSelectedId(null);
