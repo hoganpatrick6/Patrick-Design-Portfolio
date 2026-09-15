@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { TypeSettingsPanel } from "../components/TypeSettingsPanel";
 import { EditorToolbar } from "../components/EditorToolbar";
@@ -16,7 +16,13 @@ import groceryCampaign from "../assets/projects/grocery-campaign.jpg";
 export const Route = createFileRoute("/work/$slug")({
   loader: ({ params }) => {
     const project = getProject(params.slug);
-    if (!project) throw notFound();
+    if (!project) {
+      const renamed = OLD_SLUG_REDIRECTS[params.slug];
+      if (renamed) {
+        throw redirect({ to: "/work/$slug", params: { slug: renamed } });
+      }
+      throw notFound();
+    }
     return { project };
   },
   head: ({ loaderData }) => {
@@ -110,7 +116,7 @@ function ProjectPage() {
   const index = projects.findIndex((p) => p.slug === project.slug);
   const next = projects[(index + 1) % projects.length];
 
-  if (project.slug === "driftwell") {
+  if (project.slug === "grocery-fresh") {
     return <GroceryFreshPage />;
   }
 
@@ -282,10 +288,16 @@ function GroceryFreshPage() {
   );
 }
 
+/** Placeholder slugs from before the projects were renamed; old links redirect. */
+const OLD_SLUG_REDIRECTS: Record<string, string> = {
+  lunethra: "uber-credit-card",
+  driftwell: "grocery-fresh",
+  clyra: "uber-color-system",
+  forgekind: "carbon-health-rebrand",
+};
+
 function ProjectHeader({ project }: { project: (typeof projects)[number] }) {
-  const id = (slot: string) => project.slug === "driftwell"
-    ? `grocery-${slot}`
-    : `project-${project.slug}-${slot}`;
+  const id = (slot: string) => `project-${project.slug}-${slot}`;
   return (
     <>
       <CanvasBlock id={id("title")} label="Project title" autoHeight>
