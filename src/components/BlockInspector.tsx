@@ -21,7 +21,7 @@ import {
   readCustomFonts,
   writeCustomFonts,
 } from "../lib/google-fonts";
-import { fileToDataUrl, fileToImageDataUrl } from "../lib/media-files";
+import { fileToStoredImage, fileToStoredVideo } from "../lib/media-files";
 import { useCanvas } from "./CanvasProvider";
 import { useTypeSettings } from "./TypeSettingsProvider";
 
@@ -119,11 +119,11 @@ export function BlockInspector() {
           setNote("That video is too large — paste a link instead");
           return;
         }
-        updateBlock(id, { kind: "video", src: await fileToDataUrl(file) });
+        updateBlock(id, { kind: "video", src: await fileToStoredVideo(file) });
       } else {
         updateBlock(id, {
           kind: "image",
-          src: await fileToImageDataUrl(file),
+          src: await fileToStoredImage(file),
           alt: block.alt || file.name,
         });
       }

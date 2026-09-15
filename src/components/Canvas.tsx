@@ -22,7 +22,7 @@ import {
   type CanvasBlock as CanvasBlockData,
   type Placement,
 } from "../config/canvas-defaults";
-import { fileToDataUrl, fileToImageDataUrl } from "../lib/media-files";
+import { fileToStoredImage, fileToStoredVideo } from "../lib/media-files";
 import { CroppableImage } from "./CroppableImage";
 import { useCanvas } from "./CanvasProvider";
 
@@ -332,7 +332,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
       const isVideo = file.type.startsWith("video/");
       const block = addBlock(page, isVideo ? "video" : "image", { x, y, w: 6, h: 12 });
       try {
-        const src = isVideo ? await fileToDataUrl(file) : await fileToImageDataUrl(file);
+        const src = isVideo ? await fileToStoredVideo(file) : await fileToStoredImage(file);
         updateSrc(block.id, src, file.name);
       } catch {
         /* leave the empty block in place */

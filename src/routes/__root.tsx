@@ -15,6 +15,7 @@ import { ThemeProvider } from "../components/ThemeProvider";
 import { TypeSettingsProvider } from "../components/TypeSettingsProvider";
 import { CanvasProvider } from "../components/CanvasProvider";
 import { BlockInspector } from "../components/BlockInspector";
+import { Toaster } from "../components/ui/sonner";
 import { SITE_TYPE_DEFAULTS, typeSettingsToCss } from "../config/type-defaults";
 
 function NotFoundComponent() {
@@ -193,6 +194,7 @@ function RootComponent() {
             {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
             <Outlet />
             <BlockInspector />
+            <Toaster />
           </QueryClientProvider>
         </CanvasProvider>
       </TypeSettingsProvider>

@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { embedUrl } from "../config/canvas-defaults";
-import { fileToDataUrl, fileToImageDataUrl } from "../lib/media-files";
+import { fileToStoredImage, fileToStoredVideo } from "../lib/media-files";
 import { CroppableImage } from "./CroppableImage";
 import { useCanvas } from "./CanvasProvider";
 
@@ -46,9 +46,9 @@ export function EditableMedia({
           setNote("Video is too large to store — paste a link instead");
           return;
         }
-        setOverride(id, { kind: "video", src: await fileToDataUrl(file) });
+        setOverride(id, { kind: "video", src: await fileToStoredVideo(file) });
       } else {
-        setOverride(id, { kind: "image", src: await fileToImageDataUrl(file) });
+        setOverride(id, { kind: "image", src: await fileToStoredImage(file) });
       }
       setNote(null);
     } catch {

@@ -13,6 +13,7 @@ export const SITE_KEYS = {
   canvasStyles: "canvas.styles",
   canvasTexts: "canvas.texts",
   canvasHidden: "canvas.hidden",
+  canvasRemoved: "canvas.removed",
   type: "type.settings",
   bullets: (id: string) => `bullets.${id}`,
 } as const;
@@ -28,6 +29,12 @@ export function siteContent(): Promise<Record<string, unknown>> {
       .catch(() => ({}));
   }
   return cache;
+}
+
+/** Drops the cached copy so the next read refetches the shared site content. */
+export function refreshSiteContent(): Promise<Record<string, unknown>> {
+  cache = null;
+  return siteContent();
 }
 
 const timers = new Map<string, ReturnType<typeof setTimeout>>();

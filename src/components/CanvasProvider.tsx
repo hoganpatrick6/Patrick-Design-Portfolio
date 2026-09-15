@@ -21,7 +21,9 @@ import {
   type PlacementMap,
   type StyleMap,
 } from "../config/canvas-defaults";
-import { SITE_KEYS, siteContent, writeSiteValue } from "../lib/site-content";
+import { toast } from "sonner";
+import { SITE_KEYS, refreshSiteContent, siteContent, writeSiteValue } from "../lib/site-content";
+import { storeDataUrl } from "../lib/media-files";
 
 /** A swap applied to a picture that already exists in the page design. */
 export type MediaOverride = {
@@ -89,6 +91,7 @@ type HistoryEntry = {
   styles: StyleMap;
   hidden: string[];
   texts: Record<string, string>;
+  removed: string[];
 };
 
 const CanvasContext = createContext<CanvasContextValue | null>(null);
@@ -97,7 +100,10 @@ function store(key: string, value: unknown) {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    /* ignore */
+    toast.error(
+      "This browser's storage is full — your latest change may not survive a reload.",
+      { id: "canvas-store-failed" },
+    );
   }
 }
 
@@ -147,6 +153,68 @@ function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; chan
   return { blocks: next, changed };
 }
 
+/** Saved blocks win over defaults by id, except defaults the user deleted. */
+function mergeWithDefaults(saved: CanvasBlock[], removedIds: Set<string>): CanvasBlock[] {
+  const savedIds = new Set(saved.map((block) => block.id));
+  return [
+    ...SITE_CANVAS.blocks.filter((block) => !savedIds.has(block.id) && !removedIds.has(block.id)),
+    ...saved,
+  ];
+}
+
+/**
+ * One-time cleanup: older saves embedded whole images inside the page layout,
+ * which overflowed browser storage and made later saves silently fail. Move
+ * each embedded file into the shared media library and keep only its URL.
+ */
+async function extractEmbeddedMedia(
+  blocks: CanvasBlock[],
+  overrides: Record<string, MediaOverride>,
+): Promise<{ blocks: CanvasBlock[] | null; overrides: Record<string, MediaOverride> | null }> {
+  const urlCache = new Map<string, string>();
+  const swap = async (src: string): Promise<string> => {
+    if (!src.startsWith("data:")) return src;
+    const cached = urlCache.get(src);
+    if (cached) return cached;
+    const url = await storeDataUrl(src);
+    urlCache.set(src, url);
+    return url;
+  };
+
+  let blocksChanged = false;
+  const nextBlocks: CanvasBlock[] = [];
+  for (const block of blocks) {
+    if (block.src?.startsWith("data:")) {
+      const url = await swap(block.src);
+      if (url !== block.src) {
+        blocksChanged = true;
+        nextBlocks.push({ ...block, src: url });
+        continue;
+      }
+    }
+    nextBlocks.push(block);
+  }
+
+  let overridesChanged = false;
+  const nextOverrides: Record<string, MediaOverride> = {};
+  for (const [key, override] of Object.entries(overrides)) {
+    if (override.src.startsWith("data:")) {
+      const url = await swap(override.src);
+      if (url !== override.src) {
+        overridesChanged = true;
+        nextOverrides[key] = { ...override, src: url };
+        continue;
+      }
+    }
+    nextOverrides[key] = override;
+  }
+
+  return {
+    blocks: blocksChanged ? nextBlocks : null,
+    overrides: overridesChanged ? nextOverrides : null,
+  };
+}
+
 export function CanvasProvider({ children }: { children: ReactNode }) {
   const [editing, setEditing] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -168,11 +236,20 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     styles: SITE_CANVAS.styles,
     hidden: SITE_CANVAS.hidden,
     texts: {},
+    removed: [],
   });
 
+  /** Default blocks the user deleted; they stay deleted across reloads. */
+  const removed = useRef<string[]>([]);
+
   useEffect(() => {
-    live.current = { placements, blocks, styles, hidden, texts };
+    live.current = { placements, blocks, styles, hidden, texts, removed: removed.current };
   }, [placements, blocks, styles, hidden, texts]);
+
+  const persistRemoved = useCallback(() => {
+    store(CANVAS_KEYS.removed, removed.current);
+    writeSiteValue(SITE_KEYS.canvasRemoved, removed.current);
+  }, []);
 
   /**
    * Remembers the current state before a change. Rapid changes of the same
@@ -208,18 +285,53 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     setTexts(prev.texts);
     store(TEXTS_STORAGE_KEY, prev.texts);
     writeSiteValue(SITE_KEYS.canvasTexts, prev.texts);
-  }, []);
+    removed.current = prev.removed;
+    persistRemoved();
+  }, [persistRemoved]);
 
+
+  /** Applies shared site content on top of the code defaults. */
+  const applyShared = useCallback((values: Record<string, unknown>) => {
+    const rr = values[SITE_KEYS.canvasRemoved];
+    if (Array.isArray(rr)) removed.current = rr as string[];
+    const rp = values[SITE_KEYS.canvasPlacements];
+    if (rp && typeof rp === "object") {
+      setPlacements({ ...SITE_CANVAS.placements, ...(rp as PlacementMap) });
+    }
+    const rb = values[SITE_KEYS.canvasBlocks];
+    if (Array.isArray(rb)) {
+      const merged = mergeWithDefaults(rb as CanvasBlock[], new Set(removed.current));
+      const repaired = repairSavedBlocks(merged);
+      setBlocks(repaired.blocks);
+      if (repaired.changed) {
+        store(CANVAS_KEYS.blocks, repaired.blocks);
+        writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
+      }
+    }
+    const rs = values[SITE_KEYS.canvasStyles];
+    if (rs && typeof rs === "object") setStyles(rs as StyleMap);
+    const rh = values[SITE_KEYS.canvasHidden];
+    if (Array.isArray(rh)) setHidden(rh as string[]);
+    const ro = values[SITE_KEYS.mediaOverrides];
+    if (ro && typeof ro === "object") {
+      setOverrides(ro as Record<string, MediaOverride>);
+    }
+    const rt = values[SITE_KEYS.canvasTexts];
+    if (rt && typeof rt === "object") setTexts(rt as Record<string, string>);
+  }, []);
 
   // Pick up this browser's copy after hydration, then anything saved site-wide.
   useEffect(() => {
+    const removedLocal = read<string[]>(CANVAS_KEYS.removed);
+    if (Array.isArray(removedLocal)) removed.current = removedLocal;
     const p = read<PlacementMap>(CANVAS_KEYS.placements);
     if (p) setPlacements({ ...SITE_CANVAS.placements, ...p });
+    let localBlocks: CanvasBlock[] | null = null;
     const b = read<CanvasBlock[]>(CANVAS_KEYS.blocks);
     if (Array.isArray(b)) {
-      const savedIds = new Set(b.map((block) => block.id));
-      const merged = [...SITE_CANVAS.blocks.filter((block) => !savedIds.has(block.id)), ...b];
+      const merged = mergeWithDefaults(b, new Set(removed.current));
       const repaired = repairSavedBlocks(merged);
+      localBlocks = repaired.blocks;
       setBlocks(repaired.blocks);
       if (repaired.changed) {
         store(CANVAS_KEYS.blocks, repaired.blocks);
@@ -235,35 +347,42 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     const t = read<Record<string, string>>(TEXTS_STORAGE_KEY);
     if (t) setTexts(t);
 
-    void siteContent().then((values) => {
-      const rp = values[SITE_KEYS.canvasPlacements];
-      if (rp && typeof rp === "object") {
-        setPlacements({ ...SITE_CANVAS.placements, ...(rp as PlacementMap) });
+    void siteContent().then(async (values) => {
+      applyShared(values);
+      // Shrink older saves: move embedded images into the media library so
+      // layout saves stay small enough to always succeed.
+      const sharedBlocks = values[SITE_KEYS.canvasBlocks];
+      const currentBlocks = Array.isArray(sharedBlocks)
+        ? repairSavedBlocks(mergeWithDefaults(sharedBlocks as CanvasBlock[], new Set(removed.current))).blocks
+        : (localBlocks ?? SITE_CANVAS.blocks);
+      const sharedOverrides = values[SITE_KEYS.mediaOverrides];
+      const currentOverrides =
+        sharedOverrides && typeof sharedOverrides === "object"
+          ? (sharedOverrides as Record<string, MediaOverride>)
+          : (o ?? {});
+      const migrated = await extractEmbeddedMedia(currentBlocks, currentOverrides);
+      if (migrated.blocks) {
+        setBlocks(migrated.blocks);
+        store(CANVAS_KEYS.blocks, migrated.blocks);
+        writeSiteValue(SITE_KEYS.canvasBlocks, migrated.blocks);
       }
-      const rb = values[SITE_KEYS.canvasBlocks];
-      if (Array.isArray(rb)) {
-        const remote = rb as CanvasBlock[];
-        const remoteIds = new Set(remote.map((block) => block.id));
-        const merged = [...SITE_CANVAS.blocks.filter((block) => !remoteIds.has(block.id)), ...remote];
-        const repaired = repairSavedBlocks(merged);
-        setBlocks(repaired.blocks);
-        if (repaired.changed) {
-          store(CANVAS_KEYS.blocks, repaired.blocks);
-          writeSiteValue(SITE_KEYS.canvasBlocks, repaired.blocks);
-        }
+      if (migrated.overrides) {
+        setOverrides(migrated.overrides);
+        store(OVERRIDES_STORAGE_KEY, migrated.overrides);
+        writeSiteValue(SITE_KEYS.mediaOverrides, migrated.overrides);
       }
-      const rs = values[SITE_KEYS.canvasStyles];
-      if (rs && typeof rs === "object") setStyles(rs as StyleMap);
-      const rh = values[SITE_KEYS.canvasHidden];
-      if (Array.isArray(rh)) setHidden(rh as string[]);
-      const ro = values[SITE_KEYS.mediaOverrides];
-      if (ro && typeof ro === "object") {
-        setOverrides(ro as Record<string, MediaOverride>);
-      }
-      const rt = values[SITE_KEYS.canvasTexts];
-      if (rt && typeof rt === "object") setTexts(rt as Record<string, string>);
     });
-  }, []);
+  }, [applyShared]);
+
+  // When this tab regains focus, pull the newest shared content so a stale tab
+  // can't overwrite newer edits made in another tab.
+  useEffect(() => {
+    const onFocus = () => {
+      void refreshSiteContent().then(applyShared);
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [applyShared]);
 
   useEffect(() => {
     if (!editing) setSelectedId(null);
@@ -394,9 +513,14 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         persistBlocks(next);
         return next;
       });
+      // Remember deleted built-in blocks so they don't come back on reload.
+      if (SITE_CANVAS.blocks.some((b) => b.id === id) && !removed.current.includes(id)) {
+        removed.current = [...removed.current, id];
+        persistRemoved();
+      }
       setSelectedId((current) => (current === id ? null : current));
     },
-    [persistBlocks, pushHistory],
+    [persistBlocks, persistRemoved, pushHistory],
   );
 
   const styleFor = useCallback((id: string) => styles[id], [styles]);
@@ -502,12 +626,14 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     setHidden(SITE_CANVAS.hidden);
     setTexts({});
     setSelectedId(null);
+    removed.current = [];
     try {
       Object.values(CANVAS_KEYS).forEach((k) => localStorage.removeItem(k));
       localStorage.removeItem(TEXTS_STORAGE_KEY);
     } catch {
       /* ignore */
     }
+    writeSiteValue(SITE_KEYS.canvasRemoved, []);
     writeSiteValue(SITE_KEYS.canvasTexts, {});
     writeSiteValue(SITE_KEYS.canvasPlacements, SITE_CANVAS.placements);
     writeSiteValue(SITE_KEYS.canvasBlocks, SITE_CANVAS.blocks);

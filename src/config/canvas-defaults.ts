@@ -336,6 +336,7 @@ export const CANVAS_KEYS = {
   blocks: "canvas-blocks",
   styles: "canvas-styles",
   hidden: "canvas-hidden",
+  removed: "canvas-removed",
 } as const;
 
 const FALLBACK: Placement = { x: 0, y: 0, w: 12, h: 6 };
