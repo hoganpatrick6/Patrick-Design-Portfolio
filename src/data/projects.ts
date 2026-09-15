@@ -37,7 +37,7 @@ export const projects: Project[] = [
     title: "Grocery Fresh",
     category: "Art Direction",
     year: "2023",
-    description: "",
+    description: "Why would anyone want a stranger to do their shopping for them?",
     image: driftwellThumb,
     role: "Art Direction",
     client: "Uber",
