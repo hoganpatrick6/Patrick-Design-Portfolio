@@ -49,15 +49,20 @@ export const loadSiteContent = createServerFn({ method: "GET" }).handler(
 export const saveSiteContentValue = createServerFn({ method: "POST" })
   .inputValidator((data: { key: string; value: unknown }) => data)
   .handler(async ({ data }) => {
-    if (!editorEnvironmentUnlocked() && !(await editorSessionUnlocked())) {
-      throw new Response("Unauthorized", { status: 401 });
-    }
-    if (!data.key) return { saved: false as const };
+    try {
+      if (!editorEnvironmentUnlocked() && !(await editorSessionUnlocked())) {
+        return { saved: false as const };
+      }
+      if (!data.key) return { saved: false as const };
 
-    const { error } = await (await db()).from("site_content").upsert(
-      { key: data.key, value: data.value, updated_at: new Date().toISOString() },
-      { onConflict: "key" },
-    );
-    if (error) return { saved: false as const };
-    return { saved: true as const };
+      const { error } = await (await db()).from("site_content").upsert(
+        { key: data.key, value: data.value, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+      if (error) return { saved: false as const };
+      return { saved: true as const };
+    } catch {
+      // Never fail the page over a save; the editor reports an unsaved change.
+      return { saved: false as const };
+    }
   });

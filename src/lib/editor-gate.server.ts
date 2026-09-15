@@ -42,6 +42,11 @@ export function editorEnvironmentUnlocked(): boolean {
 
 /** True when the editor session was unlocked with the private key. */
 export async function editorSessionUnlocked(): Promise<boolean> {
-  const session = await useSession<EditorSession>(sessionConfig());
-  return Boolean(session.data.editor);
+  try {
+    const session = await useSession<EditorSession>(sessionConfig());
+    return Boolean(session.data.editor);
+  } catch {
+    // An unreadable or outdated unlock cookie simply means "not unlocked".
+    return false;
+  }
 }
