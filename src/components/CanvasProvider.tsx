@@ -513,9 +513,14 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         persistBlocks(next);
         return next;
       });
+      // Remember deleted built-in blocks so they don't come back on reload.
+      if (SITE_CANVAS.blocks.some((b) => b.id === id) && !removed.current.includes(id)) {
+        removed.current = [...removed.current, id];
+        persistRemoved();
+      }
       setSelectedId((current) => (current === id ? null : current));
     },
-    [persistBlocks, pushHistory],
+    [persistBlocks, persistRemoved, pushHistory],
   );
 
   const styleFor = useCallback((id: string) => styles[id], [styles]);
@@ -621,12 +626,14 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     setHidden(SITE_CANVAS.hidden);
     setTexts({});
     setSelectedId(null);
+    removed.current = [];
     try {
       Object.values(CANVAS_KEYS).forEach((k) => localStorage.removeItem(k));
       localStorage.removeItem(TEXTS_STORAGE_KEY);
     } catch {
       /* ignore */
     }
+    writeSiteValue(SITE_KEYS.canvasRemoved, []);
     writeSiteValue(SITE_KEYS.canvasTexts, {});
     writeSiteValue(SITE_KEYS.canvasPlacements, SITE_CANVAS.placements);
     writeSiteValue(SITE_KEYS.canvasBlocks, SITE_CANVAS.blocks);
