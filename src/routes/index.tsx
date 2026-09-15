@@ -3,11 +3,11 @@ import { redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
-    throw redirect({ to: "/about" });
+    throw redirect({ to: "/work" });
   },
   head: () => ({
     meta: [
-      { title: "Patrick Hogan — Brand Designer / Art Director" },
+      { title: "Work — Patrick Hogan" },
     ],
   }),
   component: Index,
