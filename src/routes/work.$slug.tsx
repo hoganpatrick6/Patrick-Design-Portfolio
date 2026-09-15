@@ -121,18 +121,18 @@ function ProjectPage() {
 
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
         <Canvas page={`project:${project.slug}`}>
-          <CanvasBlock id={headerId("title")} label="Project title">
+          <CanvasBlock id={headerId("title")} label="Project title" autoHeight>
             <h1 className="type-display text-foreground">{project.title}</h1>
           </CanvasBlock>
 
-          <CanvasBlock id={headerId("client")} label="Client details">
+          <CanvasBlock id={headerId("client")} label="Client details" autoHeight>
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
               <dd className="mt-1 type-body text-foreground">{project.client}</dd>
             </dl>
           </CanvasBlock>
 
-          <CanvasBlock id={headerId("role")} label="Role details">
+          <CanvasBlock id={headerId("role")} label="Role details" autoHeight>
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
               <dd className="mt-1 whitespace-pre-line type-body text-foreground">
@@ -141,13 +141,13 @@ function ProjectPage() {
             </dl>
           </CanvasBlock>
 
-          <CanvasBlock id={headerId("summary")} label="Project summary">
+          <CanvasBlock id={headerId("summary")} label="Project summary" autoHeight>
             <p className="max-w-xl type-body text-foreground">
               {project.description || project.overview[0]}
             </p>
           </CanvasBlock>
 
-          <CanvasBlock id="project-overview" label="Overview">
+          <CanvasBlock id="project-overview" label="Overview" autoHeight>
             <div className="max-w-2xl space-y-6">
               {project.overview.map((paragraph) => (
                 <p key={paragraph} className="type-body text-[var(--color-foreground-muted)]">
@@ -201,25 +201,25 @@ function GroceryFreshPage() {
 
       <main className="px-4 pb-32 pt-0 sm:px-8 md:px-16">
         <Canvas page={page}>
-          <CanvasBlock id="grocery-title" label="Project title">
+          <CanvasBlock id="grocery-title" label="Project title" autoHeight>
             <h1 className="type-display text-foreground">Grocery Fresh</h1>
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-client" label="Client details">
+          <CanvasBlock id="grocery-client" label="Client details" autoHeight>
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Client</dt>
               <dd className="mt-1 type-body text-foreground">Uber</dd>
             </dl>
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-role" label="Role details">
+          <CanvasBlock id="grocery-role" label="Role details" autoHeight>
             <dl>
               <dt className="type-label text-[var(--color-foreground-subtle)]">Role</dt>
               <dd className="mt-1 type-body text-foreground">Art Direction</dd>
             </dl>
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-summary" label="Project summary">
+          <CanvasBlock id="grocery-summary" label="Project summary" autoHeight>
             <p className="type-body max-w-xl">
               Why would anyone want a stranger to do their shopping for them? To build
               more trust and attract more attention to Uber Eats’ grocery business, we
@@ -241,20 +241,20 @@ function GroceryFreshPage() {
             />
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-story-title" label="Image library title">
+          <CanvasBlock id="grocery-story-title" label="Image library title" autoHeight>
             <h2 className="type-subhead text-center">
               Global Image Library
             </h2>
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-story-intro" label="Image library introduction">
+          <CanvasBlock id="grocery-story-intro" label="Image library introduction" autoHeight>
             <p className="type-body text-center">
               We partnered with photographers to shoot in four different grocery stores
               across Los Angeles, each representing a different region of the world.
             </p>
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-story-detail" label="Image library details">
+          <CanvasBlock id="grocery-story-detail" label="Image library details" autoHeight>
             <p className="type-body text-center">
               It was important for us to shoot in real Eats grocery locations with real
               Eats couriers. We wanted to give our audience an authentic look into who

@@ -37,7 +37,7 @@ type CanvasLayout = {
   colWidth: number;
   documentTop: number;
   resolved: Record<string, Resolved>;
-  register: (id: string) => void;
+  register: (id: string, autoHeight: boolean) => void;
   unregister: (id: string) => void;
   reportHeight: (id: string, px: number) => void;
   page: string;
@@ -156,6 +156,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   const [documentTop, setDocumentTop] = useState(0);
   const [ids, setIds] = useState<string[]>([]);
   const [heights, setHeights] = useState<Record<string, number>>({});
+  const [autoHeightIds, setAutoHeightIds] = useState<Record<string, boolean>>({});
   const [dropping, setDropping] = useState(false);
 
   useLayoutEffect(() => {
@@ -183,12 +184,20 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
     };
   }, []);
 
-  const register = useCallback((id: string) => {
+  const register = useCallback((id: string, autoHeight: boolean) => {
     setIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    setAutoHeightIds((prev) =>
+      prev[id] === autoHeight ? prev : { ...prev, [id]: autoHeight },
+    );
   }, []);
 
   const unregister = useCallback((id: string) => {
     setIds((prev) => prev.filter((x) => x !== id));
+    setAutoHeightIds((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
   }, []);
 
   const reportHeight = useCallback((id: string, px: number) => {
@@ -201,7 +210,12 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
 
   const { resolved, totalRows } = useMemo(() => {
     const items = ids
-      .map((id) => ({ id, p: placementFor(id), h: heights[id] ?? 0 }))
+      .map((id) => ({
+        id,
+        p: placementFor(id),
+        h: heights[id] ?? 0,
+        autoHeight: autoHeightIds[id] ?? false,
+      }))
       .sort((a, b) => a.p.y - b.p.y || a.p.x - b.p.x);
 
     type Item = (typeof items)[number];
@@ -213,7 +227,11 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
       const key = workProjectPairKey(page, item.id);
       if (!key) {
         const contentRows = Math.ceil((item.h + GUTTER) / ROW_UNIT);
-        units.push({ items: [item], p: item.p, rows: Math.max(item.p.h, contentRows || 1) });
+        units.push({
+          items: [item],
+          p: item.p,
+          rows: item.autoHeight ? Math.max(contentRows, 1) : Math.max(item.p.h, contentRows || 1),
+        });
         return;
       }
       paired.set(key, [...(paired.get(key) ?? []), item]);
@@ -226,7 +244,9 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
       const rows = Math.max(
         ...pairItems.map((item) => {
           const contentRows = Math.ceil((item.h + GUTTER) / ROW_UNIT);
-          return Math.max(item.p.h, contentRows || 1);
+          return item.autoHeight
+            ? Math.max(contentRows, 1)
+            : Math.max(item.p.h, contentRows || 1);
         }),
       );
       units.push({
@@ -270,7 +290,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
     });
 
     return { resolved: out, totalRows: bottom };
-  }, [ids, heights, page, placementFor]);
+  }, [ids, heights, autoHeightIds, page, placementFor]);
 
   const value = useMemo<CanvasLayout>(
     () => ({ stacked, colWidth, documentTop, resolved, register, unregister, reportHeight, page }),
@@ -388,6 +408,7 @@ export function CanvasBlock({
   className = "",
   onDelete,
   onTextEdit,
+  autoHeight = false,
 }: {
   id: string;
   label: string;
@@ -396,6 +417,8 @@ export function CanvasBlock({
   onDelete?: () => void;
   /** Lets a block store typed words on itself instead of as a page override. */
   onTextEdit?: (field: string, value: string) => void;
+  /** Lets a text-only frame hug its rendered content instead of its saved row height. */
+  autoHeight?: boolean;
 }) {
   const {
     editing,
@@ -429,9 +452,9 @@ export function CanvasBlock({
 
   useEffect(() => {
     if (hidden) return;
-    register(id);
+    register(id, autoHeight);
     return () => unregister(id);
-  }, [id, hidden, register, unregister]);
+  }, [id, hidden, autoHeight, register, unregister]);
 
   // Measure content so the block always reserves the room it needs.
   useLayoutEffect(() => {
@@ -592,7 +615,9 @@ export function CanvasBlock({
         left: `calc((100% + ${GUTTER}px) * ${placement.x / GRID_COLUMNS})`,
         width: `calc((100% + ${GUTTER}px) * ${placement.w / GRID_COLUMNS} - ${GUTTER}px)`,
         top: `${(spot?.top ?? placement.y) * ROW_UNIT}px`,
-        minHeight: `${Math.max(placement.h, spot?.rows ?? 0) * ROW_UNIT}px`,
+        minHeight: autoHeight
+          ? undefined
+          : `${Math.max(placement.h, spot?.rows ?? 0) * ROW_UNIT}px`,
         transform: offset ? `translate(${offset.x}px, ${offset.y}px)` : undefined,
         zIndex: 1,
       };
@@ -645,17 +670,23 @@ export function CanvasBlock({
                 onPointerDown={(e) => startDrag(e, "size-x")}
                 className="canvas-handle absolute -right-1.5 top-1/2 h-10 w-3 -translate-y-1/2 cursor-ew-resize"
               />
+              {!autoHeight && (
+                <span
+                  data-editor-ui=""
+                  data-no-drag=""
+                  onPointerDown={(e) => startDrag(e, "size-y")}
+                  className="canvas-handle absolute -bottom-1.5 left-1/2 h-3 w-10 -translate-x-1/2 cursor-ns-resize"
+                />
+              )}
               <span
                 data-editor-ui=""
                 data-no-drag=""
-                onPointerDown={(e) => startDrag(e, "size-y")}
-                className="canvas-handle absolute -bottom-1.5 left-1/2 h-3 w-10 -translate-x-1/2 cursor-ns-resize"
-              />
-              <span
-                data-editor-ui=""
-                data-no-drag=""
-                onPointerDown={(e) => startDrag(e, "size-xy")}
-                className="canvas-handle absolute -bottom-1.5 -right-1.5 h-3 w-3 cursor-nwse-resize"
+                onPointerDown={(e) => startDrag(e, autoHeight ? "size-x" : "size-xy")}
+                className={`canvas-handle absolute -right-1.5 h-3 w-3 ${
+                  autoHeight
+                    ? "top-1/2 -translate-y-1/2 cursor-ew-resize"
+                    : "-bottom-1.5 cursor-nwse-resize"
+                }`}
               />
             </>
           )}
@@ -728,6 +759,7 @@ function PlacedBlock({ block }: { block: CanvasBlockData }) {
     <CanvasBlock
       id={block.id}
       label={label}
+      autoHeight={block.kind === "text" || block.kind === "project-description"}
       onDelete={() => removeBlock(block.id)}
       onTextEdit={(field, value) => updateBlock(block.id, { [field]: value })}
     >
@@ -760,7 +792,7 @@ function RuleBlockView({ block }: { block: CanvasBlockData }) {
 
 function ProjectDescriptionBlockView({ block }: { block: CanvasBlockData }) {
   const content = (
-    <div className="grid grid-cols-1 gap-4 pb-8 md:grid-cols-5">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
       <div className="md:col-span-3">
         <h2 data-field="title" className="type-heading text-foreground">
           {block.title}

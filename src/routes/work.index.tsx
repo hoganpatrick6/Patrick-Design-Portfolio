@@ -69,7 +69,7 @@ function WorkPage() {
 
       <main className="px-8 pb-32 pt-16 md:px-16 md:pt-24">
         <Canvas page="work">
-          <CanvasBlock id="work-intro" label="Intro">
+          <CanvasBlock id="work-intro" label="Intro" autoHeight>
             <div className="pt-8">
               <p className="type-display text-foreground">
                 Patrick is a brand designer, art director and photographer who excels at
@@ -78,7 +78,7 @@ function WorkPage() {
             </div>
           </CanvasBlock>
 
-          <CanvasBlock id="work-projects-label" label="Projects label">
+          <CanvasBlock id="work-projects-label" label="Projects label" autoHeight>
             <div className="type-label text-[var(--color-foreground-subtle)]">
               Projects
             </div>

@@ -187,7 +187,7 @@ export function BlockInspector() {
                 ["w", "Wide", 1, 12],
                 ["h", "Tall", 1, 999],
               ] as const)
-        ).map(([key, label, min, max]) => (
+        ).filter(([key]) => block?.kind !== "text" && block?.kind !== "project-description" || key !== "h").map(([key, label, min, max]) => (
           <label key={key} className="block">
             <span className="text-[10px] uppercase tracking-wide text-[var(--color-foreground-subtle)]">
               {label}
