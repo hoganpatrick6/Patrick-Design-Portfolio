@@ -495,6 +495,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   );
 
   const reset = useCallback(() => {
+    pushHistory();
     setPlacements(SITE_CANVAS.placements);
     setBlocks(SITE_CANVAS.blocks);
     setStyles(SITE_CANVAS.styles);
