@@ -174,8 +174,8 @@ function ProjectPage() {
 }
 
 function GroceryFreshPage() {
-  const page = "project:driftwell";
-  const project = getProject("driftwell");
+  const page = "project:grocery-fresh";
+  const project = getProject("grocery-fresh");
   if (!project) return null;
 
   return (
@@ -186,7 +186,7 @@ function GroceryFreshPage() {
         <Canvas page={page}>
           <ProjectHeader project={project} />
 
-          <CanvasBlock id="grocery-hero" label="Carrot photograph">
+          <CanvasBlock id="grocery-fresh-hero" label="Carrot photograph">
             <EditableMedia
               id="grocery-fresh:carrots"
               src={groceryCarrots}
@@ -199,20 +199,20 @@ function GroceryFreshPage() {
             />
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-story-title" label="Image library title" autoHeight>
+          <CanvasBlock id="grocery-fresh-story-title" label="Image library title" autoHeight>
             <h2 className="type-subhead text-center">
               Global Image Library
             </h2>
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-story-intro" label="Image library introduction" autoHeight>
+          <CanvasBlock id="grocery-fresh-story-intro" label="Image library introduction" autoHeight>
             <p className="type-body text-center">
               We partnered with photographers to shoot in four different grocery stores
               across Los Angeles, each representing a different region of the world.
             </p>
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-story-detail" label="Image library details" autoHeight>
+          <CanvasBlock id="grocery-fresh-story-detail" label="Image library details" autoHeight>
             <p className="type-body text-center">
               It was important for us to shoot in real Eats grocery locations with real
               Eats couriers. We wanted to give our audience an authentic look into who
@@ -221,7 +221,7 @@ function GroceryFreshPage() {
             </p>
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-oranges" label="Oranges image">
+          <CanvasBlock id="grocery-fresh-oranges" label="Oranges image">
             <EditableMedia
               id="grocery-fresh:oranges"
               src={groceryOranges}
@@ -233,7 +233,7 @@ function GroceryFreshPage() {
             />
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-blueberries" label="Blueberries image">
+          <CanvasBlock id="grocery-fresh-blueberries" label="Blueberries image">
             <EditableMedia
               id="grocery-fresh:blueberries"
               src={groceryBlueberries}
@@ -245,7 +245,7 @@ function GroceryFreshPage() {
             />
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-tomatoes" label="Tomatoes image">
+          <CanvasBlock id="grocery-fresh-tomatoes" label="Tomatoes image">
             <EditableMedia
               id="grocery-fresh:tomatoes"
               src={groceryTomatoes}
@@ -257,7 +257,7 @@ function GroceryFreshPage() {
             />
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-eggs" label="Eggs image">
+          <CanvasBlock id="grocery-fresh-eggs" label="Eggs image">
             <EditableMedia
               id="grocery-fresh:eggs"
               src={groceryEggs}
@@ -269,7 +269,7 @@ function GroceryFreshPage() {
             />
           </CanvasBlock>
 
-          <CanvasBlock id="grocery-campaign" label="Campaign artwork">
+          <CanvasBlock id="grocery-fresh-campaign" label="Campaign artwork">
             <div className="-mx-4 overflow-hidden sm:-mx-8 md:-mx-16">
               <EditableMedia
                 id="grocery-fresh:campaign"
