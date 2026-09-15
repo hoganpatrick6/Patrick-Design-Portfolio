@@ -271,6 +271,11 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
     });
 
     units.sort((a, b) => {
+      if (page.startsWith("project:")) {
+        const aHeader = a.items.some((item) => projectHeaderSlotFor(item.id)) ? 0 : 1;
+        const bHeader = b.items.some((item) => projectHeaderSlotFor(item.id)) ? 0 : 1;
+        if (aHeader !== bHeader) return aHeader - bHeader;
+      }
       const rowOrder = a.p.y - b.p.y;
       if (rowOrder) return rowOrder;
       const aHeader = a.items.some((item) => projectHeaderSlotFor(item.id)) ? 0 : 1;
