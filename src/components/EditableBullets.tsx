@@ -54,6 +54,17 @@ export function EditableBullets({ id, bullets }: { id: string; bullets: string[]
   const updateAt = (index: number, text: string) =>
     commit(items.map((item, i) => (i === index ? text : item)));
 
+  const actionProps = {
+    type: "button" as const,
+    "data-editor-ui": "",
+    "data-no-drag": "",
+    // Keep the caret where it is so the first click already fires the action.
+    onMouseDown: (e: React.MouseEvent) => e.preventDefault(),
+    onPointerDown: (e: React.PointerEvent) => e.stopPropagation(),
+    className:
+      "rounded-full border border-[var(--color-border)] px-2 py-1 hover:text-foreground",
+  };
+
   return (
     <div className="space-y-4">
       <ul className="space-y-4">
@@ -68,36 +79,26 @@ export function EditableBullets({ id, bullets }: { id: string; bullets: string[]
                 <textarea
                   value={b}
                   rows={Math.max(2, Math.ceil(b.length / 70))}
+                  data-editor-ui=""
+                  data-no-drag=""
                   onChange={(e) => updateAt(j, e.target.value)}
                   className="type-body w-full resize-y rounded-sm border border-[var(--color-border)] bg-transparent p-2 text-foreground outline-none focus:border-foreground"
                 />
-                <span className="flex flex-wrap gap-2 text-[11px] uppercase tracking-wide text-[var(--color-foreground-muted)]">
-                  <button
-                    type="button"
-                    onClick={() => insertAt(j, "New bullet")}
-                    className="rounded-full border border-[var(--color-border)] px-2 py-1 hover:text-foreground"
-                  >
+                <span
+                  data-editor-ui=""
+                  data-no-drag=""
+                  className="flex flex-wrap gap-2 text-[11px] uppercase tracking-wide text-[var(--color-foreground-muted)]"
+                >
+                  <button {...actionProps} onClick={() => insertAt(j, "New bullet")}>
                     + Above
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => insertAt(j + 1, "New bullet")}
-                    className="rounded-full border border-[var(--color-border)] px-2 py-1 hover:text-foreground"
-                  >
+                  <button {...actionProps} onClick={() => insertAt(j + 1, "New bullet")}>
                     + Below
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => insertAt(j + 1, b)}
-                    className="rounded-full border border-[var(--color-border)] px-2 py-1 hover:text-foreground"
-                  >
+                  <button {...actionProps} onClick={() => insertAt(j + 1, b)}>
                     Duplicate
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => removeAt(j)}
-                    className="rounded-full border border-[var(--color-border)] px-2 py-1 hover:text-foreground"
-                  >
+                  <button {...actionProps} onClick={() => removeAt(j)}>
                     ✕ Delete
                   </button>
                 </span>
@@ -110,7 +111,7 @@ export function EditableBullets({ id, bullets }: { id: string; bullets: string[]
       </ul>
       {editing && (
         <button
-          type="button"
+          {...actionProps}
           onClick={() => insertAt(items.length, "New bullet")}
           className="rounded-full border border-[var(--color-border)] px-3 py-1 text-[11px] uppercase tracking-wide text-[var(--color-foreground-muted)] hover:text-foreground"
         >
@@ -120,3 +121,4 @@ export function EditableBullets({ id, bullets }: { id: string; bullets: string[]
     </div>
   );
 }
+
