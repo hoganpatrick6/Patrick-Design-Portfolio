@@ -15,6 +15,7 @@ import {
   defaultPlacement,
   PROJECT_HEADER_SLOTS,
   projectHeaderIds,
+  projectOverviewIds,
   projectHeaderPeerIds,
   projectHeaderSlotFor,
   type BlockKind,
