@@ -217,7 +217,7 @@ export const SITE_CANVAS: CanvasDefaults = {
       "h": 4
     },
     "project-lunethra-role": {
-      "x": 2,
+      "x": 0,
       "y": 11,
       "w": 2,
       "h": 4
@@ -230,19 +230,19 @@ export const SITE_CANVAS: CanvasDefaults = {
     },
     "project-clyra-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
     "project-clyra-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
-    "project-clyra-role": { "x": 2, "y": 11, "w": 2, "h": 4 },
+    "project-clyra-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-clyra-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
     "project-forgekind-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
     "project-forgekind-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
-    "project-forgekind-role": { "x": 2, "y": 11, "w": 2, "h": 4 },
+    "project-forgekind-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-forgekind-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
     "project-nestive-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
     "project-nestive-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
-    "project-nestive-role": { "x": 2, "y": 11, "w": 2, "h": 4 },
+    "project-nestive-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-nestive-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
     "project-pollenate-title": { "x": 0, "y": 1, "w": 12, "h": 6 },
     "project-pollenate-client": { "x": 0, "y": 11, "w": 2, "h": 4 },
-    "project-pollenate-role": { "x": 2, "y": 11, "w": 2, "h": 4 },
+    "project-pollenate-role": { "x": 0, "y": 11, "w": 2, "h": 4 },
     "project-pollenate-summary": { "x": 6, "y": 11, "w": 6, "h": 6 },
     "project-overview": {
       "x": 4,
@@ -269,7 +269,7 @@ export const SITE_CANVAS: CanvasDefaults = {
       "h": 3
     },
     "grocery-role": {
-      "x": 2,
+      "x": 0,
       "y": 11,
       "w": 2,
       "h": 3
