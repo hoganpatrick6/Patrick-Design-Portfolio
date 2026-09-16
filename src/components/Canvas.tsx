@@ -205,7 +205,10 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   }, []);
 
   const reportHeight = useCallback((id: string, px: number) => {
-    setHeights((prev) => (prev[id] === px ? prev : { ...prev, [id]: px }));
+    // Snap to the baseline grid so a pixel or two of measurement noise
+    // (font loading, subpixel rounding) can never reflow the page.
+    const snapped = Math.ceil(px / TEXT_ROW_STEP) * TEXT_ROW_STEP;
+    setHeights((prev) => (prev[id] === snapped ? prev : { ...prev, [id]: snapped }));
   }, []);
 
   const stacked = width > 0 && width < STACK_BREAKPOINT;
@@ -238,11 +241,11 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
       if (!key) {
         const contentRows = item.autoHeight
           ? Math.ceil(item.h / TEXT_ROW_STEP) / 4
-          : Math.ceil((item.h + GUTTER) / ROW_UNIT);
+          : item.p.h;
         units.push({
           items: [item],
           p: item.p,
-          rows: item.autoHeight ? Math.max(contentRows, 1) : Math.max(item.p.h, contentRows || 1),
+          rows: item.autoHeight ? Math.max(contentRows, 1) : Math.max(item.p.h, 1),
         });
         return;
       }
@@ -257,10 +260,10 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
         ...pairItems.map((item) => {
           const contentRows = item.autoHeight
             ? Math.ceil(item.h / TEXT_ROW_STEP) / 4
-            : Math.ceil((item.h + GUTTER) / ROW_UNIT);
+            : item.p.h;
           return item.autoHeight
             ? Math.max(contentRows, 1)
-            : Math.max(item.p.h, contentRows || 1);
+            : Math.max(item.p.h, 1);
         }),
       );
       units.push({
@@ -482,16 +485,25 @@ export function CanvasBlock({
   }, [id, hidden, autoHeight, register, unregister]);
 
   // Measure content so the block always reserves the room it needs.
+  // Only text frames need measuring; fixed-height frames keep their saved
+  // height so late-loading images can't push their neighbours around.
   useLayoutEffect(() => {
     const el = innerRef.current;
-    if (!el || hidden) return;
-    const ro = new ResizeObserver(() => {
-      reportHeight(id, el.getBoundingClientRect().height);
-    });
+    if (!el || hidden || !autoHeight) return;
+    let live = true;
+    const measure = () => {
+      if (live) reportHeight(id, el.getBoundingClientRect().height);
+    };
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    reportHeight(id, el.getBoundingClientRect().height);
-    return () => ro.disconnect();
-  }, [id, hidden, reportHeight]);
+    measure();
+    // Re-measure once web fonts settle so the first layout is the final one.
+    void document.fonts?.ready.then(measure);
+    return () => {
+      live = false;
+      ro.disconnect();
+    };
+  }, [id, hidden, autoHeight, reportHeight]);
 
   // Paint the settings of any single piece of type onto the words themselves,
   // and outline whichever piece is currently picked.
