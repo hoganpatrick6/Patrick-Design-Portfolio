@@ -161,40 +161,9 @@ function withoutBlankTexts(
   return { value, changed };
 }
 
-function synchronizedHeaderPlacements(source: PlacementMap, reset: boolean): PlacementMap {
-  const next = { ...source };
-  PROJECT_HEADER_SLOTS.forEach((slot) => {
-    const ids = projectHeaderIds(slot);
-    const canonicalId = ids[0];
-    if (!canonicalId) return;
-    const placement = reset
-      ? SITE_CANVAS.placements[canonicalId]
-      : source[canonicalId] ?? SITE_CANVAS.placements[canonicalId];
-    if (!placement) return;
-    ids.forEach((id) => {
-      next[id] = { ...placement };
-    });
-  });
-  return next;
-}
-
-function synchronizedHeaderStyles(source: StyleMap, reset: boolean): StyleMap {
-  const next: StyleMap = {};
-  Object.entries(source).forEach(([id, style]) => {
-    if (!projectHeaderSlotFor(id)) next[id] = style;
-  });
-  if (reset) return next;
-  Object.entries(source).forEach(([id, style]) => {
-    const slot = projectHeaderSlotFor(id);
-    if (!slot) return;
-    const blockId = id.split("#")[0] ?? id;
-    if (blockId !== projectHeaderIds(slot)[0]) return;
-    projectHeaderPeerIds(id).forEach((peerId) => {
-      next[peerId] = { ...style };
-    });
-  });
-  return next;
-}
+// Header fields stay in step through editing (see setPlacement / setStyle), not
+// by being re-synchronised on every load — that used to relocate fields on the
+// other projects whenever a page opened.
 
 function withoutProjectHeaderIds(ids: string[]): string[] {
   return ids.filter((id) => !projectHeaderSlotFor(id));
