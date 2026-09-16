@@ -528,18 +528,13 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       }
     }
     const rsRaw = values[SITE_KEYS.canvasStyles];
-    if (rsRaw && typeof rsRaw === "object") {
+    if (rsRaw && typeof rsRaw === "object" && !inFlight.has(SITE_KEYS.canvasStyles)) {
       const migrated = migrateRecordKeys(rsRaw as StyleMap);
       if (migrated.changed) {
         store(CANVAS_KEYS.styles, migrated.value);
         writeSiteValue(SITE_KEYS.canvasStyles, migrated.value);
       }
-      const next = synchronizedHeaderStyles(migrated.value, resetHeaderTemplate);
-      setStyles(next);
-      if (resetHeaderTemplate) {
-        store(CANVAS_KEYS.styles, next);
-        writeSiteValue(SITE_KEYS.canvasStyles, next);
-      }
+      setStyles(migrated.value);
     }
     const rhRaw = values[SITE_KEYS.canvasHidden];
     if (Array.isArray(rhRaw)) {
