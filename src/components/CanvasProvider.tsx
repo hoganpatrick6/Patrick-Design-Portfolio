@@ -608,7 +608,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     if (sRaw) {
       const migrated = migrateRecordKeys(sRaw);
       if (migrated.changed) store(CANVAS_KEYS.styles, migrated.value);
-      setStyles(synchronizedHeaderStyles(migrated.value, resetHeaderTemplate));
+      setStyles(migrated.value);
     }
     const hRaw = read<string[]>(CANVAS_KEYS.hidden);
     if (Array.isArray(hRaw)) {
