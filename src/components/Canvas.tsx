@@ -524,17 +524,22 @@ export function CanvasBlock({
     return () => unregister(id);
   }, [id, hidden, autoHeight, register, unregister]);
 
-  // Measure content so the block always reserves the room it needs.
+  // Measure content so the block always reserves the room it needs. Heights are
+  // rounded to whole steps of the grid, so a pixel of wrapping difference can't
+  // ripple down the page.
   useLayoutEffect(() => {
     const el = innerRef.current;
     if (!el || hidden) return;
-    const ro = new ResizeObserver(() => {
-      reportHeight(id, el.getBoundingClientRect().height);
-    });
+    const step = autoHeight ? TEXT_ROW_STEP : ROW_UNIT;
+    const report = () => {
+      const px = el.getBoundingClientRect().height;
+      reportHeight(id, Math.ceil(px / step) * step);
+    };
+    const ro = new ResizeObserver(report);
     ro.observe(el);
-    reportHeight(id, el.getBoundingClientRect().height);
+    report();
     return () => ro.disconnect();
-  }, [id, hidden, reportHeight]);
+  }, [id, hidden, autoHeight, reportHeight]);
 
   // Paint the settings of any single piece of type onto the words themselves,
   // and outline whichever piece is currently picked.
