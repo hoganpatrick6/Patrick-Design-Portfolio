@@ -49,6 +49,32 @@ const LayoutContext = createContext<CanvasLayout | null>(null);
 /** Text frames use quarter-baseline steps so nearby copy can be spaced precisely. */
 const TEXT_ROW_STEP = ROW_UNIT / 4;
 
+/**
+ * Settled heights, remembered per page and screen width.
+ *
+ * Measuring happens after fonts and pictures arrive, so the very first paint
+ * would otherwise lay the page out against guesses and then shuffle it. Reusing
+ * the last settled heights keeps a returning visit landing where it left off.
+ */
+const HEIGHT_CACHE_PREFIX = "canvas-heights";
+
+function heightCacheKey(page: string, width: number) {
+  const bucket =
+    width < STACK_BREAKPOINT ? "stacked" : String(Math.round(width / 100) * 100);
+  return `${HEIGHT_CACHE_PREFIX}:${page}:${bucket}`;
+}
+
+function readHeightCache(key: string): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(key);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : null;
+    return parsed && typeof parsed === "object" ? (parsed as Record<string, number>) : {};
+  } catch {
+    return {};
+  }
+}
+
 function useCanvasLayout() {
   const ctx = useContext(LayoutContext);
   if (!ctx) throw new Error("Canvas blocks must live inside <Canvas>");
