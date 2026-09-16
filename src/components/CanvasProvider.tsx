@@ -590,10 +590,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     if (pRaw) {
       const migrated = migrateRecordKeys(pRaw);
       if (migrated.changed) store(CANVAS_KEYS.placements, migrated.value);
-      setPlacements(synchronizedHeaderPlacements(
-        { ...SITE_CANVAS.placements, ...migrated.value },
-        resetHeaderTemplate,
-      ));
+      setPlacements({ ...SITE_CANVAS.placements, ...migrated.value });
     }
     let localBlocks: CanvasBlock[] | null = null;
     const b = read<CanvasBlock[]>(CANVAS_KEYS.blocks);
