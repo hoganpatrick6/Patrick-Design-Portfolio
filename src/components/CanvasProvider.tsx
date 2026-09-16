@@ -48,6 +48,7 @@ const SLUG_RENAMES: Record<string, string> = {
   driftwell: "grocery-fresh",
   clyra: "uber-color-system",
   forgekind: "carbon-health-rebrand",
+  nestive: "uber-photography-guidelines",
 };
 
 const GROCERY_ID_RENAMES: Record<string, string> = {
@@ -73,6 +74,7 @@ function renamedBlockId(id: string): string {
     if (id === `work-rule-${oldSlug}`) return `work-rule-${newSlug}`;
     if (id === `work-project-${oldSlug}-image`) return `work-project-${newSlug}-image`;
     if (id === `work-project-${oldSlug}-copy`) return `work-project-${newSlug}-copy`;
+    if (id === `project-${oldSlug}-overview`) return `project-${newSlug}-overview`;
     for (const slot of PROJECT_HEADER_SLOTS) {
       if (id === `project-${oldSlug}-${slot}`) return `project-${newSlug}-${slot}`;
     }
@@ -329,6 +331,13 @@ function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; chan
         ...block,
         description: "Why would anyone want a stranger to do their shopping for them?",
       }];
+    }
+    if (
+      block.id === "work-project-uber-photography-guidelines-copy" &&
+      block.title === "Nestive"
+    ) {
+      changed = true;
+      return [{ ...block, title: "Uber Photography Guidelines" }];
     }
     return [block];
   });
