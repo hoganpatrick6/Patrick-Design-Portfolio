@@ -75,8 +75,8 @@ export const projects: Project[] = [
     ],
   },
   {
-    slug: "nestive",
-    title: "Nestive",
+    slug: "uber-photography-guidelines",
+    title: "Uber Photography Guidelines",
     category: "Editorial",
     year: "2022",
     description: "Magazine design and digital editorial direction.",
