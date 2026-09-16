@@ -341,7 +341,16 @@ function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; chan
     }
     return [block];
   });
-  return { blocks: next, changed };
+  // Older saves sometimes stored the same block twice, stacked in the same
+  // spot, so overlapping copies showed through each other. Keep the newest
+  // copy of each block (the last occurrence holds the latest edits).
+  const lastIndexByKey = new Map<string, number>();
+  next.forEach((block, index) => lastIndexByKey.set(`${block.page}::${block.id}`, index));
+  const deduped = next.filter(
+    (block, index) => lastIndexByKey.get(`${block.page}::${block.id}`) === index,
+  );
+  if (deduped.length !== next.length) changed = true;
+  return { blocks: deduped, changed };
 }
 
 /** Saved blocks win over defaults by id, except defaults the user deleted. */
