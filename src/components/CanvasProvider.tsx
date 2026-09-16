@@ -518,7 +518,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setPlacements({ ...SITE_CANVAS.placements, ...migrated.value });
     }
     const rb = values[SITE_KEYS.canvasBlocks];
-    if (Array.isArray(rb)) {
+    if (Array.isArray(rb) && !inFlight.has(SITE_KEYS.canvasBlocks)) {
       const merged = mergeWithDefaults(rb as CanvasBlock[], new Set(removed.current));
       const repaired = repairSavedBlocks(merged);
       setBlocks(repaired.blocks);
