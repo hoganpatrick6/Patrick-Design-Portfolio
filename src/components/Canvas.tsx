@@ -238,6 +238,31 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   const colWidth =
     width > 0 ? (width - GUTTER * (GRID_COLUMNS - 1)) / GRID_COLUMNS : 0;
 
+  const cacheKey = width > 0 ? heightCacheKey(page, width) : null;
+  const seededKey = useRef<string | null>(null);
+
+  // Start from the heights this page settled on last time, so the first paint
+  // already reserves the right room instead of re-flowing once type loads.
+  useLayoutEffect(() => {
+    if (!cacheKey || seededKey.current === cacheKey) return;
+    seededKey.current = cacheKey;
+    const cached = readHeightCache(cacheKey);
+    if (Object.keys(cached).length === 0) return;
+    setHeights((prev) => ({ ...prev, ...cached }));
+  }, [cacheKey]);
+
+  useEffect(() => {
+    if (!cacheKey) return;
+    const timer = setTimeout(() => {
+      try {
+        window.localStorage.setItem(cacheKey, JSON.stringify(heights));
+      } catch {
+        /* remembering heights is an optimisation, never required */
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [cacheKey, heights]);
+
   const { resolved, totalRows } = useMemo(() => {
     const items = ids
       .map((id) => ({
