@@ -27,7 +27,13 @@ import {
   type StyleMap,
 } from "../config/canvas-defaults";
 import { toast } from "sonner";
-import { SITE_KEYS, refreshSiteContent, siteContent, writeSiteValue } from "../lib/site-content";
+import {
+  SITE_KEYS,
+  pendingSiteKeys,
+  refreshSiteContent,
+  siteContent,
+  writeSiteValue,
+} from "../lib/site-content";
 import { storeDataUrl } from "../lib/media-files";
 
 /** A swap applied to a picture that already exists in the page design. */
