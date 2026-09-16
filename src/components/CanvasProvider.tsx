@@ -487,8 +487,15 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
 
   /** Applies shared site content on top of the code defaults. */
-  const applyShared = useCallback((values: Record<string, unknown>) => {
-    const resetHeaderTemplate = values[SITE_KEYS.canvasHeaderTemplate] !== HEADER_TEMPLATE_VERSION;
+  const applyShared = useCallback((
+    values: Record<string, unknown>,
+    // Header slots are re-synced to the shared template on first load only;
+    // a later refresh must not snap a nudged header back into place.
+    options?: { syncHeaderTemplate?: boolean },
+  ) => {
+    const syncHeaders = options?.syncHeaderTemplate !== false;
+    const resetHeaderTemplate =
+      syncHeaders && values[SITE_KEYS.canvasHeaderTemplate] !== HEADER_TEMPLATE_VERSION;
     const rrRaw = values[SITE_KEYS.canvasRemoved];
     // Union, not overwrite: a deletion made in any tab wins.
     if (Array.isArray(rrRaw)) {
