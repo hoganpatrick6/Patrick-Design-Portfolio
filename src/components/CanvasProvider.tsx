@@ -487,15 +487,8 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
 
 
   /** Applies shared site content on top of the code defaults. */
-  const applyShared = useCallback((
-    values: Record<string, unknown>,
-    // Header slots are re-synced to the shared template on first load only;
-    // a later refresh must not snap a nudged header back into place.
-    options?: { syncHeaderTemplate?: boolean },
-  ) => {
-    const syncHeaders = options?.syncHeaderTemplate !== false;
-    const resetHeaderTemplate =
-      syncHeaders && values[SITE_KEYS.canvasHeaderTemplate] !== HEADER_TEMPLATE_VERSION;
+  const applyShared = useCallback((values: Record<string, unknown>) => {
+    const resetHeaderTemplate = values[SITE_KEYS.canvasHeaderTemplate] !== HEADER_TEMPLATE_VERSION;
     const rrRaw = values[SITE_KEYS.canvasRemoved];
     // Union, not overwrite: a deletion made in any tab wins.
     if (Array.isArray(rrRaw)) {
@@ -519,10 +512,10 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         store(CANVAS_KEYS.placements, migrated.value);
         writeSiteValue(SITE_KEYS.canvasPlacements, migrated.value);
       }
-      const source = { ...SITE_CANVAS.placements, ...migrated.value };
-      const next = syncHeaders
-        ? synchronizedHeaderPlacements(source, resetHeaderTemplate)
-        : source;
+      const next = synchronizedHeaderPlacements(
+        { ...SITE_CANVAS.placements, ...migrated.value },
+        resetHeaderTemplate,
+      );
       setPlacements(next);
       if (resetHeaderTemplate) {
         store(CANVAS_KEYS.placements, next);
@@ -546,9 +539,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         store(CANVAS_KEYS.styles, migrated.value);
         writeSiteValue(SITE_KEYS.canvasStyles, migrated.value);
       }
-      const next = syncHeaders
-        ? synchronizedHeaderStyles(migrated.value, resetHeaderTemplate)
-        : migrated.value;
+      const next = synchronizedHeaderStyles(migrated.value, resetHeaderTemplate);
       setStyles(next);
       if (resetHeaderTemplate) {
         store(CANVAS_KEYS.styles, next);
@@ -684,9 +675,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   // can't overwrite newer edits made in another tab.
   useEffect(() => {
     const onFocus = () => {
-      void refreshSiteContent().then((values) =>
-        applyShared(values, { syncHeaderTemplate: false }),
-      );
+      void refreshSiteContent().then(applyShared);
     };
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
