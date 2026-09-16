@@ -1,0 +1,1 @@
+ALTER TABLE public.media_files DROP COLUMN data;
