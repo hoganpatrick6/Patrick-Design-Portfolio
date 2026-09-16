@@ -684,7 +684,9 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
   // can't overwrite newer edits made in another tab.
   useEffect(() => {
     const onFocus = () => {
-      void refreshSiteContent().then(applyShared);
+      void refreshSiteContent().then((values) =>
+        applyShared(values, { syncHeaderTemplate: false }),
+      );
     };
     window.addEventListener("focus", onFocus);
     return () => window.removeEventListener("focus", onFocus);
