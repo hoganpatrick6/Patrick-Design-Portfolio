@@ -1,9 +1,3 @@
-import lunethraThumb from "../assets/projects/lunethra.jpg";
-import driftwellThumb from "../assets/projects/driftwell.jpg";
-import clyraThumb from "../assets/projects/clyra.jpg";
-import forgekindThumb from "../assets/projects/forgekind.jpg";
-import nestiveThumb from "../assets/projects/nestive.jpg";
-import pollenateThumb from "../assets/projects/pollenate.jpg";
 
 /**
  * The page canvas.
@@ -381,17 +375,11 @@ export const SITE_CANVAS: CanvasDefaults = {
     }
   },
   "blocks": [
-    { "id": "work-project-uber-credit-card-image", "page": "work", "kind": "image", "src": lunethraThumb, "alt": "Uber Credit Card", "caption": "", "aspect": "3:2" },
     { "id": "work-project-uber-credit-card-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/uber-credit-card", "title": "Uber Credit Card", "description": "Design and art direction for Uber’s first multi-market co-brand credit card", "category": "Brand Design,\nArt Direction", "year": "2025" },
-    { "id": "work-project-grocery-fresh-image", "page": "work", "kind": "image", "src": driftwellThumb, "alt": "Grocery Fresh", "caption": "", "aspect": "3:2" },
     { "id": "work-project-grocery-fresh-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/grocery-fresh", "title": "Grocery Fresh", "description": "Why would anyone want a stranger to do their shopping for them?", "category": "Art Direction", "year": "2023" },
-    { "id": "work-project-uber-color-system-image", "page": "work", "kind": "image", "src": clyraThumb, "alt": "Clyra", "caption": "", "aspect": "3:2" },
     { "id": "work-project-uber-color-system-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/uber-color-system", "title": "Uber Color System", "description": "A strategic consolidation of Uber's global color theory.", "category": "Product Design", "year": "2023" },
-    { "id": "work-project-carbon-health-rebrand-image", "page": "work", "kind": "image", "src": forgekindThumb, "alt": "Forgekind", "caption": "", "aspect": "3:2" },
     { "id": "work-project-carbon-health-rebrand-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/carbon-health-rebrand", "title": "Forgekind", "description": "Identity, typography, and web experience for a creative studio.", "category": "Brand & Web", "year": "2022" },
-    { "id": "work-project-uber-photography-guidelines-image", "page": "work", "kind": "image", "src": nestiveThumb, "alt": "Uber Photography Guidelines", "caption": "", "aspect": "3:2" },
     { "id": "work-project-uber-photography-guidelines-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/uber-photography-guidelines", "title": "Uber Photography Guidelines", "description": "Creating the visual language for Uber Photography.", "category": "Editorial", "year": "2022" },
-    { "id": "work-project-pollenate-image", "page": "work", "kind": "image", "src": pollenateThumb, "alt": "Pollenate", "caption": "", "aspect": "3:2" },
     { "id": "work-project-pollenate-copy", "page": "work", "kind": "project-description", "src": "", "alt": "", "caption": "", "aspect": "auto", "href": "/work/pollenate", "title": "Pollenate", "description": "Visual direction and packaging for a consumer goods launch.", "category": "Art Direction", "year": "2021" }
     ,
     { "id": "work-rule-intro", "page": "work", "kind": "rule", "src": "", "alt": "", "caption": "", "aspect": "auto", "fill": "var(--color-border)", "thickness": 1 },
