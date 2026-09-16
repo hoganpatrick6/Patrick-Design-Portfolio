@@ -105,14 +105,6 @@ function flushSiteValue(key: string): void {
     });
 }
 
-/**
- * Keys with a change of this tab's own that hasn't landed yet. Refreshed shared
- * content must not paint over these, or a fresh nudge looks like it sprang back.
- */
-export function pendingSiteKeys(): Set<string> {
-  return new Set([...timers.keys(), ...pending.keys(), ...saving]);
-}
-
 /** Saves a value for the whole site, batching rapid edits per key. */
 export function writeSiteValue(key: string, value: unknown): void {
   if (typeof window === "undefined") return;
