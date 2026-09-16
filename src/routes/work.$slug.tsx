@@ -13,6 +13,15 @@ import groceryTomatoes from "../assets/projects/grocery-tomatoes.jpg";
 import groceryEggs from "../assets/projects/grocery-eggs.jpg";
 import groceryCampaign from "../assets/projects/grocery-campaign.jpg";
 
+/** Next-project thumbnails reuse the Work page's saved media-library images. */
+const NEXT_PROJECT_THUMBS: Record<string, string> = {
+  "uber-credit-card": "/api/public/media/fac95b94-956f-49fd-bf54-2cac01af6a6f",
+  "grocery-fresh": "/api/public/media/29ca994b-8b87-4fb1-805d-1c68f877172c",
+  "carbon-health-rebrand": "/api/public/media/1d705643-4a57-4c63-963b-c680fdc88255",
+  "uber-photography-guidelines": "/api/public/media/9bcd0f00-aabb-4446-8e5c-96239b103943",
+};
+
+
 export const Route = createFileRoute("/work/$slug")({
   loader: ({ params }) => {
     const project = getProject(params.slug);
@@ -154,14 +163,16 @@ function ProjectPage() {
             params={{ slug: next.slug }}
             className="group mt-6 grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-12"
           >
-            <div className="md:col-span-5 lg:col-span-4">
-              <EditableMedia
-                id={`project-thumb:${next.slug}`}
-                src={next.image}
-                alt={next.title}
-                className="aspect-[3/2] w-full rounded-sm object-cover"
-              />
-            </div>
+            {NEXT_PROJECT_THUMBS[next.slug] ? (
+              <div className="md:col-span-5 lg:col-span-4">
+                <EditableMedia
+                  id={`project-thumb:${next.slug}`}
+                  src={NEXT_PROJECT_THUMBS[next.slug]}
+                  alt={next.title}
+                  className="aspect-[3/2] w-full rounded-sm object-cover"
+                />
+              </div>
+            ) : null}
             <div className="md:col-span-7">
               <h2 className="type-heading transition-colors group-hover:text-[var(--color-foreground-muted)]">
                 {next.title}
