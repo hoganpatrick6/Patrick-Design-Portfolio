@@ -1,9 +1,3 @@
-import lunethraThumb from "../assets/projects/lunethra.jpg";
-import driftwellThumb from "../assets/projects/driftwell.jpg";
-import clyraThumb from "../assets/projects/clyra.jpg";
-import forgekindThumb from "../assets/projects/forgekind.jpg";
-import nestiveThumb from "../assets/projects/nestive.jpg";
-import pollenateThumb from "../assets/projects/pollenate.jpg";
 
 export type Project = {
   slug: string;
@@ -11,7 +5,6 @@ export type Project = {
   category: string;
   year: string;
   description: string;
-  image: string;
   role: string;
   client: string;
   overview: string[];
@@ -24,7 +17,6 @@ export const projects: Project[] = [
     category: "Brand Identity\n2025",
     year: "2025",
     description: "Design and art direction for Uber’s first multi-market co-brand credit card",
-    image: lunethraThumb,
     role: "Brand Design, Art Direction",
     client: "Lunethra",
     overview: [
@@ -38,7 +30,6 @@ export const projects: Project[] = [
     category: "Art Direction",
     year: "2023",
     description: "Why would anyone want a stranger to do their shopping for them?",
-    image: driftwellThumb,
     role: "Art Direction",
     client: "Uber",
     overview: [
@@ -52,7 +43,6 @@ export const projects: Project[] = [
     category: "Product Design",
     year: "2023",
     description: "A strategic consolidation of Uber's global color theory.",
-    image: clyraThumb,
     role: "Product Design, Web Design",
     client: "Uber",
     overview: [
@@ -66,7 +56,6 @@ export const projects: Project[] = [
     category: "Brand & Web",
     year: "2022",
     description: "Identity, typography, and web experience for a creative studio.",
-    image: forgekindThumb,
     role: "Identity, Web Design",
     client: "Forgekind",
     overview: [
@@ -80,7 +69,6 @@ export const projects: Project[] = [
     category: "Editorial",
     year: "2022",
     description: "Creating the visual language for Uber Photography.",
-    image: nestiveThumb,
     role: "Editorial Design",
     client: "Nestive",
     overview: [
@@ -94,7 +82,6 @@ export const projects: Project[] = [
     category: "Art Direction",
     year: "2021",
     description: "Visual direction and packaging for a consumer goods launch.",
-    image: pollenateThumb,
     role: "Art Direction, Packaging",
     client: "Pollenate",
     overview: [
