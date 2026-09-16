@@ -79,7 +79,7 @@ export const projects: Project[] = [
     title: "Uber Photography Guidelines",
     category: "Editorial",
     year: "2022",
-    description: "Magazine design and digital editorial direction.",
+    description: "Creating the visual language for Uber Photography.",
     image: nestiveThumb,
     role: "Editorial Design",
     client: "Nestive",
