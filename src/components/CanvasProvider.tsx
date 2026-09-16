@@ -332,6 +332,13 @@ function repairSavedBlocks(blocks: CanvasBlock[]): { blocks: CanvasBlock[]; chan
         description: "Why would anyone want a stranger to do their shopping for them?",
       }];
     }
+    if (
+      block.id === "work-project-uber-photography-guidelines-copy" &&
+      block.title === "Nestive"
+    ) {
+      changed = true;
+      return [{ ...block, title: "Uber Photography Guidelines" }];
+    }
     return [block];
   });
   return { blocks: next, changed };
