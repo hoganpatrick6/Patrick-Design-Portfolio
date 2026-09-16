@@ -51,6 +51,12 @@ export function refreshSiteContent(): Promise<Record<string, unknown>> {
 
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
+/** Latest value waiting to be saved for each shared content key. */
+const pending = new Map<string, unknown>();
+
+/** Keys with a save request already in progress. */
+const saving = new Set<string>();
+
 let warnedStale = false;
 
 function warnStale(): void {
@@ -66,33 +72,53 @@ function warnStale(): void {
   });
 }
 
+/**
+ * Saves one key at a time. A newer edit made while the request is in flight is
+ * kept in `pending`, then sent with the timestamp returned by this request.
+ */
+function flushSiteValue(key: string): void {
+  if (saving.has(key) || !pending.has(key)) return;
+
+  const value = pending.get(key);
+  pending.delete(key);
+  saving.add(key);
+
+  void saveSiteContentValue({
+    data: { key, value, baseStamp: stamps.get(key) },
+  })
+    .then((res) => {
+      if ((res as { stale?: boolean })?.stale) {
+        // Do not send later local edits over a genuinely newer shared value.
+        pending.delete(key);
+        warnStale();
+        return;
+      }
+      const stamp = (res as { stamp?: string })?.stamp;
+      if (stamp) stamps.set(key, stamp);
+    })
+    .catch(() => {
+      /* editing is not unlocked here; the local copy still applies */
+    })
+    .finally(() => {
+      saving.delete(key);
+      if (pending.has(key)) flushSiteValue(key);
+    });
+}
+
 /** Saves a value for the whole site, batching rapid edits per key. */
 export function writeSiteValue(key: string, value: unknown): void {
   if (typeof window === "undefined") return;
   void siteContent().then((values) => {
     values[key] = value;
   });
+  pending.set(key, value);
   const existing = timers.get(key);
   if (existing) clearTimeout(existing);
   timers.set(
     key,
     setTimeout(() => {
       timers.delete(key);
-      void saveSiteContentValue({
-        data: { key, value, baseStamp: stamps.get(key) },
-      })
-        .then((res) => {
-          // A stale tab must not overwrite newer content saved elsewhere.
-          if ((res as { stale?: boolean })?.stale) {
-            warnStale();
-            return;
-          }
-          const stamp = (res as { stamp?: string })?.stamp;
-          if (stamp) stamps.set(key, stamp);
-        })
-        .catch(() => {
-          /* editing is not unlocked here; the local copy still applies */
-        });
+      flushSiteValue(key);
     }, 400),
   );
 }
