@@ -38,7 +38,7 @@ type CanvasLayout = {
   colWidth: number;
   documentTop: number;
   resolved: Record<string, Resolved>;
-  register: (id: string, autoHeight: boolean) => void;
+  register: (id: string, autoHeight: boolean, flowGroup?: string) => void;
   unregister: (id: string) => void;
   reportHeight: (id: string, px: number) => void;
   page: string;
@@ -161,6 +161,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   const [ids, setIds] = useState<string[]>([]);
   const [heights, setHeights] = useState<Record<string, number>>({});
   const [autoHeightIds, setAutoHeightIds] = useState<Record<string, boolean>>({});
+  const [flowGroups, setFlowGroups] = useState<Record<string, string | undefined>>({});
   const [dropping, setDropping] = useState(false);
 
   useLayoutEffect(() => {
@@ -188,16 +189,24 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
     };
   }, []);
 
-  const register = useCallback((id: string, autoHeight: boolean) => {
+  const register = useCallback((id: string, autoHeight: boolean, flowGroup?: string) => {
     setIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
     setAutoHeightIds((prev) =>
       prev[id] === autoHeight ? prev : { ...prev, [id]: autoHeight },
+    );
+    setFlowGroups((prev) =>
+      prev[id] === flowGroup ? prev : { ...prev, [id]: flowGroup },
     );
   }, []);
 
   const unregister = useCallback((id: string) => {
     setIds((prev) => prev.filter((x) => x !== id));
     setAutoHeightIds((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    setFlowGroups((prev) => {
       const next = { ...prev };
       delete next[id];
       return next;
@@ -219,6 +228,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
         p: placementFor(id),
         h: heights[id] ?? 0,
         autoHeight: autoHeightIds[id] ?? false,
+        flowGroup: flowGroups[id],
       }))
       .sort((a, b) => {
         const rowOrder = a.p.y - b.p.y;
@@ -285,13 +295,16 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
 
     const out: Record<string, Resolved> = {};
     const placed: { p: Placement; top: number; rows: number }[] = [];
+    const flowBottoms = new Map<string, number>();
     let bottom = 0;
 
     units.forEach((unit, unitIndex) => {
       const { p, rows } = unit;
       // Keep the block where it was dropped, and only slide it down far
       // enough to clear something it would actually sit on top of.
-      let top = p.y;
+      const flowGroup = unit.items[0]?.flowGroup;
+      const flowBottom = flowGroup ? flowBottoms.get(flowGroup) : undefined;
+      let top = flowBottom === undefined ? p.y : flowBottom + 2;
       let moved = true;
       let guard = 0;
       while (moved && guard++ < 40) {
@@ -311,11 +324,12 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
         out[item.id] = { top, rows, order: unitIndex * 10 + itemIndex };
       });
       placed.push({ p, top, rows });
+      if (flowGroup) flowBottoms.set(flowGroup, top + rows);
       bottom = Math.max(bottom, top + rows);
     });
 
     return { resolved: out, totalRows: bottom };
-  }, [ids, heights, autoHeightIds, page, placementFor]);
+  }, [ids, heights, autoHeightIds, flowGroups, page, placementFor]);
 
   const value = useMemo<CanvasLayout>(
     () => ({ stacked, colWidth, documentTop, resolved, register, unregister, reportHeight, page }),
@@ -434,6 +448,7 @@ export function CanvasBlock({
   onDelete,
   onTextEdit,
   autoHeight = false,
+  flowGroup,
 }: {
   id: string;
   label: string;
@@ -444,6 +459,8 @@ export function CanvasBlock({
   onTextEdit?: (field: string, value: string) => void;
   /** Lets a text-only frame hug its rendered content instead of its saved row height. */
   autoHeight?: boolean;
+  /** Keeps related auto-height blocks in a fixed-gap vertical sequence. */
+  flowGroup?: string;
 }) {
   const {
     editing,
@@ -477,9 +494,9 @@ export function CanvasBlock({
 
   useEffect(() => {
     if (hidden) return;
-    register(id, autoHeight);
+    register(id, autoHeight, flowGroup);
     return () => unregister(id);
-  }, [id, hidden, autoHeight, register, unregister]);
+  }, [id, hidden, autoHeight, flowGroup, register, unregister]);
 
   // Measure content so the block always reserves the room it needs.
   useLayoutEffect(() => {
