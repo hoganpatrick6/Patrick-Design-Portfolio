@@ -562,7 +562,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setOverrides(migrated.value);
     }
     const rt = values[SITE_KEYS.canvasTexts];
-    if (rt && typeof rt === "object") {
+    if (rt && typeof rt === "object" && !inFlight.has(SITE_KEYS.canvasTexts)) {
       const migrated = migrateRecordKeys(rt as Record<string, string>);
       const cleaned = withoutBlankTexts(migrated.value);
       if (migrated.changed || cleaned.changed) {
