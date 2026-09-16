@@ -154,14 +154,16 @@ function ProjectPage() {
             params={{ slug: next.slug }}
             className="group mt-6 grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-12"
           >
-            <div className="md:col-span-5 lg:col-span-4">
-              <EditableMedia
-                id={`project-thumb:${next.slug}`}
-                src={next.image}
-                alt={next.title}
-                className="aspect-[3/2] w-full rounded-sm object-cover"
-              />
-            </div>
+            {NEXT_PROJECT_THUMBS[next.slug] ? (
+              <div className="md:col-span-5 lg:col-span-4">
+                <EditableMedia
+                  id={`project-thumb:${next.slug}`}
+                  src={NEXT_PROJECT_THUMBS[next.slug]}
+                  alt={next.title}
+                  className="aspect-[3/2] w-full rounded-sm object-cover"
+                />
+              </div>
+            ) : null}
             <div className="md:col-span-7">
               <h2 className="type-heading transition-colors group-hover:text-[var(--color-foreground-muted)]">
                 {next.title}
