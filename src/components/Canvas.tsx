@@ -284,17 +284,18 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
     const paired = new Map<string, Item[]>();
     const units: LayoutUnit[] = [];
 
+    // Text frames hug their words; everything else keeps exactly the height it
+    // was given, so a picture loading at a slightly different size can never
+    // shove the rest of the page down.
+    const rowsFor = (item: Item) =>
+      item.autoHeight
+        ? Math.max(Math.ceil(item.h / TEXT_ROW_STEP) / 4, 1)
+        : Math.max(item.p.h, 1);
+
     items.forEach((item) => {
       const key = workProjectPairKey(page, item.id);
       if (!key) {
-        const contentRows = item.autoHeight
-          ? Math.ceil(item.h / TEXT_ROW_STEP) / 4
-          : Math.ceil((item.h + GUTTER) / ROW_UNIT);
-        units.push({
-          items: [item],
-          p: item.p,
-          rows: item.autoHeight ? Math.max(contentRows, 1) : Math.max(item.p.h, contentRows || 1),
-        });
+        units.push({ items: [item], p: item.p, rows: rowsFor(item) });
         return;
       }
       paired.set(key, [...(paired.get(key) ?? []), item]);
