@@ -15,7 +15,7 @@ export const Route = createFileRoute("/api/public/media/$id")({
         }
         const file = await readMediaFile(id).catch(() => null);
         if (!file) return new Response("Not found", { status: 404 });
-        return new Response(Buffer.from(file.data, "base64"), {
+        return new Response(file.body, {
           headers: {
             "content-type": file.content_type,
             "cache-control": "public, max-age=31536000, immutable",
