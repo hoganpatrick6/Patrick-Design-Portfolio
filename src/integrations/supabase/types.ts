@@ -18,19 +18,16 @@ export type Database = {
         Row: {
           content_type: string
           created_at: string
-          data: string
           id: string
         }
         Insert: {
           content_type: string
           created_at?: string
-          data: string
           id?: string
         }
         Update: {
           content_type?: string
           created_at?: string
-          data?: string
           id?: string
         }
         Relationships: []
