@@ -199,7 +199,7 @@ function ResumePage() {
             </div>
           </CanvasBlock>
 
-          <CanvasBlock id="resume-experience" label="Experience" autoHeight>
+          <CanvasBlock id="resume-experience" label="Experience" autoHeight flowGroup="resume-right">
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Experience</SectionLabel>
               </div>
@@ -235,7 +235,7 @@ function ResumePage() {
               </div>
           </CanvasBlock>
 
-          <CanvasBlock id="resume-skills" label="Skills" autoHeight>
+          <CanvasBlock id="resume-skills" label="Skills" autoHeight flowGroup="resume-right">
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Skills</SectionLabel>
               </div>
@@ -258,7 +258,7 @@ function ResumePage() {
               </div>
           </CanvasBlock>
 
-          <CanvasBlock id="resume-education" label="Education" autoHeight>
+          <CanvasBlock id="resume-education" label="Education" autoHeight flowGroup="resume-right">
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Education</SectionLabel>
               </div>
@@ -275,7 +275,7 @@ function ResumePage() {
               </div>
           </CanvasBlock>
 
-          <CanvasBlock id="resume-recommendations" label="Recommendations" autoHeight>
+          <CanvasBlock id="resume-recommendations" label="Recommendations" autoHeight flowGroup="resume-right">
               <div className="border-t border-[var(--color-border)] pb-10 pt-8">
                 <SectionLabel>Recommendations</SectionLabel>
               </div>
