@@ -1,19 +1,25 @@
-# Export all media library files as downloadable files
+# Restore the About page (and the portrait)
 
-## Goal
-Take every image and video stored in the site's shared media library (the backend) and give them to you as real files you can download — nothing on the site changes.
+## What happened
 
-## Steps
-1. Read every file from the media library in the backend, including its type (PNG, JPEG, video, etc.).
-2. Decode each one back into its original file and give it a sensible filename (e.g. `media-1.png`, `media-2.jpg`, `video-3.mp4`).
-3. Bundle them into a single zip so you can download everything at once from the Files panel.
-4. Also produce a small list showing which file belongs to which media link, so you can match them to where they appear on the site.
+Nothing was deleted from your saved content. Two separate things are going on:
 
-## What does not change
-- No edits to the site, pages, or saved layout.
-- Nothing is deleted from the media library — the site keeps working exactly as it does now.
+1. On the About page, four sections — Experience, Skills, Education and Recommendations — are marked as hidden in the saved version. All of their wording (Kent State, the Houzz/Uber/Carbon Health bullets, your skills lists, both recommendations) is still stored intact.
+2. Your portrait was uploaded three times last night, but the saved page never ended up with an image slot pointing at it. The photo itself is safe in your media library — I found it and confirmed it is the right one (you in a brown shirt against a light background).
 
-## Technical details
-- Query `media_files` (id, content_type, data) via the backend; decode base64 to bytes; extension from content_type.
-- Write files under `/mnt/documents/media-export/` and zip to `/mnt/documents/media-export.zip`.
-- Include a `manifest.csv` mapping each filename to its `/api/public/media/<id>` URL.
+## What I'll do
+
+1. Bring back the four hidden About sections, with their saved wording untouched.
+2. Add a portrait image slot on the left column of the About page, directly under the intro copy, using the photo from your library.
+3. Add the same portrait in the same position on the Resume page.
+4. Leave every other page, all wording, and all other images exactly as they are. No new copy of any kind will be written.
+
+## One thing to confirm as we go
+
+The About page also has two empty text boxes ("New text block") sitting on it from an earlier session. I'll leave them in place unless you tell me to remove them.
+
+## Technical notes
+
+- Remove `about-experience`, `about-skills`, `about-education`, `about-recommendations` from the saved `canvas.hidden` list in `site_content`.
+- Add an image block on page `about` and page `resume` pointing at `/api/public/media/974cf46a-f778-4319-9ff0-ee4e01216369` (image/jpeg, 1200x1800), placed in the left column beneath the intro block (`x:0`, below `about-intro` / `resume-intro`, above the contact block's row, with contact shifted down as needed).
+- Persist through the saved `canvas.blocks` / `canvas.placements` records so the change survives reload in both tabs; verify with Playwright at desktop and mobile widths.
