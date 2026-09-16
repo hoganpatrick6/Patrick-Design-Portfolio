@@ -37,7 +37,7 @@ export const uploadMediaFile = createServerFn({ method: "POST" })
     // Keep one row per file so ids stay stable and referenced blocks keep
     // working; the bytes themselves go to storage under that id.
     const { data: row, error } = await (db.from("media_files") as any)
-      .insert({ content_type: contentType, data: "" })
+      .insert({ content_type: contentType })
       .select("id")
       .single();
     if (error || !row) return { url: null };
@@ -58,28 +58,15 @@ export async function readMediaFile(
 ): Promise<{ content_type: string; body: ArrayBuffer } | null> {
   const db = await admin();
   const { data: row } = await (db.from("media_files") as any)
-    .select("content_type,data")
+    .select("content_type")
     .eq("id", id)
     .single();
 
   const stored = await db.storage.from(BUCKET).download(id);
-  if (stored.data) {
-    return {
-      content_type: row?.content_type || stored.data.type || "application/octet-stream",
-      body: await stored.data.arrayBuffer(),
-    };
-  }
-
-  // Fallback for any file not yet copied into storage.
-  if (row?.data) {
-    const bytes = Buffer.from(row.data, "base64");
-    return {
-      content_type: row.content_type || "application/octet-stream",
-      body: bytes.buffer.slice(
-        bytes.byteOffset,
-        bytes.byteOffset + bytes.byteLength,
-      ) as ArrayBuffer,
-    };
-  }
-  return null;
+  if (!stored.data) return null;
+  return {
+    content_type:
+      row?.content_type || stored.data.type || "application/octet-stream",
+    body: await stored.data.arrayBuffer(),
+  };
 }
