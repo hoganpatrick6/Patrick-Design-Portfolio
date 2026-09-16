@@ -48,6 +48,7 @@ const SLUG_RENAMES: Record<string, string> = {
   driftwell: "grocery-fresh",
   clyra: "uber-color-system",
   forgekind: "carbon-health-rebrand",
+  nestive: "uber-photography-guidelines",
 };
 
 const GROCERY_ID_RENAMES: Record<string, string> = {

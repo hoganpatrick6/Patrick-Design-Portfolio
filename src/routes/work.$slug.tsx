@@ -300,6 +300,7 @@ const OLD_SLUG_REDIRECTS: Record<string, string> = {
   driftwell: "grocery-fresh",
   clyra: "uber-color-system",
   forgekind: "carbon-health-rebrand",
+  nestive: "uber-photography-guidelines",
 };
 
 function ProjectHeader({ project }: { project: (typeof projects)[number] }) {

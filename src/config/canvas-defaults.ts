@@ -114,7 +114,7 @@ const PROJECT_SLUGS = [
   "grocery-fresh",
   "uber-color-system",
   "carbon-health-rebrand",
-  "nestive",
+  "uber-photography-guidelines",
   "pollenate",
 ] as const;
 
