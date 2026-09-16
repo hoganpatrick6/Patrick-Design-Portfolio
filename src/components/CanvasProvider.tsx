@@ -27,7 +27,13 @@ import {
   type StyleMap,
 } from "../config/canvas-defaults";
 import { toast } from "sonner";
-import { SITE_KEYS, refreshSiteContent, siteContent, writeSiteValue } from "../lib/site-content";
+import {
+  SITE_KEYS,
+  pendingSiteKeys,
+  refreshSiteContent,
+  siteContent,
+  writeSiteValue,
+} from "../lib/site-content";
 import { storeDataUrl } from "../lib/media-files";
 
 /** A swap applied to a picture that already exists in the page design. */
@@ -155,40 +161,9 @@ function withoutBlankTexts(
   return { value, changed };
 }
 
-function synchronizedHeaderPlacements(source: PlacementMap, reset: boolean): PlacementMap {
-  const next = { ...source };
-  PROJECT_HEADER_SLOTS.forEach((slot) => {
-    const ids = projectHeaderIds(slot);
-    const canonicalId = ids[0];
-    if (!canonicalId) return;
-    const placement = reset
-      ? SITE_CANVAS.placements[canonicalId]
-      : source[canonicalId] ?? SITE_CANVAS.placements[canonicalId];
-    if (!placement) return;
-    ids.forEach((id) => {
-      next[id] = { ...placement };
-    });
-  });
-  return next;
-}
-
-function synchronizedHeaderStyles(source: StyleMap, reset: boolean): StyleMap {
-  const next: StyleMap = {};
-  Object.entries(source).forEach(([id, style]) => {
-    if (!projectHeaderSlotFor(id)) next[id] = style;
-  });
-  if (reset) return next;
-  Object.entries(source).forEach(([id, style]) => {
-    const slot = projectHeaderSlotFor(id);
-    if (!slot) return;
-    const blockId = id.split("#")[0] ?? id;
-    if (blockId !== projectHeaderIds(slot)[0]) return;
-    projectHeaderPeerIds(id).forEach((peerId) => {
-      next[peerId] = { ...style };
-    });
-  });
-  return next;
-}
+// Header fields stay in step through editing (see setPlacement / setStyle), not
+// by being re-synchronised on every load — that used to relocate fields on the
+// other projects whenever a page opened.
 
 function withoutProjectHeaderIds(ids: string[]): string[] {
   return ids.filter((id) => !projectHeaderSlotFor(id));
@@ -506,24 +481,19 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       }
     }
     const rpRaw = values[SITE_KEYS.canvasPlacements];
-    if (rpRaw && typeof rpRaw === "object") {
+    // A change of this tab's own that hasn't finished saving keeps precedence,
+    // so refreshed content can never spring a fresh nudge back.
+    const inFlight = pendingSiteKeys();
+    if (rpRaw && typeof rpRaw === "object" && !inFlight.has(SITE_KEYS.canvasPlacements)) {
       const migrated = migrateRecordKeys(rpRaw as PlacementMap);
       if (migrated.changed) {
         store(CANVAS_KEYS.placements, migrated.value);
         writeSiteValue(SITE_KEYS.canvasPlacements, migrated.value);
       }
-      const next = synchronizedHeaderPlacements(
-        { ...SITE_CANVAS.placements, ...migrated.value },
-        resetHeaderTemplate,
-      );
-      setPlacements(next);
-      if (resetHeaderTemplate) {
-        store(CANVAS_KEYS.placements, next);
-        writeSiteValue(SITE_KEYS.canvasPlacements, next);
-      }
+      setPlacements({ ...SITE_CANVAS.placements, ...migrated.value });
     }
     const rb = values[SITE_KEYS.canvasBlocks];
-    if (Array.isArray(rb)) {
+    if (Array.isArray(rb) && !inFlight.has(SITE_KEYS.canvasBlocks)) {
       const merged = mergeWithDefaults(rb as CanvasBlock[], new Set(removed.current));
       const repaired = repairSavedBlocks(merged);
       setBlocks(repaired.blocks);
@@ -533,18 +503,13 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       }
     }
     const rsRaw = values[SITE_KEYS.canvasStyles];
-    if (rsRaw && typeof rsRaw === "object") {
+    if (rsRaw && typeof rsRaw === "object" && !inFlight.has(SITE_KEYS.canvasStyles)) {
       const migrated = migrateRecordKeys(rsRaw as StyleMap);
       if (migrated.changed) {
         store(CANVAS_KEYS.styles, migrated.value);
         writeSiteValue(SITE_KEYS.canvasStyles, migrated.value);
       }
-      const next = synchronizedHeaderStyles(migrated.value, resetHeaderTemplate);
-      setStyles(next);
-      if (resetHeaderTemplate) {
-        store(CANVAS_KEYS.styles, next);
-        writeSiteValue(SITE_KEYS.canvasStyles, next);
-      }
+      setStyles(migrated.value);
     }
     const rhRaw = values[SITE_KEYS.canvasHidden];
     if (Array.isArray(rhRaw)) {
@@ -572,7 +537,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       setOverrides(migrated.value);
     }
     const rt = values[SITE_KEYS.canvasTexts];
-    if (rt && typeof rt === "object") {
+    if (rt && typeof rt === "object" && !inFlight.has(SITE_KEYS.canvasTexts)) {
       const migrated = migrateRecordKeys(rt as Record<string, string>);
       const cleaned = withoutBlankTexts(migrated.value);
       if (migrated.changed || cleaned.changed) {
@@ -600,10 +565,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     if (pRaw) {
       const migrated = migrateRecordKeys(pRaw);
       if (migrated.changed) store(CANVAS_KEYS.placements, migrated.value);
-      setPlacements(synchronizedHeaderPlacements(
-        { ...SITE_CANVAS.placements, ...migrated.value },
-        resetHeaderTemplate,
-      ));
+      setPlacements({ ...SITE_CANVAS.placements, ...migrated.value });
     }
     let localBlocks: CanvasBlock[] | null = null;
     const b = read<CanvasBlock[]>(CANVAS_KEYS.blocks);
@@ -621,7 +583,7 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
     if (sRaw) {
       const migrated = migrateRecordKeys(sRaw);
       if (migrated.changed) store(CANVAS_KEYS.styles, migrated.value);
-      setStyles(synchronizedHeaderStyles(migrated.value, resetHeaderTemplate));
+      setStyles(migrated.value);
     }
     const hRaw = read<string[]>(CANVAS_KEYS.hidden);
     if (Array.isArray(hRaw)) {

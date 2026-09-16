@@ -49,6 +49,32 @@ const LayoutContext = createContext<CanvasLayout | null>(null);
 /** Text frames use quarter-baseline steps so nearby copy can be spaced precisely. */
 const TEXT_ROW_STEP = ROW_UNIT / 4;
 
+/**
+ * Settled heights, remembered per page and screen width.
+ *
+ * Measuring happens after fonts and pictures arrive, so the very first paint
+ * would otherwise lay the page out against guesses and then shuffle it. Reusing
+ * the last settled heights keeps a returning visit landing where it left off.
+ */
+const HEIGHT_CACHE_PREFIX = "canvas-heights";
+
+function heightCacheKey(page: string, width: number) {
+  const bucket =
+    width < STACK_BREAKPOINT ? "stacked" : String(Math.round(width / 100) * 100);
+  return `${HEIGHT_CACHE_PREFIX}:${page}:${bucket}`;
+}
+
+function readHeightCache(key: string): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(key);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : null;
+    return parsed && typeof parsed === "object" ? (parsed as Record<string, number>) : {};
+  } catch {
+    return {};
+  }
+}
+
 function useCanvasLayout() {
   const ctx = useContext(LayoutContext);
   if (!ctx) throw new Error("Canvas blocks must live inside <Canvas>");
@@ -212,6 +238,31 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
   const colWidth =
     width > 0 ? (width - GUTTER * (GRID_COLUMNS - 1)) / GRID_COLUMNS : 0;
 
+  const cacheKey = width > 0 ? heightCacheKey(page, width) : null;
+  const seededKey = useRef<string | null>(null);
+
+  // Start from the heights this page settled on last time, so the first paint
+  // already reserves the right room instead of re-flowing once type loads.
+  useLayoutEffect(() => {
+    if (!cacheKey || seededKey.current === cacheKey) return;
+    seededKey.current = cacheKey;
+    const cached = readHeightCache(cacheKey);
+    if (Object.keys(cached).length === 0) return;
+    setHeights((prev) => ({ ...prev, ...cached }));
+  }, [cacheKey]);
+
+  useEffect(() => {
+    if (!cacheKey) return;
+    const timer = setTimeout(() => {
+      try {
+        window.localStorage.setItem(cacheKey, JSON.stringify(heights));
+      } catch {
+        /* remembering heights is an optimisation, never required */
+      }
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [cacheKey, heights]);
+
   const { resolved, totalRows } = useMemo(() => {
     const items = ids
       .map((id) => ({
@@ -233,17 +284,18 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
     const paired = new Map<string, Item[]>();
     const units: LayoutUnit[] = [];
 
+    // Text frames hug their words; everything else keeps exactly the height it
+    // was given, so a picture loading at a slightly different size can never
+    // shove the rest of the page down.
+    const rowsFor = (item: Item) =>
+      item.autoHeight
+        ? Math.max(Math.ceil(item.h / TEXT_ROW_STEP) / 4, 1)
+        : Math.max(item.p.h, 1);
+
     items.forEach((item) => {
       const key = workProjectPairKey(page, item.id);
       if (!key) {
-        const contentRows = item.autoHeight
-          ? Math.ceil(item.h / TEXT_ROW_STEP) / 4
-          : Math.ceil((item.h + GUTTER) / ROW_UNIT);
-        units.push({
-          items: [item],
-          p: item.p,
-          rows: item.autoHeight ? Math.max(contentRows, 1) : Math.max(item.p.h, contentRows || 1),
-        });
+        units.push({ items: [item], p: item.p, rows: rowsFor(item) });
         return;
       }
       paired.set(key, [...(paired.get(key) ?? []), item]);
@@ -253,16 +305,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
       const left = Math.min(...pairItems.map((item) => item.p.x));
       const right = Math.max(...pairItems.map((item) => item.p.x + item.p.w));
       const top = Math.min(...pairItems.map((item) => item.p.y));
-      const rows = Math.max(
-        ...pairItems.map((item) => {
-          const contentRows = item.autoHeight
-            ? Math.ceil(item.h / TEXT_ROW_STEP) / 4
-            : Math.ceil((item.h + GUTTER) / ROW_UNIT);
-          return item.autoHeight
-            ? Math.max(contentRows, 1)
-            : Math.max(item.p.h, contentRows || 1);
-        }),
-      );
+      const rows = Math.max(...pairItems.map(rowsFor));
       units.push({
         items: pairItems.sort((a, b) => a.p.x - b.p.x),
         p: { x: left, y: top, w: right - left, h: rows },
@@ -481,17 +524,22 @@ export function CanvasBlock({
     return () => unregister(id);
   }, [id, hidden, autoHeight, register, unregister]);
 
-  // Measure content so the block always reserves the room it needs.
+  // Measure content so the block always reserves the room it needs. Heights are
+  // rounded to whole steps of the grid, so a pixel of wrapping difference can't
+  // ripple down the page.
   useLayoutEffect(() => {
     const el = innerRef.current;
     if (!el || hidden) return;
-    const ro = new ResizeObserver(() => {
-      reportHeight(id, el.getBoundingClientRect().height);
-    });
+    const step = autoHeight ? TEXT_ROW_STEP : ROW_UNIT;
+    const report = () => {
+      const px = el.getBoundingClientRect().height;
+      reportHeight(id, Math.ceil(px / step) * step);
+    };
+    const ro = new ResizeObserver(report);
     ro.observe(el);
-    reportHeight(id, el.getBoundingClientRect().height);
+    report();
     return () => ro.disconnect();
-  }, [id, hidden, reportHeight]);
+  }, [id, hidden, autoHeight, reportHeight]);
 
   // Paint the settings of any single piece of type onto the words themselves,
   // and outline whichever piece is currently picked.
