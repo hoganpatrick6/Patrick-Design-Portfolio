@@ -74,6 +74,7 @@ function renamedBlockId(id: string): string {
     if (id === `work-rule-${oldSlug}`) return `work-rule-${newSlug}`;
     if (id === `work-project-${oldSlug}-image`) return `work-project-${newSlug}-image`;
     if (id === `work-project-${oldSlug}-copy`) return `work-project-${newSlug}-copy`;
+    if (id === `project-${oldSlug}-overview`) return `project-${newSlug}-overview`;
     for (const slot of PROJECT_HEADER_SLOTS) {
       if (id === `project-${oldSlug}-${slot}`) return `project-${newSlug}-${slot}`;
     }
