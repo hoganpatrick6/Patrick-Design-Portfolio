@@ -305,16 +305,7 @@ export function Canvas({ page, children }: { page: string; children: ReactNode }
       const left = Math.min(...pairItems.map((item) => item.p.x));
       const right = Math.max(...pairItems.map((item) => item.p.x + item.p.w));
       const top = Math.min(...pairItems.map((item) => item.p.y));
-      const rows = Math.max(
-        ...pairItems.map((item) => {
-          const contentRows = item.autoHeight
-            ? Math.ceil(item.h / TEXT_ROW_STEP) / 4
-            : Math.ceil((item.h + GUTTER) / ROW_UNIT);
-          return item.autoHeight
-            ? Math.max(contentRows, 1)
-            : Math.max(item.p.h, contentRows || 1);
-        }),
-      );
+      const rows = Math.max(...pairItems.map(rowsFor));
       units.push({
         items: pairItems.sort((a, b) => a.p.x - b.p.x),
         p: { x: left, y: top, w: right - left, h: rows },
