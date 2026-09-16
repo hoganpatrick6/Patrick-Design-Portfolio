@@ -519,10 +519,10 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         store(CANVAS_KEYS.placements, migrated.value);
         writeSiteValue(SITE_KEYS.canvasPlacements, migrated.value);
       }
-      const next = synchronizedHeaderPlacements(
-        { ...SITE_CANVAS.placements, ...migrated.value },
-        resetHeaderTemplate,
-      );
+      const source = { ...SITE_CANVAS.placements, ...migrated.value };
+      const next = syncHeaders
+        ? synchronizedHeaderPlacements(source, resetHeaderTemplate)
+        : source;
       setPlacements(next);
       if (resetHeaderTemplate) {
         store(CANVAS_KEYS.placements, next);
@@ -546,7 +546,9 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
         store(CANVAS_KEYS.styles, migrated.value);
         writeSiteValue(SITE_KEYS.canvasStyles, migrated.value);
       }
-      const next = synchronizedHeaderStyles(migrated.value, resetHeaderTemplate);
+      const next = syncHeaders
+        ? synchronizedHeaderStyles(migrated.value, resetHeaderTemplate)
+        : migrated.value;
       setStyles(next);
       if (resetHeaderTemplate) {
         store(CANVAS_KEYS.styles, next);
