@@ -506,21 +506,16 @@ export function CanvasProvider({ children }: { children: ReactNode }) {
       }
     }
     const rpRaw = values[SITE_KEYS.canvasPlacements];
-    if (rpRaw && typeof rpRaw === "object") {
+    // A change of this tab's own that hasn't finished saving keeps precedence,
+    // so refreshed content can never spring a fresh nudge back.
+    const inFlight = pendingSiteKeys();
+    if (rpRaw && typeof rpRaw === "object" && !inFlight.has(SITE_KEYS.canvasPlacements)) {
       const migrated = migrateRecordKeys(rpRaw as PlacementMap);
       if (migrated.changed) {
         store(CANVAS_KEYS.placements, migrated.value);
         writeSiteValue(SITE_KEYS.canvasPlacements, migrated.value);
       }
-      const next = synchronizedHeaderPlacements(
-        { ...SITE_CANVAS.placements, ...migrated.value },
-        resetHeaderTemplate,
-      );
-      setPlacements(next);
-      if (resetHeaderTemplate) {
-        store(CANVAS_KEYS.placements, next);
-        writeSiteValue(SITE_KEYS.canvasPlacements, next);
-      }
+      setPlacements({ ...SITE_CANVAS.placements, ...migrated.value });
     }
     const rb = values[SITE_KEYS.canvasBlocks];
     if (Array.isArray(rb)) {
